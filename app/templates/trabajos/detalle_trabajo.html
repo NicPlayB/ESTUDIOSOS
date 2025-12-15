@@ -1,0 +1,209 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalle del Trabajo</title>
+
+    <!-- PDF.JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .preview-box {
+            width: 220px;
+            height: 280px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .preview-box img,
+        .preview-box canvas {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .file-icon {
+            width: 96px;
+            height: 96px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 16px;
+            background: #0d6efd;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 6px;
+            margin: 5px 0;
+        }
+
+        .btn:hover {
+            background: #0b5ed7;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #5c636a;
+        }
+    </style>
+</head>
+<body>
+
+<!-- BOTONES SUPERIORES -->
+<a href="{% url 'ver_trabajos' trabajo.clase.id_clase %}" class="btn btn-secondary">
+    ⬅ Volver a trabajos
+</a>
+
+{% if es_profesor %}
+<a href="{% url 'ver_entregas_trabajo' trabajo.id_trabajos %}" class="btn">
+    📋 Ver entregas de estudiantes
+</a>
+{% endif %}
+
+<h2>📄 Detalle del Trabajo</h2>
+
+<p><strong>ID:</strong> {{ trabajo.id_trabajos }}</p>
+<p><strong>Descripción:</strong> {{ trabajo.descripcion }}</p>
+<p><strong>Fecha creación:</strong> {{ trabajo.fecha_creacion }}</p>
+<p><strong>Fecha entrega:</strong> {{ trabajo.fecha_entrega }}</p>
+
+<hr>
+
+<h3>📎 Archivo del Trabajo</h3>
+
+{% if archivo %}
+    {% with archivo.url_archivo.url as file_url %}
+    {% with archivo.url_archivo.name|lower as file_name %}
+    {% with file_name|slice:"-4:" as ext %}
+
+    <div class="preview-box">
+        {% if ext == ".jpg" or ext == ".png" or ext == ".gif" or file_name|slice:"-5:" == ".jpeg" %}
+            <img src="{{ file_url }}">
+
+        {% elif ext == ".pdf" %}
+            <canvas id="pdf-trabajo"></canvas>
+
+        {% elif ext == ".doc" or file_name|slice:"-5:" == ".docx" %}
+            <img src="{% static 'icons/doc.png' %}" class="file-icon">
+
+        {% elif ext == ".xls" or file_name|slice:"-5:" == ".xlsx" %}
+            <img src="{% static 'icons/xls.png' %}" class="file-icon">
+
+        {% elif ext == ".ppt" or file_name|slice:"-5:" == ".pptx" %}
+            <img src="{% static 'icons/ppt.png' %}" class="file-icon">
+
+        {% elif ext == ".zip" or ext == ".rar" %}
+            <img src="{% static 'icons/zip.png' %}" class="file-icon">
+
+        {% else %}
+            <img src="{% static 'icons/document.png' %}" class="file-icon">
+        {% endif %}
+    </div>
+
+    <a href="{{ file_url }}" target="_blank">⬇ Descargar archivo</a>
+
+    {% endwith %}
+    {% endwith %}
+    {% endwith %}
+{% else %}
+    <p>No hay archivo asociado.</p>
+{% endif %}
+
+{# ================= ENTREGA DEL ESTUDIANTE ================= #}
+
+{% if es_estudiante %}
+<hr>
+
+{% if entrega %}
+<h3>📤 Mi Entrega</h3>
+
+{% with entrega.archivo.url_archivo.url as file_url %}
+{% with entrega.archivo.url_archivo.name|lower as file_name %}
+{% with file_name|slice:"-4:" as ext %}
+
+<div class="preview-box">
+    {% if ext == ".jpg" or ext == ".png" or ext == ".gif" or file_name|slice:"-5:" == ".jpeg" %}
+        <img src="{{ file_url }}">
+
+    {% elif ext == ".pdf" %}
+        <canvas id="pdf-entrega"></canvas>
+
+    {% elif ext == ".doc" or file_name|slice:"-5:" == ".docx" %}
+        <img src="{% static 'icons/doc.png' %}" class="file-icon">
+
+    {% elif ext == ".xls" or file_name|slice:"-5:" == ".xlsx" %}
+        <img src="{% static 'icons/xls.png' %}" class="file-icon">
+
+    {% elif ext == ".ppt" or file_name|slice:"-5:" == ".pptx" %}
+        <img src="{% static 'icons/ppt.png' %}" class="file-icon">
+
+    {% else %}
+        <img src="{% static 'icons/document.png' %}" class="file-icon">
+    {% endif %}
+</div>
+
+<p>
+    <strong>Estado:</strong> {{ entrega.estado }}<br>
+    <strong>Fecha entrega:</strong> {{ entrega.fecha_entrega }}
+</p>
+
+<a href="{{ file_url }}" target="_blank">⬇ Descargar mi entrega</a>
+
+{% endwith %}
+{% endwith %}
+{% endwith %}
+
+{% else %}
+<a href="{% url 'entregar_trabajo' trabajo.id_trabajos %}" class="btn">
+    📤 Entregar trabajo
+</a>
+{% endif %}
+{% endif %}
+
+{# ================= PDF PREVIEW ================= #}
+
+{% if archivo and archivo.url_archivo.name|lower|slice:"-4:" == ".pdf" %}
+<script>
+pdfjsLib.getDocument("{{ archivo.url_archivo.url }}").promise.then(pdf => {
+    pdf.getPage(1).then(page => {
+        const viewport = page.getViewport({ scale: 1.2 });
+        const canvas = document.getElementById('pdf-trabajo');
+        const ctx = canvas.getContext('2d');
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        page.render({ canvasContext: ctx, viewport: viewport });
+    });
+});
+</script>
+{% endif %}
+
+{% if es_estudiante and entrega and entrega.archivo.url_archivo.name|lower|slice:"-4:" == ".pdf" %}
+<script>
+pdfjsLib.getDocument("{{ entrega.archivo.url_archivo.url }}").promise.then(pdf => {
+    pdf.getPage(1).then(page => {
+        const viewport = page.getViewport({ scale: 1.2 });
+        const canvas = document.getElementById('pdf-entrega');
+        const ctx = canvas.getContext('2d');
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        page.render({ canvasContext: ctx, viewport: viewport });
+    });
+});
+</script>
+{% endif %}
+
+</body>
+</html>

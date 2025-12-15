@@ -1,0 +1,135 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Entregar Trabajo</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            margin: 20px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: auto;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .info {
+            margin-bottom: 15px;
+            color: #555;
+        }
+
+        .estado {
+            padding: 6px 12px;
+            border-radius: 4px;
+            display: inline-block;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .estado-entregado { background: #d4edda; color: #155724; }
+        .estado-retardo { background: #fff3cd; color: #856404; }
+        .estado-pendiente { background: #f8d7da; color: #721c24; }
+
+        form {
+            margin-top: 20px;
+        }
+
+        input[type="file"] {
+            margin-bottom: 15px;
+        }
+
+        button {
+            background-color: #4a6fa5;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        button:hover {
+            background-color: #3a5a85;
+        }
+
+        .btn-volver {
+            display: inline-block;
+            margin-top: 15px;
+            text-decoration: none;
+            color: #6c757d;
+        }
+
+        .archivo-actual {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>📤 Entregar Trabajo</h2>
+
+    <div class="info">
+        <strong>Clase:</strong> {{ clase.nombre }} <br>
+        <strong>Trabajo:</strong> {{ trabajo.descripcion }} <br>
+        <strong>Fecha límite:</strong> {{ trabajo.fecha_entrega }}
+    </div>
+
+    {% if entrega %}
+        <div class="estado 
+            {% if entrega.estado == 'Entregado' %}estado-entregado
+            {% elif entrega.estado == 'Entregado con retardo' %}estado-retardo
+            {% else %}estado-pendiente{% endif %}">
+            Estado actual: {{ entrega.estado }}
+        </div>
+
+        {% if entrega.archivo %}
+            <div class="archivo-actual">
+                <strong>Archivo entregado:</strong><br>
+                <a href="{{ entrega.archivo.url_archivo.url }}" target="_blank">
+                    {{ entrega.archivo.url_archivo.name }}
+                </a>
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="estado estado-pendiente">
+            Estado actual: Pendiente
+        </div>
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        {{ archivo_form.as_p }}
+
+        <button type="submit">
+            {% if entrega %}🔁 Reentregar{% else %}📤 Entregar{% endif %}
+        </button>
+    </form>
+
+    <a href="{% url 'detalle_trabajo' trabajo.id_trabajos %}" class="btn-volver">
+        ⬅ Volver al detalle del trabajo
+    </a>
+
+</div>
+
+</body>
+</html>

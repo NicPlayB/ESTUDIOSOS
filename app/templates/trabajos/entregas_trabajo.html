@@ -1,0 +1,258 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Entregas del Trabajo</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            padding: 20px;
+        }
+
+        h2 {
+            margin-bottom: 5px;
+        }
+
+        .info {
+            margin-bottom: 20px;
+            color: #555;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        th, td {
+            padding: 12px 14px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: center;
+        }
+
+        th {
+            background: #0d6efd;
+            color: white;
+            font-weight: normal;
+        }
+
+        tr:hover {
+            background: #f1f5f9;
+        }
+
+        .badge {
+            padding: 6px 10px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: bold;
+            color: #fff;
+            display: inline-block;
+        }
+
+        .entregado {
+            background: #198754;
+        }
+
+        .pendiente {
+            background: #ffc107;
+            color: #000;
+        }
+
+        .no-entregado {
+            background: #dc3545;
+        }
+
+        .retardo {
+            background: #fd7e14;
+        }
+
+        a.btn {
+            padding: 6px 12px;
+            background: #0d6efd;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        a.btn:hover {
+            background: #0b5ed7;
+        }
+
+        .volver {
+            margin-top: 20px;
+            display: inline-block;
+        }
+
+        /* Modal de previsualización */
+        #modalPreview {
+            display: none;
+            position: fixed;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%;
+            background: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        #modalPreview .modal-content {
+            background:#fff;
+            padding:20px;
+            border-radius:8px;
+            max-width:90%;
+            max-height:90%;
+            position: relative;
+        }
+
+        #modalPreview #closeModal {
+            position:absolute;
+            top:10px;
+            right:15px;
+            cursor:pointer;
+            font-size:24px;
+        }
+
+        #previewContent {
+            width:100%;
+            height:100%;
+            overflow:auto;
+            text-align:center;
+        }
+    </style>
+</head>
+<body>
+
+<h2>📤 Entregas del Trabajo</h2>
+
+<div class="info">
+    <strong>Clase:</strong> {{ clase.nombre }} <br>
+    <strong>Trabajo:</strong> {{ trabajo.descripcion }} <br>
+    <strong>Fecha límite:</strong> {{ trabajo.fecha_entrega }}
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Estudiante</th>
+            <th>Estado</th>
+            <th>Fecha de entrega</th>
+            <th>Archivo</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in estudiantes %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ item.estudiante.nombres }} {{ item.estudiante.apellidos }}</td>
+
+            {% if item.entrega %}
+                <td>
+                    {% if item.entrega.estado == "Entregado" %}
+                        <span class="badge entregado">Entregado</span>
+                    {% elif item.entrega.estado == "Pendiente" %}
+                        <span class="badge pendiente">Pendiente</span>
+                    {% elif item.entrega.estado == "Entregado con retardo" %}
+                        <span class="badge retardo">Con retardo</span>
+                    {% else %}
+                        <span class="badge no-entregado">No entregado</span>
+                    {% endif %}
+                </td>
+
+                <td>{{ item.entrega.fecha_entrega|date:"d/m/Y H:i" }}</td>
+
+                <td>
+                    {% if item.entrega.archivo %}
+                        {% with archivo=item.entrega.archivo %}
+                            {% with ext=archivo.url_archivo.name|lower|slice:"-4:" %}
+                                {% if ext == ".pdf" %}
+                                    <a class="btn" href="javascript:void(0)" onclick="openPreview('{{ archivo.url_archivo.url }}','pdf')">📄 Ver PDF</a>
+                                {% elif ext == ".jpg" or ext == ".png" or ext == ".gif" or archivo.url_archivo.name|lower|slice:"-5:" == ".jpeg" %}
+                                    <a class="btn" href="javascript:void(0)" onclick="openPreview('{{ archivo.url_archivo.url }}','img')">🖼 Ver imagen</a>
+                                {% elif ext == ".doc" or archivo.url_archivo.name|lower|slice:"-5:" == ".docx"
+                                        or ext == ".xls" or archivo.url_archivo.name|lower|slice:"-5:" == ".xlsx"
+                                        or ext == ".ppt" or archivo.url_archivo.name|lower|slice:"-5:" == ".pptx" %}
+                                    <a class="btn" href="javascript:void(0)" onclick="openPreview('{{ archivo.url_archivo.url }}','office')">📄 Ver documento</a>
+                                {% else %}
+                                    <a class="btn" href="{{ archivo.url_archivo.url }}" target="_blank">📄 Descargar</a>
+                                {% endif %}
+                            {% endwith %}
+                        {% endwith %}
+                    {% else %}
+                        —
+                    {% endif %}
+                </td>
+            {% else %}
+                <td><span class="badge no-entregado">No entregado</span></td>
+                <td>—</td>
+                <td>—</td>
+            {% endif %}
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5">No hay estudiantes inscritos.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{% url 'ver_trabajos' clase.id_clase %}" class="btn volver">⬅ Volver a trabajos</a>
+
+<!-- Modal de previsualización -->
+<div id="modalPreview">
+    <div class="modal-content">
+        <span id="closeModal">&times;</span>
+        <div id="previewContent"></div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+<script>
+const modal = document.getElementById('modalPreview');
+const previewContent = document.getElementById('previewContent');
+const closeModal = document.getElementById('closeModal');
+
+closeModal.onclick = () => modal.style.display = 'none';
+
+function openPreview(url, tipo) {
+    previewContent.innerHTML = '';
+    if(tipo === 'pdf') {
+        const canvas = document.createElement('canvas');
+        previewContent.appendChild(canvas);
+        pdfjsLib.getDocument(url).promise.then(pdf => {
+            pdf.getPage(1).then(page => {
+                const viewport = page.getViewport({ scale: 1.2 });
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                const ctx = canvas.getContext('2d');
+                page.render({ canvasContext: ctx, viewport: viewport });
+            });
+        });
+    } else if(tipo === 'img') {
+        const img = document.createElement('img');
+        img.src = url;
+        img.style.maxWidth = '100%';
+        img.style.maxHeight = '80vh';
+        previewContent.appendChild(img);
+    } else if(tipo === 'office') {
+        const iframe = document.createElement('iframe');
+        iframe.src = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(url)}`;
+        iframe.style.width = '100%';
+        iframe.style.height = '80vh';
+        previewContent.appendChild(iframe);
+    }
+    modal.style.display = 'flex';
+}
+</script>
+
+</body>
+</html>

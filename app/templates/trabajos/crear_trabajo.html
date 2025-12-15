@@ -1,0 +1,40 @@
+<div class="container mt-4">
+    <h2>Crear Trabajo</h2>
+    <hr>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <label class="form-label">Descripción</label>
+            {{ trabajo_form.descripcion }}
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Fecha de entrega</label>
+            {{ trabajo_form.fecha_entrega }}
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Clase</label>
+            {{ trabajo_form.clase }}
+        </div>
+
+        <hr>
+
+        <h4>Archivo</h4>
+
+        <div class="mb-3">
+            <label class="form-label">Subir archivo</label>
+            {{ archivo_form.url_archivo }}
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Tipo de archivo</label>
+            {{ archivo_form.tipo_archivo }}
+        </div>
+
+        <button class="btn btn-primary" type="submit">Crear trabajo</button>
+        <a href="{% url 'ver_trabajos' clase.id_clase %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>

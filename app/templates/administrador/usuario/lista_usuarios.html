@@ -1,0 +1,632 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Usuarios</title>
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+    <!-- Google Fonts para mejorar tipografía -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    
+    <style>
+        /* ============================
+           VARIABLES DE COLOR
+           ============================ */
+        :root {
+            --skin-color: #ffe6d0ff;    /* Color piel más fuerte */
+            --orange-light: #ffd8b5;  /* Naranja claro */
+            --orange-medium: #ffb347; /* Naranja medio */
+            --orange-dark: #ff9500;   /* Naranja oscuro */
+            --orange-hover: #ff8800;  /* Naranja para hover */
+            --orange-strong: #ff7b00; /* Naranja más fuerte */
+        }
+
+        /* ============================
+           ESTILOS GENERALES
+           ============================ */
+        body {
+            background-color: var(--skin-color) !important;
+            font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            animation: fadeInBody 0.8s ease-out;
+        }
+
+        @keyframes fadeInBody {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* ============================
+           CONTENEDOR PRINCIPAL
+           ============================ */
+        .main-container {
+            animation: slideUp 0.8s ease-out;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 0 auto;
+            background-color: white;
+            padding: 40px;
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ============================
+           TÍTULO
+           ============================ */
+        h2 {
+            color: var(--orange-dark);
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        /* ============================
+           ESTILOS DE BOTONES
+           ============================ */
+        .btn-primary {
+            background-color: var(--orange-dark);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            color: white;
+            transform: scale(1.05);
+            background-color: var(--orange-dark);
+            box-shadow: 0 5px 15px rgba(255, 149, 0, 0.4);
+        }
+
+        .btn-danger {
+            border-radius: 8px;
+            padding: 8px 16px;
+            transition: all 0.3s;
+        }
+
+        .btn-danger:hover {
+            transform: scale(1.05);
+        }
+
+        /* ============================
+           ESTILOS DE TABLA RESPONSIVE
+           ============================ */
+        .table-responsive {
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            background-color: var(--orange-dark);
+            color: white;
+            font-weight: 500;
+            border: none;
+            padding: 15px;
+            white-space: nowrap;
+        }
+
+        .table tbody tr {
+            transition: all 0.3s;
+        }
+
+        .table tbody tr:hover {
+            background-color: rgba(255, 179, 71, 0.1);
+        }
+
+        .table tbody td {
+            padding: 15px;
+            vertical-align: middle;
+            border-color: #f0f0f0;
+        }
+
+        /* ============================
+           ESTILOS DE FORMULARIO
+           ============================ */
+        .form-control {
+            border: 1px solid #e0e0e0;
+            padding: 12px 15px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .form-control:focus {
+            border-color: var(--orange-medium);
+            box-shadow: 0 0 0 0.25rem rgba(255, 179, 71, 0.25);
+        }
+
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        /* ============================
+           ALERTA FLOTANTE SUPERIOR DERECHA - CORREGIDA
+           ============================ */
+        .floating-alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            min-width: 350px;
+            z-index: 9999;
+            animation: slideInRight .5s ease-out;
+        }
+
+        @keyframes slideInRight {
+            from { 
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to { 
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .custom-alert {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            padding: 18px 50px 18px 18px; /* Más padding a la derecha para la X */
+            display: flex;
+            align-items: flex-start;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 15px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .custom-alert:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .alert-icon {
+            font-size: 26px;
+            margin-right: 15px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .alert-content {
+            flex: 1;
+            padding-right: 10px;
+        }
+
+        .alert-content strong {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .btn-close-custom {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: transparent;
+            border: none;
+            font-size: 18px;
+            color: white !important;
+            opacity: 0.8;
+            cursor: pointer;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .btn-close-custom:hover {
+            opacity: 1;
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .alert-success {
+            background: rgba(76, 175, 80, 0.65);
+            color: white;
+            border-left: 5px solid rgba(46, 125, 50, 0.7);
+        }
+
+        .alert-error, .alert-danger {
+            background: rgba(244, 67, 54, 0.65);
+            color: white;
+            border-left: 5px solid rgba(183, 28, 28, 0.7);
+        }
+
+        .alert-warning {
+            background: rgba(255, 152, 0, 0.65);
+            color: white;
+            border-left: 5px solid rgba(230, 81, 0, 0.7);
+        }
+
+        .alert-info {
+            background: rgba(33, 150, 243, 0.65);
+            color: white;
+            border-left: 5px solid rgba(13, 71, 161, 0.7);
+        }
+
+        .progress-bar-timer {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.9);
+            width: 100%;
+            animation: shrink 3s linear forwards;
+            border-radius: 2px;
+            margin-top: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        @keyframes shrink {
+            from { width: 100%; }
+            to   { width: 0; }
+        }
+
+        /* ============================
+           MODAL DE CONFIRMACIÓN PERSONALIZADO
+           ============================ */
+        .confirmation-modal .modal-content {
+            border-radius: 15px;
+            overflow: hidden;
+            border: none;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .confirmation-modal .modal-header {
+            background: linear-gradient(135deg, var(--orange-strong), var(--orange-dark));
+            color: white;
+            border-bottom: none;
+            padding: 20px 25px;
+        }
+
+        .confirmation-modal .modal-title {
+            font-weight: 600;
+            font-size: 1.3rem;
+        }
+
+        .confirmation-modal .modal-body {
+            padding: 30px 25px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .confirmation-modal .modal-footer {
+            border-top: none;
+            padding: 20px 25px;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .confirmation-modal .btn-confirm {
+            background-color: var(--orange-dark);
+            border: none;
+            color: white;
+            padding: 10px 25px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .confirmation-modal .btn-confirm:hover {
+            background-color: var(--orange-strong);
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(255, 149, 0, 0.4);
+        }
+
+        .confirmation-modal .btn-cancel {
+            background-color: #6c757d;
+            border: none;
+            color: white;
+            padding: 10px 25px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .confirmation-modal .btn-cancel:hover {
+            background-color: #5a6268;
+            transform: scale(1.05);
+        }
+        /* --------------- MODO DESKTOP (TABLE) --------------- */
+.table-responsive-cards .card-item {
+    display: none;
+}
+
+/* --------------- MODO MÓVIL (CARDS) --------------- */
+@media (max-width: 768px) {
+
+    /* Ocultar tabla en móvil */
+    .table-responsive-cards table {
+        display: none;
+    }
+
+    /* Mostrar cards */
+    .table-responsive-cards .card-item {
+        display: block;
+        background: #fff;
+        padding: 15px;
+        margin-bottom: 12px;
+        border-radius: 10px;
+        border: 1px solid #ddd;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    }
+
+    .table-responsive-cards .card-item p {
+        margin: 3px 0;
+    }
+
+    .table-responsive-cards .card-actions {
+        margin-top: 10px;
+        display: flex;
+        gap: 8px;
+    }
+}
+
+    </style>
+</head>
+<body>
+<!-- ====================================================
+     ALERTAS SUPERIORES (USANDO EL SISTEMA DE MESSAGES) - CORREGIDAS
+     ==================================================== -->
+{% if messages %}
+    <div class="floating-alert">
+        {% for message in messages %}
+            {% if message.tags == 'success' %}
+                <div class="custom-alert alert-success" id="alert-{{ forloop.counter }}">
+                    <i class="m alert-icon bi bi-check-circle-fill"></i>
+                    <div class="alert-content">
+                        <strong>{{ message }}</strong>
+                        <div class="progress-bar-timer"></div>
+                    </div>
+                    <button type="button" class="btn-close-custom" onclick="closeAlert('alert-{{ forloop.counter }}')" aria-label="Close">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+            {% elif message.tags == 'error' or message.tags == 'danger' %}
+                <div class="custom-alert alert-danger" id="alert-{{ forloop.counter }}">
+                    <i class="alert-icon bi bi-exclamation-triangle-fill"></i>
+                    <div class="alert-content">
+                        <strong>{{ message }}</strong>
+                        <div class="progress-bar-timer"></div>
+                    </div>
+                    <button type="button" class="btn-close-custom" onclick="closeAlert('alert-{{ forloop.counter }}')" aria-label="Close">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+            {% elif message.tags == 'warning' %}
+                <div class="custom-alert alert-warning" id="alert-{{ forloop.counter }}">
+                    <i class="alert-icon bi bi-exclamation-triangle-fill"></i>
+                    <div class="alert-content">
+                        <strong>{{ message }}</strong>
+                        <div class="progress-bar-timer"></div>
+                    </div>
+                    <button type="button" class="btn-close-custom" onclick="closeAlert('alert-{{ forloop.counter }}')" aria-label="Close">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+            {% elif message.tags == 'info' %}
+                <div class="custom-alert alert-info" id="alert-{{ forloop.counter }}">
+                    <i class="alert-icon bi bi-info-circle-fill"></i>
+                    <div class="alert-content">
+                        <strong>{{ message }}</strong>
+                        <div class="progress-bar-timer"></div>
+                    </div>
+                    <button type="button" class="btn-close-custom" onclick="closeAlert('alert-{{ forloop.counter }}')" aria-label="Close">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+            {% else %}
+                <div class="custom-alert alert-info" id="alert-{{ forloop.counter }}">
+                    <i class="alert-icon bi bi-info-circle-fill"></i>
+                    <div class="alert-content">
+                        <strong>{{ message }}</strong>
+                        <div class="progress-bar-timer"></div>
+                    </div>
+                    <button type="button" class="btn-close-custom" onclick="closeAlert('alert-{{ forloop.counter }}')" aria-label="Close">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endif %}
+
+<!-- ====================================================
+     MODAL DE CONFIRMACIÓN
+     ==================================================== -->
+<div class="modal fade confirmation-modal" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmationModalLabel">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>Confirmar Cambio de Rol
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas cambiar el rol de este usuario?</p>
+                <p class="fw-bold" id="userDetails"></p>
+                <p class="small text-muted">Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-confirm" id="confirmUpdate">Sí, Actualizar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ====================================================
+     CONTENEDOR PRINCIPAL
+     ==================================================== -->
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-12">
+            <div class="main-container">
+                <h2 class="mb-4">Gestión de Usuarios</h2>
+
+                <!-- Tabla de usuarios responsive -->
+                <div id="tablaUsuarios">
+                    <div class="table-responsive">
+                        {% include "administrador/usuario/tabla_usuarios.html" %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- WebSocket -->
+<script>
+    const socket = new WebSocket("ws://" + window.location.host + "/ws/usuarios/");
+
+    socket.onopen = () => console.log("Conexión WebSocket establecida");
+    socket.onclose = () => console.log("Conexión WebSocket cerrada");
+
+    socket.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        if(data.action === "refresh") {
+            const tablaDiv = document.getElementById("tablaUsuarios");
+            tablaDiv.innerHTML = data.html;
+
+            // Obtener CSRF del meta
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+            // Agregar csrf_token a cada formulario dinámico
+            tablaDiv.querySelectorAll('form').forEach(form => {
+                let input = form.querySelector('input[name="csrfmiddlewaretoken"]');
+                if (!input) {
+                    input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'csrfmiddlewaretoken';
+                    form.prepend(input);
+                }
+                input.value = csrfToken;
+            });
+
+            // Reasignar event listeners a los botones después de actualizar la tabla
+            setupUpdateButtons();
+        }
+    };
+
+    /* =========================================
+       Variables globales para el modal
+       ========================================= */
+    let currentForm = null;
+
+    /* =========================================
+       Configurar los botones de actualización
+       ========================================= */
+    function setupUpdateButtons() {
+        document.querySelectorAll('.btn-update-role').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const form = this.closest('form');
+                const usuarioId = form.querySelector('input[name="usuario_id"]').value;
+                const usuarioNombre = form.closest('tr').querySelector('td:nth-child(2)').textContent;
+                const usuarioRolActual = form.closest('tr').querySelector('td:nth-child(4)').textContent;
+                const nuevoRol = form.querySelector('select[name="nuevo_rol"]');
+                const nuevoRolTexto = nuevoRol.options[nuevoRol.selectedIndex].text;
+                
+                // Guardar referencia al formulario actual
+                currentForm = form;
+                
+                // Actualizar detalles en el modal
+                document.getElementById('userDetails').innerHTML = 
+                    `<strong>Usuario:</strong> ${usuarioNombre}<br>
+                     <strong>Rol actual:</strong> ${usuarioRolActual}<br>
+                     <strong>Nuevo rol:</strong> ${nuevoRolTexto}`;
+                
+                // Mostrar el modal
+                const modal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+                modal.show();
+            });
+        });
+    }
+
+    /* =========================================
+       Configurar el botón de confirmación del modal
+       ========================================= */
+    document.getElementById('confirmUpdate').addEventListener('click', function() {
+        if (currentForm) {
+            // Enviar el formulario
+            currentForm.submit();
+            
+            // Cerrar el modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('confirmationModal'));
+            modal.hide();
+        }
+    });
+
+    /* =========================================
+       Función para cerrar alertas manualmente
+       ========================================= */
+    function closeAlert(alertId) {
+        const alert = document.getElementById(alertId);
+        if (alert) {
+            alert.style.opacity = '0';
+            alert.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                alert.remove();
+            }, 300);
+        }
+    }
+
+    /* =========================================
+       Cierre automático de alertas en 4 segundos
+       ========================================= */
+    setTimeout(() => {
+        document.querySelectorAll('.custom-alert').forEach(alert => {
+            alert.style.opacity = '0';
+            alert.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                alert.remove();
+            }, 300);
+        });
+    }, 4000);
+
+    /* =========================================
+       Inicializar los botones cuando se carga la página
+       ========================================= */
+    document.addEventListener('DOMContentLoaded', function() {
+        setupUpdateButtons();
+    });
+
+
+</script>
+</body>
+</html>

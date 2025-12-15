@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trabajos - {{ clase.nombre }}</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f6f9;
+        }
+        .header {
+            background-color: #4a6fa5;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .trabajo-card {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            background-color: #ffffff;
+        }
+        .trabajo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .trabajo-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        .trabajo-estado {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .estado-pendiente { background-color: #fff3cd; color: #856404; }
+        .estado-entregado { background-color: #d4edda; color: #155724; }
+        .estado-no-entregado { background-color: #f8d7da; color: #721c24; }
+        .estado-retardo { background-color: #d1ecf1; color: #0c5460; }
+
+        .trabajo-info {
+            margin: 5px 0;
+            color: #555;
+        }
+
+        .btn-detalles {
+            display: inline-block;
+            background-color: #4a6fa5;
+            color: white;
+            padding: 8px 15px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .btn-detalles:hover {
+            background-color: #3a5a85;
+        }
+
+        .btn-crear {
+            display: inline-block;
+            background-color: #28a745;
+            color: white;
+            padding: 8px 15px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .btn-crear:hover {
+            background-color: #218838;
+        }
+
+        .btn-volver {
+            display: inline-block;
+            background-color: #6c757d;
+            color: white;
+            padding: 8px 15px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        .btn-volver:hover {
+            background-color: #5a6268;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .alert.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .alert.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .alert.info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- BOTÓN VOLVER A CLASES ACTIVAS -->
+    <a href="{% url 'clases_activas' %}" class="btn-volver">
+        ⬅ Volver a clases activas
+    </a>
+
+    <!-- HEADER -->
+    <div class="header">
+        <h1>Trabajos - {{ clase.nombre }}</h1>
+        <p>Código: {{ clase.codigo_clase }}</p>
+
+        {% if clase.usuario == request.usuario %}
+            <a href="{% url 'crear_trabajo' clase.id_clase %}" class="btn-crear">
+                ➕ Crear trabajo
+            </a>
+        {% endif %}
+    </div>
+
+    <!-- MENSAJES -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert {{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- LISTA DE TRABAJOS -->
+    <h2>Lista de Trabajos</h2>
+
+    {% if trabajos %}
+        {% for trabajo in trabajos %}
+            <div class="trabajo-card">
+
+                <div class="trabajo-header">
+                    <div class="trabajo-title">
+                        {{ trabajo.descripcion }}
+                    </div>
+
+                    <div class="trabajo-estado estado-{{ trabajo.estado|slugify }}">
+                        {{ trabajo.estado }}
+                    </div>
+                </div>
+
+                <div class="trabajo-info">
+                    <strong>ID:</strong> {{ trabajo.id_trabajos }}
+                </div>
+
+                <div class="trabajo-info">
+                    <strong>Fecha de creación:</strong>
+                    {{ trabajo.fecha_creacion|date:"d/m/Y H:i" }}
+                </div>
+
+                <div class="trabajo-info">
+                    <strong>Fecha de entrega:</strong>
+                    {{ trabajo.fecha_entrega|date:"d/m/Y" }}
+                </div>
+
+                <!-- BOTÓN DETALLES -->
+                <a href="{% url 'detalle_trabajo' trabajo.id_trabajos %}" class="btn-detalles">
+                    Ver detalles
+                </a>
+
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No hay trabajos disponibles para esta clase.</p>
+    {% endif %}
+
+</body>
+</html>

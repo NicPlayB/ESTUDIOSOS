@@ -1,0 +1,69 @@
+<div class="table-responsive-cards">
+
+    <!-- TABLA (solo desktop) -->
+    <div class="table-container">
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Correo</th>
+                    <th>Rol</th>
+                    <th>Cambiar Rol</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for usuario in usuarios %}
+                <tr>
+                    <td>{{ usuario.id_usuarios }}</td>
+                    <td>{{ usuario.nombres }} {{ usuario.apellidos }}</td>
+                    <td>{{ usuario.correo }}</td>
+                    <td>{{ usuario.id_tipo_rol.nombre }}</td>
+                    <td>
+                        <form method="POST" action="{% url 'gestion_usuarios' %}" style="display:flex; gap: 5px;">
+                            {% csrf_token %}
+                            <input type="hidden" name="usuario_id" value="{{ usuario.id_usuarios }}">
+                            <select name="nuevo_rol" class="form-select">
+                                {% for rol in roles %}
+                                    <option value="{{ rol.id_rol }}" {% if usuario.id_tipo_rol.id_rol == rol.id_rol %}selected{% endif %}>
+                                        {{ rol.nombre }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <button type="button" class="btn btn-primary btn-update-role">Actualizar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- CARDS (solo móvil) -->
+    <div class="cards-container">
+        {% for usuario in usuarios %}
+        <div class="card-item">
+            <p><strong>ID:</strong> {{ usuario.id_usuarios }}</p>
+            <p><strong>Nombre:</strong> {{ usuario.nombres }} {{ usuario.apellidos }}</p>
+            <p><strong>Correo:</strong> {{ usuario.correo }}</p>
+            <p><strong>Rol:</strong> {{ usuario.id_tipo_rol.nombre }}</p>
+
+            <div class="card-actions">
+                <form method="POST" action="{% url 'gestion_usuarios' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="usuario_id" value="{{ usuario.id_usuarios }}">
+                    <select name="nuevo_rol" class="form-select form-select-sm">
+                        {% for rol in roles %}
+                            <option value="{{ rol.id_rol }}" {% if usuario.id_tipo_rol.id_rol == rol.id_rol %}selected{% endif %}>
+                                {{ rol.nombre }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <button type="button" class="btn btn-primary btn-sm btn-update-role">Actualizar</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>

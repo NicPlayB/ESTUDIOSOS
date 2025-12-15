@@ -1,0 +1,626 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Iniciar Sesión</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+    <!-- Google Fonts para mejorar tipografía -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ============================
+           VARIABLES DE COLOR
+           ============================ */
+        :root {
+            --skin-color: #ffe6d0ff;    /* Color piel más fuerte */
+            --orange-light: #ffd8b5;  /* Naranja claro */
+            --orange-medium: #ffb347; /* Naranja medio */
+            --orange-dark: #ff9500;   /* Naranja oscuro */
+            --orange-hover: #ff8800;  /* Naranja para hover */
+            --orange-strong: #ff7b00; /* Naranja más fuerte */
+        }
+
+        /* ============================
+           ESTILOS GENERALES
+           ============================ */
+        body {
+            background-color: var(--skin-color) !important;
+            font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            animation: fadeInBody 0.8s ease-out;
+            display: flex;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        @keyframes fadeInBody {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* ============================
+           CONTENEDOR PRINCIPAL
+           ============================ */
+        .main-container {
+            animation: slideUp 0.8s ease-out;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 0 auto;
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ============================
+           PANEL DE INSTRUCCIONES
+           ============================ */
+        .instructions-panel {
+            background: linear-gradient(135deg, var(--orange-strong), var(--orange-dark));
+            padding: 40px 30px;
+            color: white;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center; /* Centrar contenido */
+        }
+
+        .instructions-panel h3 {
+            color: white;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+
+        .instruction-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            text-align: left; /* Texto alineado a la izquierda pero en contenedor centrado */
+        }
+
+        .instruction-icon {
+            background-color: rgba(255, 255, 255, 0.2);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+            color: white;
+        }
+
+        .instruction-text {
+            flex: 1;
+        }
+
+        .instruction-text h5 {
+            color: white;
+            font-weight: 500;
+        }
+
+        .instruction-text p {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 300;
+        }
+
+        /* Ocultar panel de instrucciones en pantallas pequeñas */
+        @media (max-width: 767.98px) {
+            .instructions-panel {
+                display: none;
+            }
+        }
+
+        /* ============================
+           PANEL DE FORMULARIO
+           ============================ */
+        .form-panel {
+            background-color: white;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .form-panel h3 {
+            color: var(--orange-dark);
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .welcome-message {
+            color: #6c757d;
+            margin-bottom: 25px;
+            text-align: center;
+            font-weight: 300;
+        }
+
+        /* ============================
+           LOGO
+           ============================ */
+        .logo-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            width: 100px;
+            height: 100px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Rotación y zoom de la imagen dentro */
+        .logo:hover img {
+            transform: rotate(10deg) scale(1.15);
+        }
+
+        /* ============================
+           ESTILO PARA EL INPUT DE CONTRASEÑA
+           ============================ */
+        .password-wrapper {
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        .password-wrapper input {
+            flex: 1;
+            padding-right: 38px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            cursor: pointer;
+            font-size: 20px;
+            color: #666;
+        }
+
+        input::-ms-reveal,
+        input::-ms-clear {
+            display: none !important;
+        }
+
+        /* ============================
+           ESTILOS DE FORMULARIO
+           ============================ */
+        .form-control {
+            border: 1px solid #e0e0e0;
+            padding: 12px 15px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .form-control:focus {
+            border-color: var(--orange-medium);
+            box-shadow: 0 0 0 0.25rem rgba(255, 179, 71, 0.25);
+        }
+
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        /* ============================
+           BOTÓN DE INGRESAR
+           ============================ */
+        .btn-login {
+            background-color: var(--orange-dark);
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-login:hover {
+            color: white;
+            transform: scale(1.05);
+            background-color: var(--orange-dark);
+            box-shadow: 0 5px 15px rgba(255, 149, 0, 0.4);
+        }
+
+        /* ============================
+           ENLACE DE REGISTRO
+           ============================ */
+        .register-link {
+            color: #6c757d; /* Color gris */
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: 400;
+        }
+
+        .register-link:hover {
+            color: var(--orange-dark); /* Color naranja en hover */
+            text-decoration: underline;
+        }
+
+        /* ============================
+           ALERTA FLOTANTE SUPERIOR DERECHA - MÁS TRANSPARENTE
+           ============================ */
+        .floating-alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            min-width: 350px;
+            z-index: 9999;
+            animation: slideInRight .5s ease-out;
+        }
+
+        @keyframes slideInRight {
+            from { 
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to { 
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .custom-alert {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            padding: 18px;
+            display: flex;
+            align-items: flex-start;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 15px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .custom-alert:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .alert-icon {
+            font-size: 26px;
+            margin-right: 15px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .alert-content {
+            flex: 1;
+            padding-right: 10px;
+        }
+
+        .alert-content strong {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .btn-close-custom {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: transparent;
+            border: none;
+            font-size: 18px;
+            color: white !important;
+            opacity: 0.8;
+            cursor: pointer;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .btn-close-custom:hover {
+            opacity: 1;
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .alert-success {
+            background: rgba(76, 175, 80, 0.65);
+            color: white;
+            border-left: 5px solid rgba(46, 125, 50, 0.7);
+        }
+
+        .alert-error, .alert-danger {
+            background: rgba(244, 67, 54, 0.65);
+            color: white;
+            border-left: 5px solid rgba(183, 28, 28, 0.7);
+        }
+
+        .alert-warning {
+            background: rgba(255, 152, 0, 0.65);
+            color: white;
+            border-left: 5px solid rgba(230, 81, 0, 0.7);
+        }
+
+        .alert-info {
+            background: rgba(33, 150, 243, 0.65);
+            color: white;
+            border-left: 5px solid rgba(13, 71, 161, 0.7);
+        }
+
+        .progress-bar-timer {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.9);
+            width: 100%;
+            animation: shrink 3s linear forwards;
+            border-radius: 2px;
+            margin-top: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        @keyframes shrink {
+            from { width: 100%; }
+            to   { width: 0; }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- ====================================================
+     ALERTAS SUPERIORES (USANDO EL SISTEMA DE MESSAGES) - MÁS TRANSPARENTES
+     ==================================================== -->
+{% if messages %}
+    <div class="floating-alert">
+        {% for message in messages %}
+            {% if message.tags == 'success' %}
+                <div class="custom-alert alert-success">
+                    <i class="m alert-icon bi bi-check-circle-fill"></i>
+                    <div class="alert-content">
+                        <strong>{{ message }}</strong>
+                        <div class="progress-bar-timer"></div>
+                    </div>
+                    <button type="button" class="btn-close-custom" data-bs-dismiss="alert" aria-label="Close">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+            {% elif message.tags == 'error' or message.tags == 'danger' %}
+                <div class="custom-alert alert-danger">
+                    <i class="alert-icon bi bi-exclamation-triangle-fill"></i>
+                    <div class="alert-content">
+                        <strong>{{ message }}</strong>
+                        <div class="progress-bar-timer"></div>
+                    </div>
+                    <button type="button" class="btn-close-custom" data-bs-dismiss="alert" aria-label="Close">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+            {% elif message.tags == 'warning' %}
+                <div class="custom-alert alert-warning">
+                    <i class="alert-icon bi bi-exclamation-triangle-fill"></i>
+                    <div class="alert-content">
+                        <strong>{{ message }}</strong>
+                        <div class="progress-bar-timer"></div>
+                    </div>
+                    <button type="button" class="btn-close-custom" data-bs-dismiss="alert" aria-label="Close">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+            {% elif message.tags == 'info' %}
+                <div class="custom-alert alert-info">
+                    <i class="alert-icon bi bi-info-circle-fill"></i>
+                    <div class="alert-content">
+                        <strong>{{ message }}</strong>
+                        <div class="progress-bar-timer"></div>
+                    </div>
+                    <button type="button" class="btn-close-custom" data-bs-dismiss="alert" aria-label="Close">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+            {% else %}
+                <div class="custom-alert alert-info">
+                    <i class="alert-icon bi bi-info-circle-fill"></i>
+                    <div class="alert-content">
+                        <strong>{{ message }}</strong>
+                        <div class="progress-bar-timer"></div>
+                    </div>
+                    <button type="button" class="btn-close-custom" data-bs-dismiss="alert" aria-label="Close">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endif %}
+
+<!-- ====================================================
+     CONTENEDOR PRINCIPAL CON DOS COLUMNAS
+     ==================================================== -->
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="main-container">
+                <div class="row g-0">
+                    <!-- COLUMNA IZQUIERDA: INSTRUCCIONES (OCULTA EN MÓVIL) -->
+                    <div class="col-md-6 d-none d-md-block">
+                        <div class="instructions-panel">
+                            <h3>Bienvenido</h3>
+                            
+                            <div class="instruction-item">
+                                <div class="instruction-icon">
+                                    <i class="bi bi-book"></i>
+                                </div>
+                                <div class="instruction-text">
+                                    <h5>Acceso a Materiales</h5>
+                                    <p class="mb-0">Consulta tus apuntes, tareas y recursos de estudio en cualquier momento.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="instruction-item">
+                                <div class="instruction-icon">
+                                    <i class="bi bi-calendar-check"></i>
+                                </div>
+                                <div class="instruction-text">
+                                    <h5>Calendario Académico</h5>
+                                    <p class="mb-0">Mantente al día con fechas de exámenes, entregas y eventos importantes.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="instruction-item">
+                                <div class="instruction-icon">
+                                    <i class="bi bi-graph-up"></i>
+                                </div>
+                                <div class="instruction-text">
+                                    <h5>Seguimiento de Progreso</h5>
+                                    <p class="mb-0">Revisa tus calificaciones y el avance en cada materia.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="instruction-item">
+                                <div class="instruction-icon">
+                                    <i class="bi bi-chat-dots"></i>
+                                </div>
+                                <div class="instruction-text">
+                                    <h5>Comunicación Directa</h5>
+                                    <p class="mb-0">Conéctate con profesores y compañeros de clase fácilmente.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- COLUMNA DERECHA: FORMULARIO -->
+                    <div class="col-md-6">
+                        <div class="form-panel">
+                            <!-- Logo -->
+                            <div class="logo-container">
+                                <div class="logo">
+                                    <img src="{% static 'img/Logo tipo Estudiosos_Mesa de trabajo 1 copia 12.png' %}" alt="Logo de la empresa">
+                                </div>
+                            </div>
+                            
+                            <h3 class="text-center">Iniciar Sesión</h3>
+                            <p class="welcome-message">Ingresa todos los datos</p>
+                            
+                            <form method="POST">
+                                {% csrf_token %}
+                                
+                                <!-- CAMPO CORREO -->
+                                <div class="mb-4">
+                                    <label for="id_correo" class="form-label">{{ form.correo.label }}</label>
+                                    {{ form.correo }}
+                                    {% if form.correo.errors %}
+                                        <div class="text-danger small mt-1"><i class="me-2 bi bi-exclamation-triangle-fill text-danger"></i>{{ form.correo.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- CAMPO CONTRASEÑA CON ICONO -->
+                                <div class="mb-4">
+                                    <label for="id_contrasena" class="form-label">{{ form.contrasena.label }}</label>
+                                    <div class="password-wrapper">
+                                        <input type="password"
+                                               name="contrasena"
+                                               id="id_contrasena"
+                                               class="form-control"
+                                               placeholder="Ingresa tu contraseña">
+                                        <i class="bi bi-eye-fill toggle-password"
+                                           data-target="id_contrasena"></i>
+                                    </div>
+                                    {% if form.contrasena.errors %}
+                                        <div class="text-danger small mt-1"><i class="me-2 bi bi-exclamation-triangle-fill text-danger"></i>{{ form.contrasena.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- BOTÓN ENVIAR -->
+                                <button class="btn btn-login w-100 mt-4" type="submit">
+                                    <i class="bi bi-box-arrow-in-right"></i>
+                                    Ingresar
+                                </button>
+                            </form>
+                            
+                            <!-- Enlace a registro -->
+                            <div class="text-center mt-4">
+                                <a href="{% url 'registrar' %}" class="register-link">¿No tienes cuenta? Regístrate aquí</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    /* =========================================
+       Función que muestra u oculta la contraseña
+       ========================================= */
+    document.querySelectorAll(".toggle-password").forEach(icon => {
+        icon.addEventListener("click", () => {
+            const inputID = icon.getAttribute("data-target");
+            const input = document.getElementById(inputID);
+
+            // Cambiar entre texto y contraseña
+            input.type = input.type === "password" ? "text" : "password";
+
+            // Cambiar icono
+            icon.classList.toggle("bi-eye-fill");
+            icon.classList.toggle("bi-eye-slash-fill");
+        });
+    });
+
+    /* =========================================
+       Cierre automático de alertas en 3 segundos
+       ========================================= */
+    setTimeout(() => {
+        document.querySelectorAll('.custom-alert').forEach(alert => {
+            let alertInstance = bootstrap.Alert.getOrCreateInstance(alert);
+            alertInstance.close();
+        });
+    }, 4000);
+</script>
+
+</body>
+</html>
