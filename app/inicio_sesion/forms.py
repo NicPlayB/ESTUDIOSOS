@@ -64,12 +64,14 @@ class RegistroForm(forms.ModelForm):
             "correo",
             "celular",
             "fecha_nacimiento",
+            "id_tipo_rol",   # 👈 AQUI
             "contrasena",
         ]
 
         labels = {
             "id_tipo_documento": "Tipo de Documento",
             "fecha_nacimiento": "Fecha de Nacimiento",
+            "id_tipo_rol": "Rol",  # 👈 LABEL
         }
 
         widgets = {
@@ -80,10 +82,10 @@ class RegistroForm(forms.ModelForm):
             "pais": forms.TextInput(attrs={"class": "form-control"}),
             "correo": forms.EmailInput(attrs={"class": "form-control"}),
             "celular": forms.TextInput(attrs={"class": "form-control"}),
-
             "fecha_nacimiento": forms.DateInput(
                 attrs={"class": "form-control", "type": "date"}
             ),
+            "id_tipo_rol": forms.Select(attrs={"class": "form-control"}),  # 👈 SELECT
         }
 
     # --- VALIDACIONES ---
