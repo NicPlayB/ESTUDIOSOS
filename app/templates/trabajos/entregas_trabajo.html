@@ -79,10 +79,20 @@
             text-decoration: none;
             border-radius: 6px;
             font-size: 14px;
+            display: inline-block;
+            margin: 2px;
         }
 
         a.btn:hover {
             background: #0b5ed7;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
         }
 
         .volver {
@@ -119,6 +129,12 @@
             right:15px;
             cursor:pointer;
             font-size:24px;
+            color: #555;
+            z-index: 10000;
+        }
+
+        #modalPreview #closeModal:hover {
+            color: #000;
         }
 
         #previewContent {
@@ -126,6 +142,13 @@
             height:100%;
             overflow:auto;
             text-align:center;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            flex-wrap: wrap;
         }
     </style>
 </head>
@@ -171,25 +194,67 @@
                 <td>{{ item.entrega.fecha_entrega|date:"d/m/Y H:i" }}</td>
 
                 <td>
+                    <div class="btn-group">
                     {% if item.entrega.archivo %}
                         {% with archivo=item.entrega.archivo %}
-                            {% with ext=archivo.url_archivo.name|lower|slice:"-4:" %}
-                                {% if ext == ".pdf" %}
-                                    <a class="btn" href="javascript:void(0)" onclick="openPreview('{{ archivo.url_archivo.url }}','pdf')">📄 Ver PDF</a>
-                                {% elif ext == ".jpg" or ext == ".png" or ext == ".gif" or archivo.url_archivo.name|lower|slice:"-5:" == ".jpeg" %}
-                                    <a class="btn" href="javascript:void(0)" onclick="openPreview('{{ archivo.url_archivo.url }}','img')">🖼 Ver imagen</a>
-                                {% elif ext == ".doc" or archivo.url_archivo.name|lower|slice:"-5:" == ".docx"
-                                        or ext == ".xls" or archivo.url_archivo.name|lower|slice:"-5:" == ".xlsx"
-                                        or ext == ".ppt" or archivo.url_archivo.name|lower|slice:"-5:" == ".pptx" %}
-                                    <a class="btn" href="javascript:void(0)" onclick="openPreview('{{ archivo.url_archivo.url }}','office')">📄 Ver documento</a>
+                            {% with extension=archivo.url_archivo.name|lower|slice:"-4:" %}
+                                {% if extension == ".pdf" %}
+                                    <!-- PDF: Google Docs Viewer -->
+                                    <a class="btn" href="https://docs.google.com/viewer?url={{ request.scheme }}://{{ request.get_host }}{{ archivo.url_archivo.url }}&embedded=true" target="_blank" title="Ver con Google Viewer">
+                                        📄 Ver PDF
+                                    </a>
+                                    <a class="btn btn-secondary" href="{{ archivo.url_archivo.url }}" target="_blank" download>
+                                        ⬇ Descargar
+                                    </a>
+                                
+                                {% elif extension == ".jpg" or extension == ".png" or extension == ".gif" or archivo.url_archivo.name|lower|slice:"-5:" == ".jpeg" %}
+                                    <!-- Imágenes: Modal propio -->
+                                    <a class="btn" href="javascript:void(0)" onclick="openImagePreview('{{ archivo.url_archivo.url }}')" title="Ver imagen">
+                                        🖼 Ver imagen
+                                    </a>
+                                    <a class="btn btn-secondary" href="{{ archivo.url_archivo.url }}" target="_blank" download>
+                                        ⬇ Descargar
+                                    </a>
+                                
+                                {% elif extension == ".doc" or archivo.url_archivo.name|lower|slice:"-5:" == ".docx" %}
+                                    <!-- Word: Google Docs Viewer -->
+                                    <a class="btn" href="https://docs.google.com/viewer?url={{ request.scheme }}://{{ request.get_host }}{{ archivo.url_archivo.url }}&embedded=true" target="_blank" title="Ver con Google Viewer">
+                                        📝 Ver Word
+                                    </a>
+                                    <a class="btn btn-secondary" href="{{ archivo.url_archivo.url }}" target="_blank" download>
+                                        ⬇ Descargar
+                                    </a>
+                                
+                                {% elif extension == ".xls" or archivo.url_archivo.name|lower|slice:"-5:" == ".xlsx" %}
+                                    <!-- Excel: Google Docs Viewer -->
+                                    <a class="btn" href="https://docs.google.com/viewer?url={{ request.scheme }}://{{ request.get_host }}{{ archivo.url_archivo.url }}&embedded=true" target="_blank" title="Ver con Google Viewer">
+                                        📊 Ver Excel
+                                    </a>
+                                    <a class="btn btn-secondary" href="{{ archivo.url_archivo.url }}" target="_blank" download>
+                                        ⬇ Descargar
+                                    </a>
+                                
+                                {% elif extension == ".ppt" or archivo.url_archivo.name|lower|slice:"-5:" == ".pptx" %}
+                                    <!-- PowerPoint: Google Docs Viewer -->
+                                    <a class="btn" href="https://docs.google.com/viewer?url={{ request.scheme }}://{{ request.get_host }}{{ archivo.url_archivo.url }}&embedded=true" target="_blank" title="Ver con Google Viewer">
+                                        🖥 Ver PowerPoint
+                                    </a>
+                                    <a class="btn btn-secondary" href="{{ archivo.url_archivo.url }}" target="_blank" download>
+                                        ⬇ Descargar
+                                    </a>
+                                
                                 {% else %}
-                                    <a class="btn" href="{{ archivo.url_archivo.url }}" target="_blank">📄 Descargar</a>
+                                    <!-- Otros tipos: solo descarga -->
+                                    <a class="btn btn-secondary" href="{{ archivo.url_archivo.url }}" target="_blank" download>
+                                        📄 Descargar
+                                    </a>
                                 {% endif %}
                             {% endwith %}
                         {% endwith %}
                     {% else %}
                         —
                     {% endif %}
+                    </div>
                 </td>
             {% else %}
                 <td><span class="badge no-entregado">No entregado</span></td>
@@ -207,7 +272,7 @@
 
 <a href="{% url 'ver_trabajos' clase.id_clase %}" class="btn volver">⬅ Volver a trabajos</a>
 
-<!-- Modal de previsualización -->
+<!-- Modal de previsualización para imágenes -->
 <div id="modalPreview">
     <div class="modal-content">
         <span id="closeModal">&times;</span>
@@ -215,43 +280,43 @@
     </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
 <script>
 const modal = document.getElementById('modalPreview');
 const previewContent = document.getElementById('previewContent');
 const closeModal = document.getElementById('closeModal');
 
-closeModal.onclick = () => modal.style.display = 'none';
-
-function openPreview(url, tipo) {
+closeModal.onclick = () => {
+    modal.style.display = 'none';
     previewContent.innerHTML = '';
-    if(tipo === 'pdf') {
-        const canvas = document.createElement('canvas');
-        previewContent.appendChild(canvas);
-        pdfjsLib.getDocument(url).promise.then(pdf => {
-            pdf.getPage(1).then(page => {
-                const viewport = page.getViewport({ scale: 1.2 });
-                canvas.width = viewport.width;
-                canvas.height = viewport.height;
-                const ctx = canvas.getContext('2d');
-                page.render({ canvasContext: ctx, viewport: viewport });
-            });
-        });
-    } else if(tipo === 'img') {
-        const img = document.createElement('img');
-        img.src = url;
-        img.style.maxWidth = '100%';
-        img.style.maxHeight = '80vh';
-        previewContent.appendChild(img);
-    } else if(tipo === 'office') {
-        const iframe = document.createElement('iframe');
-        iframe.src = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(url)}`;
-        iframe.style.width = '100%';
-        iframe.style.height = '80vh';
-        previewContent.appendChild(iframe);
+};
+
+// Cerrar modal al hacer clic fuera del contenido
+modal.onclick = (e) => {
+    if (e.target === modal) {
+        modal.style.display = 'none';
+        previewContent.innerHTML = '';
     }
+};
+
+// Función para previsualizar imágenes en el modal
+function openImagePreview(url) {
+    previewContent.innerHTML = '';
+    const img = document.createElement('img');
+    img.src = url;
+    img.style.maxWidth = '100%';
+    img.style.maxHeight = '80vh';
+    img.style.borderRadius = '4px';
+    previewContent.appendChild(img);
     modal.style.display = 'flex';
 }
+
+// Manejo de tecla Escape para cerrar modal
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.style.display === 'flex') {
+        modal.style.display = 'none';
+        previewContent.innerHTML = '';
+    }
+});
 </script>
 
 </body>
