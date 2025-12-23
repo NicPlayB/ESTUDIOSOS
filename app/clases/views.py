@@ -150,6 +150,44 @@ def clases_inactivas(request):
         "rol": rol
     })
     
+@login_requerido
+def editar_eliminar_clase(request, clase_id):
+    usuario = request.usuario
+    rol = usuario.id_tipo_rol.id_rol
+
+    clase = get_object_or_404(Clase, id_clase=clase_id, usuario=usuario)
+
+    # 🔒 Solo profesor
+    if rol != 3:
+        messages.error(request, "No tienes permisos para esta acción.")
+        return redirect("clases_activas")
+
+    # ✏️ EDITAR
+    if "editar_clase" in request.POST:
+        clase.nombre = request.POST.get("nombre")
+        clase.descripcion = request.POST.get("descripcion")
+        clase.estado = request.POST.get("estado")
+        clase.save()
+        messages.success(request, "Clase actualizada correctamente.")
+        return redirect("clases_activas")
+
+    # 🗑️ ELIMINAR
+    if request.method == "POST" and "eliminar_clase" in request.POST:
+
+        # 🔥 VALIDACIÓN: ¿hay trabajos asociados?
+        if Trabajos.objects.filter(clase=clase).exists():
+            messages.error(
+                request,
+                " No puedes eliminar esta clase porque ya tiene trabajos asociados."
+            )
+            return redirect("clases_activas")
+
+        clase.delete()
+        messages.success(request, "Clase eliminada correctamente.")
+        return redirect("clases_activas")
+
+    return redirect("clases_activas")
+    
     
 @login_requerido
 def ver_trabajos(request, id_clase):
@@ -393,4 +431,116 @@ def ver_entregas_trabajo(request, trabajo_id):
         'trabajo': trabajo,
         'clase': clase,
         'estudiantes': estudiantes
+    })
+    
+    
+def inscritos_clase(request, clase_id):
+    # Obtener la clase
+    clase = get_object_or_404(Clase, id_clase=clase_id)
+
+    # Obtener los inscritos a esa clase
+    inscritos = InscritoClase.objects.filter(clase=clase).select_related('usuario')
+
+    context = {
+        'clase': clase,
+        'inscritos': inscritos
+    }
+
+    return render(request, 'inscritos/inscritos_clase.html', context)
+
+
+
+
+@login_requerido
+def clases_virtuales(request, clase_id):
+    clase = get_object_or_404(Clase, id_clase=clase_id)
+
+    clases_virtuales = ClaseVirtual.objects.filter(
+        clase=clase
+    ).order_by('fecha_de_clase')
+
+    # ➕ CREAR
+    if request.method == 'POST' and 'crear' in request.POST:
+        form = ClaseVirtualForm(request.POST)
+        if form.is_valid():
+            obj = form.save(commit=False)
+            obj.clase = clase
+            obj.usuario = request.usuario  # 👈 CORRECTO
+            obj.save()
+            messages.success(request, "Clase virtual creada correctamente.")
+            return redirect('clases_virtuales', clase_id=clase.id_clase)
+
+    # ✏️ EDITAR
+    elif request.method == 'POST' and 'editar' in request.POST:
+        clase_virtual = get_object_or_404(
+            ClaseVirtual,
+            id_clase_virtual=request.POST.get('id_clase_virtual')
+        )
+        form = ClaseVirtualForm(request.POST, instance=clase_virtual)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Clase virtual actualizada correctamente.")
+            return redirect('clases_virtuales', clase_id=clase.id_clase)
+
+    # 🗑️ ELIMINAR
+    elif request.method == 'POST' and 'eliminar' in request.POST:
+        clase_virtual = get_object_or_404(
+            ClaseVirtual,
+            id_clase_virtual=request.POST.get('id_clase_virtual')
+        )
+        clase_virtual.delete()
+        messages.success(request, "Clase virtual eliminada correctamente.")
+        return redirect('clases_virtuales', clase_id=clase.id_clase)
+
+    form = ClaseVirtualForm()
+
+    return render(request, 'clases_virtuales/clases_virtuales.html', {
+        'clase': clase,
+        'clases_virtuales': clases_virtuales,
+        'form': form,
+        'usuario': request.usuario
+    })
+    
+    
+@login_requerido
+def comentarios_clase(request, clase_id):
+    clase = get_object_or_404(Clase, id_clase=clase_id)
+    comentarios = ComentarioClase.objects.filter(
+        clase=clase
+    ).order_by('fecha_creacion')
+
+    # CREAR
+    if request.method == 'POST' and 'crear' in request.POST:
+        ComentarioClase.objects.create(
+            descripcion=request.POST.get('descripcion'),
+            clase=clase,
+            usuario=request.usuario
+        )
+        return redirect('comentarios_clase', clase_id=clase.id_clase)
+
+    # EDITAR (solo si es mío)
+    if request.method == 'POST' and 'editar' in request.POST:
+        comentario = get_object_or_404(
+            ComentarioClase,
+            id_comentario_clase=request.POST.get('id_comentario_clase'),
+            usuario=request.usuario
+        )
+        comentario.descripcion = request.POST.get('descripcion')
+        comentario.save()
+        return redirect('comentarios_clase', clase_id=clase.id_clase)
+
+    # ELIMINAR (solo si es mío)
+    if request.method == 'POST' and 'eliminar' in request.POST:
+        comentario = get_object_or_404(
+            ComentarioClase,
+            id_comentario_clase=request.POST.get('id_comentario_clase'),
+            usuario=request.usuario
+        )
+        comentario.delete()
+        return redirect('comentarios_clase', clase_id=clase.id_clase)
+
+    return render(request, 'comentarios/comentarios_clase.html', {
+        'clase': clase,
+        'comentarios': comentarios,
+        'usuario': request.usuario
     })

@@ -83,3 +83,14 @@ class TrabajoForm(forms.ModelForm):
             "fecha_entrega": forms.DateInput(attrs={"type": "date", "class": "form-control"}),
             "clase": forms.Select(attrs={"class": "form-control"}),
         }
+        
+        
+class ClaseVirtualForm(forms.ModelForm):
+    class Meta:
+        model = ClaseVirtual
+        fields = ['descripcion', 'fecha_de_clase', 'url_clase']
+        widgets = {
+            'fecha_de_clase': forms.DateTimeInput(
+                attrs={'type': 'datetime-local'}
+            )
+        }

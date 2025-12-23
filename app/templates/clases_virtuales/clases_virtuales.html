@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Clases virtuales</title>
+
+<style>
+body { font-family: Arial; background:#f4f6f9; padding:20px }
+.card { background:#fff; padding:15px; border-radius:6px; margin-bottom:10px }
+button { padding:6px 10px; margin:4px }
+.modal {
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.4);
+}
+.modal-content {
+    background:#fff;
+    width:400px;
+    margin:10% auto;
+    padding:20px;
+    border-radius:6px;
+}
+.close { float:right; cursor:pointer }
+</style>
+
+<script>
+function abrirModal(id){
+    document.getElementById(id).style.display='block'
+}
+function cerrarModal(id){
+    document.getElementById(id).style.display='none'
+}
+</script>
+</head>
+
+<body>
+
+<h2>Clases virtuales – {{ clase.nombre }}</h2>
+
+<nav>
+        <h3>Menú</h3>
+
+        <a href="{% url 'clases_activas' %}">Clases activas</a><br>
+
+        <a href="{% url 'ver_trabajos' clase.id_clase %}">Trabajos</a><br>
+
+        <a href="{% url 'inscritos_clase' clase.id_clase %}">Inscritos</a><br>
+
+        <a href="{% url 'clases_virtuales' clase.id_clase %}">Clases virtuales</a><br>
+
+        <a href="{% url 'comentarios_clase' clase.id_clase %}">Comentarios</a>
+    </nav>
+
+<button onclick="abrirModal('modalCrear')">➕ Crear clase virtual</button>
+
+{% for cv in clases_virtuales %}
+<div class="card">
+    <strong>{{ cv.descripcion }}</strong><br>
+    📅 {{ cv.fecha_de_clase|date:"d/m/Y H:i" }}<br>
+    🔗 <a href="{{ cv.url_clase }}" target="_blank">Entrar</a><br>
+
+    <button onclick="abrirModal('modalEditar{{ cv.id_clase_virtual }}')">✏️ Editar</button>
+    <button onclick="abrirModal('modalEliminar{{ cv.id_clase_virtual }}')">🗑️ Eliminar</button>
+</div>
+
+<!-- MODAL EDITAR -->
+<div class="modal" id="modalEditar{{ cv.id_clase_virtual }}">
+    <div class="modal-content">
+        <span class="close" onclick="cerrarModal('modalEditar{{ cv.id_clase_virtual }}')">✖</span>
+
+        <h3>Editar clase virtual</h3>
+
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="editar">
+            <input type="hidden" name="id_clase_virtual" value="{{ cv.id_clase_virtual }}">
+
+            <input type="text" name="descripcion" value="{{ cv.descripcion }}" required><br><br>
+            <input type="datetime-local" name="fecha_de_clase"
+                   value="{{ cv.fecha_de_clase|date:'Y-m-d\\TH:i' }}" required><br><br>
+            <input type="url" name="url_clase" value="{{ cv.url_clase }}" required><br><br>
+
+            <button type="submit">Guardar</button>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL ELIMINAR -->
+<div class="modal" id="modalEliminar{{ cv.id_clase_virtual }}">
+    <div class="modal-content">
+        <h3>¿Eliminar clase virtual?</h3>
+        <p>{{ cv.descripcion }}</p>
+
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="eliminar">
+            <input type="hidden" name="id_clase_virtual" value="{{ cv.id_clase_virtual }}">
+            <button type="submit">Sí, eliminar</button>
+            <button type="button" onclick="cerrarModal('modalEliminar{{ cv.id_clase_virtual }}')">
+                Cancelar
+            </button>
+        </form>
+    </div>
+</div>
+
+{% endfor %}
+
+<!-- MODAL CREAR -->
+<div class="modal" id="modalCrear">
+    <div class="modal-content">
+        <span class="close" onclick="cerrarModal('modalCrear')">✖</span>
+
+        <h3>Nueva clase virtual</h3>
+
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="crear">
+
+            {{ form.descripcion }}
+            {{ form.fecha_de_clase }}
+            {{ form.url_clase }}
+
+            <br><br>
+            <button type="submit">Crear</button>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

@@ -191,3 +191,77 @@ class EntregaTrabajo(models.Model):
     def __str__(self):
         return f"Entrega {self.id_entrega} - {self.estudiante} - Trabajo {self.trabajo.id_trabajos}"
 
+
+class ClaseVirtual(models.Model):
+    id_clase_virtual = models.AutoField(primary_key=True)
+
+    descripcion = models.CharField(max_length=255)
+
+    fecha_creacion = models.DateTimeField(
+        auto_now_add=True,
+        db_column='fecha_creacion'
+    )
+
+    fecha_de_clase = models.DateTimeField(
+        db_column='fecha_de_clase'
+    )
+
+    url_clase = models.CharField(
+        max_length=255,
+        db_column='url_clase'
+    )
+
+    # Relaciones
+    clase = models.ForeignKey(
+        Clase,
+        on_delete=models.CASCADE,
+        db_column='id_clase',
+        related_name='clases_virtuales'
+    )
+
+    usuario = models.ForeignKey(
+        Usuario,
+        on_delete=models.CASCADE,
+        db_column='id_usuario',
+        related_name='clases_virtuales'
+    )
+
+    class Meta:
+        db_table = 'clases_virtuales'
+        managed = False
+    def __str__(self):
+        return f"Clase virtual {self.id_clase_virtual} - {self.descripcion}"
+    
+    
+    
+    
+class ComentarioClase(models.Model):
+    id_comentario_clase = models.AutoField(primary_key=True)
+
+    descripcion = models.CharField(max_length=255)
+
+    fecha_creacion = models.DateTimeField(
+        auto_now_add=True,
+        db_column='fecha_creacion'
+    )
+
+    # Relaciones
+    clase = models.ForeignKey(
+        Clase,
+        on_delete=models.CASCADE,
+        db_column='id_clase',
+        related_name='comentarios'
+    )
+
+    usuario = models.ForeignKey(
+        Usuario,
+        on_delete=models.CASCADE,
+        db_column='id_usuario',
+        related_name='comentarios_clase'
+    )
+
+    class Meta:
+        db_table = 'comentarios_clase'
+
+    def __str__(self):
+        return f"Comentario {self.id_comentario_clase} - {self.usuario.nombres}"

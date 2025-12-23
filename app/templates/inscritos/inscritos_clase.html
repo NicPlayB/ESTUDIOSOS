@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Inscritos - {{ clase.nombre }}</title>
+</head>
+<body>
+
+
+    <nav>
+        <h3>Menú</h3>
+
+        <a href="{% url 'clases_activas' %}">Clases activas</a><br>
+
+        <a href="{% url 'ver_trabajos' clase.id_clase %}">Trabajos</a><br>
+
+        <a href="{% url 'inscritos_clase' clase.id_clase %}">Inscritos</a><br>
+
+        <a href="{% url 'clases_virtuales' clase.id_clase %}">Clases virtuales</a><br>
+
+        <a href="{% url 'comentarios_clase' clase.id_clase %}">Comentarios</a>
+    </nav>
+
+<h2>Inscritos en {{ clase.nombre }}</h2>
+<p>Código: {{ clase.codigo_clase }}</p>
+
+{% if inscritos %}
+    <table border="1" cellpadding="8">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Fecha inscripción</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for inscripcion in inscritos %}
+                <tr>
+                    <td>{{ inscripcion.usuario.nombres }}</td>
+                    <td>{{ inscripcion.usuario.correo }}</td>
+                    <td>{{ inscripcion.fecha_inscripcion|date:"d/m/Y H:i" }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No hay estudiantes inscritos.</p>
+{% endif %}
+
+</body>
+</html>

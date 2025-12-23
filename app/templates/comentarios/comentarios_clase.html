@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Comentarios</title>
+
+<style>
+body {
+    background:#f4f6f9;
+    font-family: Arial;
+}
+
+.chat {
+    max-width: 800px;
+    margin: auto;
+}
+
+.mensaje {
+    max-width: 60%;
+    padding: 10px;
+    border-radius: 10px;
+    margin: 8px 0;
+    position: relative;
+}
+
+.izquierda {
+    background: #ffffff;
+}
+
+.derecha {
+    background: #dcf8c6;
+    margin-left: auto;
+}
+
+.usuario {
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.fecha {
+    font-size: 10px;
+    text-align: right;
+    color: #666;
+}
+
+.menu {
+    position: absolute;
+    top: 5px;
+    right: 8px;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.menu-opciones {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 20px;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    z-index: 10;
+    min-width: 120px;
+}
+
+.menu-opciones button {
+    background: none;
+    border: none;
+    padding: 8px;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+}
+
+.menu-opciones button:hover {
+    background: #f0f0f0;
+}
+
+.form-comentario {
+    margin-top: 20px;
+    display: flex;
+    gap: 5px;
+}
+
+.form-comentario input {
+    flex: 1;
+    padding: 10px;
+}
+</style>
+
+<script>
+let editando = false;
+let comentarioEditandoId = null;
+
+document.addEventListener("click", function (e) {
+    // Cerrar menús
+    document.querySelectorAll(".menu-opciones").forEach(menu => {
+        menu.style.display = "none";
+    });
+
+    // Abrir menú
+    if (e.target.classList.contains("menu-btn")) {
+        e.stopPropagation();
+        e.target.nextElementSibling.style.display = "block";
+    }
+});
+
+// Activar edición
+function editarComentario(id, texto) {
+    const input = document.getElementById("input-comentario");
+    const form = document.getElementById("form-comentario");
+    const boton = document.getElementById("btn-enviar");
+
+    input.value = texto;
+    input.focus();
+
+    editando = true;
+    comentarioEditandoId = id;
+
+    form.querySelector("[name=crear]").disabled = true;
+    document.getElementById("campo-editar").disabled = false;
+    document.getElementById("id-comentario").value = id;
+
+    boton.textContent = "Guardar";
+}
+</script>
+</head>
+
+<body>
+
+<div class="chat">
+
+<nav>
+        <h3>Menú</h3>
+
+        <a href="{% url 'clases_activas' %}">Clases activas</a><br>
+
+        <a href="{% url 'ver_trabajos' clase.id_clase %}">Trabajos</a><br>
+
+        <a href="{% url 'inscritos_clase' clase.id_clase %}">Inscritos</a><br>
+
+        <a href="{% url 'clases_virtuales' clase.id_clase %}">Clases virtuales</a><br>
+
+        <a href="{% url 'comentarios_clase' clase.id_clase %}">Comentarios</a>
+    </nav>
+
+
+<h2>Comentarios – {{ clase.nombre }}</h2>
+
+{% for c in comentarios %}
+<div class="mensaje {% if c.usuario == usuario %}derecha{% else %}izquierda{% endif %}">
+    
+    <div class="usuario">{{ c.usuario.nombres }}</div>
+
+    {{ c.descripcion }}
+
+    <div class="fecha">
+        {{ c.fecha_creacion|date:"d/m/Y H:i" }}
+    </div>
+
+    {% if c.usuario == usuario %}
+    <div class="menu">
+        <span class="menu-btn">⋮</span>
+        <div class="menu-opciones">
+            <button onclick="editarComentario('{{ c.id_comentario_clase }}', '{{ c.descripcion|escapejs }}')">
+                ✏️ Editar
+            </button>
+
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="eliminar">
+                <input type="hidden" name="id_comentario_clase" value="{{ c.id_comentario_clase }}">
+                <button type="submit">🗑️ Eliminar</button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endfor %}
+
+<!-- FORM CREAR / EDITAR -->
+<form method="post" class="form-comentario" id="form-comentario">
+    {% csrf_token %}
+
+    <!-- flags -->
+    <input type="hidden" name="crear">
+    <input type="hidden" name="editar" id="campo-editar" disabled>
+    <input type="hidden" name="id_comentario_clase" id="id-comentario">
+
+    <input
+        type="text"
+        name="descripcion"
+        id="input-comentario"
+        placeholder="Escribe un comentario..."
+        required
+    >
+
+    <button type="submit" id="btn-enviar">Enviar</button>
+</form>
+
+</div>
+
+</body>
+</html>

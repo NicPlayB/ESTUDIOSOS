@@ -100,7 +100,7 @@ CHANNEL_LAYERS = {
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-default_db = 'postgres'  # 'mysql' o 'postgres'
+default_db = 'mysql'  # 'mysql' o 'postgres'
 
 if default_db == 'mysql':
     DATABASES = {

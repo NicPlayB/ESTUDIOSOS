@@ -5,7 +5,8 @@
     <title>Clases Activas</title>
 
     <!-- Bootstrap -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
 
     <style>
         .modal-backdrop.show {
@@ -16,14 +17,20 @@
             font-size: 0.9rem;
             margin-top: 3px;
         }
+        .clase-descripcion {
+            font-size: 0.9rem;
+            color: #555;
+        }
     </style>
 </head>
 
 <body class="bg-light">
 
-    <a href="{% url 'cerrar_sesion' %}" style="color:red;">
-        Cerrar sesión
-    </a>
+    
+
+<a href="{% url 'cerrar_sesion' %}" class="text-danger ms-3 mt-3 d-inline-block">
+    Cerrar sesión
+</a>
 
 <div class="container mt-4">
 
@@ -37,43 +44,62 @@
 
     <!-- MENSAJES -->
     {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        {% endfor %}
-    {% endif %}
+    {% for message in messages %}
 
+        {% if message.tags == 'success' %}
+            <div class="alert alert-success alert-dismissible fade show">
+        {% elif message.tags == 'error' %}
+            <div class="alert alert-danger alert-dismissible fade show">
+        {% elif message.tags == 'warning' %}
+            <div class="alert alert-warning alert-dismissible fade show">
+        {% elif message.tags == 'info' %}
+            <div class="alert alert-info alert-dismissible fade show">
+        {% else %}
+            <div class="alert alert-secondary alert-dismissible fade show">
+        {% endif %}
+
+                {{ message }}
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="alert"></button>
+            </div>
+
+    {% endfor %}
+{% endif %}
+
+    <!-- ========================= -->
     <!-- PROFESOR -->
+    <!-- ========================= -->
     {% if rol == 3 %}
 
-    <!-- BOTÓN PARA ABRIR EL FORM FLOTANTE -->
-    <button class="btn btn-primary mb-4" data-bs-toggle="modal" data-bs-target="#modalCrearClase">
+    <!-- BOTÓN CREAR -->
+    <button class="btn btn-primary mb-4"
+            data-bs-toggle="modal"
+            data-bs-target="#modalCrearClase">
         Crear nueva clase
     </button>
 
-    <!-- MODAL FLOTANTE -->
+    <!-- MODAL CREAR CLASE -->
     <div class="modal fade {% if crear_form.errors %}show{% endif %}"
          id="modalCrearClase"
-         style="{% if crear_form.errors %}display:block;{% endif %}"
-         tabindex="-1">
+         tabindex="-1"
+         style="{% if crear_form.errors %}display:block;{% endif %}">
 
         <div class="modal-dialog">
             <div class="modal-content">
 
                 <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title">Crear Clase</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"></button>
                 </div>
 
                 <div class="modal-body">
-
                     <form method="POST">
                         {% csrf_token %}
 
-                        <!-- Campo: NOMBRE -->
-                        <label class="form-label">Nombre de la clase</label>
+                        <label class="form-label">Nombre</label>
                         {{ crear_form.nombre }}
                         {% if crear_form.nombre.errors %}
                             <div class="error-text">
@@ -81,7 +107,6 @@
                             </div>
                         {% endif %}
 
-                        <!-- Campo: DESCRIPCIÓN -->
                         <label class="form-label mt-3">Descripción</label>
                         {{ crear_form.descripcion }}
                         {% if crear_form.descripcion.errors %}
@@ -90,65 +115,147 @@
                             </div>
                         {% endif %}
 
-                        <button type="submit" name="crear_clase"
+                        <button type="submit"
+                                name="crear_clase"
                                 class="btn btn-success mt-4 w-100">
                             Crear Clase
                         </button>
                     </form>
-
                 </div>
 
             </div>
         </div>
     </div>
 
-    <h4>Tus clases activas</h4>
+    <h4 class="mt-4">Tus clases activas</h4>
 
     {% for clase in clases_profesor %}
-        <div class="card mb-3">
-            <div class="card-body d-flex justify-content-between align-items-center">
+    <div class="card mb-3">
+        <div class="card-body">
 
-                <div>
-                    <strong>{{ clase.codigo_clase }}</strong> |
-                    {{ clase.nombre }} |
-                    Estado: {{ clase.estado }}
-                </div>
+            <h5 class="card-title mb-1">{{ clase.nombre }}</h5>
 
-                <div class="d-flex gap-2">
+            <p class="clase-descripcion mb-2">
+                {{ clase.descripcion }}
+            </p>
 
-                    <!-- BOTÓN CORREGIDO -->
-                    <a href="{% url 'ver_trabajos' clase.id_clase %}" class="btn btn-info btn-sm">
-                        Ver trabajos
-                    </a>
+            <p class="mb-2">
+                <strong>Código:</strong> {{ clase.codigo_clase }} |
+                <strong>Estado:</strong> {{ clase.estado }}
+            </p>
 
-                    <form action="{% url 'cambiar_estado_clase' clase.id_clase %}"
-                          method="POST" class="d-flex">
-                        {% csrf_token %}
-                        <select name="estado" class="form-control me-2">
-                            <option value="Activa" {% if clase.estado == 'Activa' %}selected{% endif %}>Activa</option>
-                            <option value="Inactiva" {% if clase.estado == 'Inactiva' %}selected{% endif %}>Inactiva</option>
-                        </select>
-                        <button class="btn btn-warning">Actualizar</button>
-                        <input type="hidden" name="redirect" value="activas">
-                    </form>
+            <div class="d-flex gap-2">
 
-                </div>
+                <a href="{% url 'ver_trabajos' clase.id_clase %}"
+                   class="btn btn-info btn-sm">
+                    Ver trabajos
+                </a>
+
+                <!-- EDITAR -->
+                <button class="btn btn-warning btn-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalEditarClase{{ clase.id_clase }}">
+                    Editar
+                </button>
+
+                <!-- ELIMINAR -->
+                <form method="POST"
+                      action="{% url 'editar_eliminar_clase' clase.id_clase %}">
+                    {% csrf_token %}
+                    <button type="submit"
+                            name="eliminar_clase"
+                            class="btn btn-danger btn-sm"
+                            onclick="return confirm(
+                            'No podrás eliminar la clase si ya tiene trabajos creados. ¿Deseas continuar?'
+                            )">
+                        Eliminar
+                    </button>
+                </form>
+
             </div>
         </div>
+    </div>
+
+    <!-- MODAL EDITAR CLASE -->
+    <div class="modal fade"
+         id="modalEditarClase{{ clase.id_clase }}"
+         tabindex="-1">
+
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title">Editar Clase</h5>
+                    <button class="btn-close"
+                            data-bs-dismiss="modal"></button>
+                </div>
+
+                <form method="POST"
+                      action="{% url 'editar_eliminar_clase' clase.id_clase %}">
+                    {% csrf_token %}
+
+                    <div class="modal-body">
+
+                        <label class="form-label">Nombre</label>
+                        <input type="text"
+                               name="nombre"
+                               value="{{ clase.nombre }}"
+                               class="form-control"
+                               required>
+
+                        <label class="form-label mt-3">Descripción</label>
+                        <textarea name="descripcion"
+                                  class="form-control"
+                                  required>{{ clase.descripcion }}</textarea>
+
+                        <!-- 🔥 NUEVO: CAMBIAR ESTADO -->
+                        <label class="form-label mt-3">Estado de la clase</label>
+                        <select name="estado" class="form-select">
+                            <option value="Activa"
+                                {% if clase.estado == "Activa" %}selected{% endif %}>
+                                Activa
+                            </option>
+                            <option value="Inactiva"
+                                {% if clase.estado == "Inactiva" %}selected{% endif %}>
+                                Inactiva
+                            </option>
+                        </select>
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit"
+                                name="editar_clase"
+                                class="btn btn-success">
+                            Guardar cambios
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
     {% endfor %}
     {% endif %}
 
-
+    <!-- ========================= -->
     <!-- ESTUDIANTE -->
+    <!-- ========================= -->
     {% if rol == 4 %}
 
     <div class="card mb-4">
-        <div class="card-header bg-success text-white">Unirse a una clase</div>
+        <div class="card-header bg-success text-white">
+            Unirse a una clase
+        </div>
         <div class="card-body">
             <form method="POST">
                 {% csrf_token %}
                 {{ unirse_form.codigo_clase }}
-                <button type="submit" name="unirse_clase" class="btn btn-primary mt-3">Unirse</button>
+                <button type="submit"
+                        name="unirse_clase"
+                        class="btn btn-primary mt-3">
+                    Unirse
+                </button>
             </form>
         </div>
     </div>
@@ -158,16 +265,21 @@
     {% for ins in clases_estudiante %}
         {% if ins.clase.estado == "Activa" %}
         <div class="card mb-2">
-            <div class="card-body d-flex justify-content-between align-items-center">
+            <div class="card-body">
 
-                <div>
-                    <strong>{{ ins.clase.codigo_clase }}</strong> |
-                    {{ ins.clase.nombre }} |
-                    Estado: {{ ins.clase.estado }}
-                </div>
+                <h5 class="mb-1">{{ ins.clase.nombre }}</h5>
 
-                <!-- BOTÓN PARA ESTUDIANTE (estaba bien) -->
-                <a href="{% url 'ver_trabajos' ins.clase.id_clase %}" class="btn btn-info btn-sm">
+                <p class="clase-descripcion mb-2">
+                    {{ ins.clase.descripcion }}
+                </p>
+
+                <p class="mb-2">
+                    <strong>Código:</strong> {{ ins.clase.codigo_clase }} |
+                    <strong>Estado:</strong> {{ ins.clase.estado }}
+                </p>
+
+                <a href="{% url 'ver_trabajos' ins.clase.id_clase %}"
+                   class="btn btn-info btn-sm">
                     Ver trabajos
                 </a>
 
@@ -175,7 +287,6 @@
         </div>
         {% endif %}
     {% endfor %}
-
     {% endif %}
 
 </div>
@@ -184,8 +295,9 @@
 
 {% if crear_form.errors %}
 <script>
-    // Mantener el modal abierto cuando hay errores
-    var modal = new bootstrap.Modal(document.getElementById('modalCrearClase'));
+    var modal = new bootstrap.Modal(
+        document.getElementById('modalCrearClase')
+    );
     modal.show();
 </script>
 {% endif %}
