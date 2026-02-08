@@ -25,6 +25,7 @@ urlpatterns = [
     path('inicio_sesion/', include('inicio_sesion.urls')),
     path('administrador/', include('administrador.urls')),
     path('clases/', include('clases.urls')),
+    path('perfil/', include('perfil.urls')),
     
 ]
 if settings.DEBUG:

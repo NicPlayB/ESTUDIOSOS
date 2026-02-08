@@ -3,207 +3,607 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Detalle del Trabajo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle del Trabajo - {{ trabajo.descripcion|truncatechars:30 }}</title>
 
-    <!-- PDF.JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-
-        .preview-box {
-            width: 220px;
-            height: 280px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            background: #f8f9fa;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            margin-bottom: 10px;
-        }
-
-        .preview-box img,
-        .preview-box canvas {
-            max-width: 100%;
-            max-height: 100%;
-        }
-
-        .file-icon {
-            width: 96px;
-            height: 96px;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 10px 16px;
-            background: #0d6efd;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 6px;
-            margin: 5px 0;
-        }
-
-        .btn:hover {
-            background: #0b5ed7;
-        }
-
-        .btn-secondary {
-            background: #6c757d;
-        }
-
-        .btn-secondary:hover {
-            background: #5c636a;
-        }
-    </style>
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS Personalizado -->
+    <link rel="stylesheet" href="{% static 'css/trabajos/detalle_trabajo.css' %}">
 </head>
 <body>
 
-<!-- BOTONES SUPERIORES -->
-<a href="{% url 'ver_trabajos' trabajo.clase.id_clase %}" class="btn btn-secondary">
-    ⬅ Volver a trabajos
-</a>
+    <!-- BOTÓN HAMBURGUESA -->
+    <button class="hamburger-btn" id="hamburgerBtn" title="Menú">
+        <i class="bi bi-list"></i>
+    </button>
 
-{% if es_profesor %}
-<a href="{% url 'ver_entregas_trabajo' trabajo.id_trabajos %}" class="btn">
-    📋 Ver entregas de estudiantes
-</a>
-{% endif %}
+    <!-- OVERLAY PARA CERRAR NAV -->
+    <div class="nav-overlay" id="navOverlay"></div>
 
-<h2>📄 Detalle del Trabajo</h2>
-
-<p><strong>ID:</strong> {{ trabajo.id_trabajos }}</p>
-<p><strong>Descripción:</strong> {{ trabajo.descripcion }}</p>
-<p><strong>Fecha creación:</strong> {{ trabajo.fecha_creacion }}</p>
-<p><strong>Fecha entrega:</strong> {{ trabajo.fecha_entrega }}</p>
-
-<hr>
-
-<h3>📎 Archivo del Trabajo</h3>
-
-{% if archivo %}
-    {% with archivo.url_archivo.url as file_url %}
-    {% with archivo.url_archivo.name|lower as file_name %}
-    {% with file_name|slice:"-4:" as ext %}
-
-    <div class="preview-box">
-        {% if ext == ".jpg" or ext == ".png" or ext == ".gif" or file_name|slice:"-5:" == ".jpeg" %}
-            <img src="{{ file_url }}">
-
-        {% elif ext == ".pdf" %}
-            <canvas id="pdf-trabajo"></canvas>
-
-        {% elif ext == ".doc" or file_name|slice:"-5:" == ".docx" %}
-            <img src="{% static 'icons/doc.png' %}" class="file-icon">
-
-        {% elif ext == ".xls" or file_name|slice:"-5:" == ".xlsx" %}
-            <img src="{% static 'icons/xls.png' %}" class="file-icon">
-
-        {% elif ext == ".ppt" or file_name|slice:"-5:" == ".pptx" %}
-            <img src="{% static 'icons/ppt.png' %}" class="file-icon">
-
-        {% elif ext == ".zip" or ext == ".rar" %}
-            <img src="{% static 'icons/zip.png' %}" class="file-icon">
-
-        {% else %}
-            <img src="{% static 'icons/document.png' %}" class="file-icon">
+    <!-- NUEVO CONTENEDOR DE ALERTAS CLEAN (BORDE) -->
+    <div class="alert-container">
+        {% if messages %}
+            {% for message in messages %}
+                {% if message.tags == 'success' %}
+                    <!-- El mensaje de éxito se maneja con el modal, no con alertas -->
+                {% elif message.tags == 'error' %}
+                    <div class="alert-toast error">
+                        <div class="alert-toast-icon">
+                            <!-- SVG para error -->
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="15" y1="9" x2="9" y2="15"></line>
+                                <line x1="9" y1="9" x2="15" y2="15"></line>
+                            </svg>
+                        </div>
+                        <div class="alert-toast-content">
+                            <div class="alert-toast-title">Error</div>
+                            <div class="alert-toast-message">{{ message }}</div>
+                        </div>
+                        <button class="alert-toast-close">&times;</button>
+                        <div class="alert-toast-progress" style="color: var(--alert-error)"></div>
+                    </div>
+                {% elif message.tags == 'warning' %}
+                    <div class="alert-toast warning">
+                        <div class="alert-toast-icon">
+                            <!-- SVG para warning -->
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                <line x1="12" y1="9" x2="12" y2="13"></line>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                            </svg>
+                        </div>
+                        <div class="alert-toast-content">
+                            <div class="alert-toast-title">Advertencia</div>
+                            <div class="alert-toast-message">{{ message }}</div>
+                        </div>
+                        <button class="alert-toast-close">&times;</button>
+                        <div class="alert-toast-progress" style="color: var(--alert-warning)"></div>
+                    </div>
+                {% elif message.tags == 'info' %}
+                    <div class="alert-toast info">
+                        <div class="alert-toast-icon">
+                            <!-- SVG para info -->
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="16" x2="12" y2="12"></line>
+                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                            </svg>
+                        </div>
+                        <div class="alert-toast-content">
+                            <div class="alert-toast-title">Información</div>
+                            <div class="alert-toast-message">{{ message }}</div>
+                        </div>
+                        <button class="alert-toast-close">&times;</button>
+                        <div class="alert-toast-progress" style="color: var(--alert-info)"></div>
+                    </div>
+                {% else %}
+                    <div class="alert-toast info">
+                        <div class="alert-toast-icon">
+                            <!-- SVG para info por defecto -->
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="16" x2="12" y2="12"></line>
+                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                            </svg>
+                        </div>
+                        <div class="alert-toast-content">
+                            <div class="alert-toast-title">Mensaje</div>
+                            <div class="alert-toast-message">{{ message }}</div>
+                        </div>
+                        <button class="alert-toast-close">&times;</button>
+                        <div class="alert-toast-progress" style="color: var(--alert-info)"></div>
+                    </div>
+                {% endif %}
+            {% endfor %}
         {% endif %}
     </div>
 
-    <a href="{{ file_url }}" target="_blank">⬇ Descargar archivo</a>
+    <div class="container-fluid p-0">
+        <!-- LAYOUT PRINCIPAL -->
+        <div class="main-layout">
+            <!-- NAVEGACIÓN (CON EL DISEÑO DEL CÓDIGO 1 PERO LAS URLS DEL CÓDIGO 3) -->
+            <div class="sidebar-nav">
+                <!-- LOGO CON IMAGEN DEL CÓDIGO 1 -->
+                <div class="logo-section">
+                    <img src="{% static 'img/Logo tipo Estudiosos_Mesa de trabajo 1 copia 14.png' %}" alt="Logo Estudiosos">
+                    <span>Estudiosos</span>
+                </div>
+                <nav class="nav flex-column">
+                    <!-- ENLACES CON LAS URLS ORIGINALES DEL CÓDIGO 3 -->
+                    <a class="nav-link" href="{% url 'panel_inicio' trabajo.clase.id_clase %}">
+                        <i class="bi bi-house-door"></i>Inicio
+                    </a>
+                    
+                    {% if trabajo.clase %}
+                    <!-- ENLACE ACTIVO (Trabajos) CON LA URL ORIGINAL -->
+                    <a class="nav-link active" href="{% url 'gestionar_trabajos' trabajo.clase.id_clase %}">
+                        <i class="bi bi-file-text"></i>Trabajos
+                    </a>
+                    
+                    <a class="nav-link" href="{% url 'inscritos_clase' trabajo.clase.id_clase %}">
+                        <i class="bi bi-people"></i>Inscritos
+                    </a>
+                    
+                    <a class="nav-link" href="{% url 'clases_virtuales' trabajo.clase.id_clase %}">
+                        <i class="bi bi-camera-video"></i>Clases virtuales
+                    </a>
+                    
+                    <a class="nav-link" href="{% url 'comentarios_clase' trabajo.clase.id_clase %}">
+                        <i class="bi bi-chat-dots"></i>Comentarios
+                    </a>
+                    {% endif %}
+                    
+                    {% if modo_admin %}
+                    <a class="nav-link" href="{% url 'panel_administrador' %}" title="Panel de Administración">
+                        <i class="bi bi-shield-lock-fill"></i>Panel de Administración
+                    </a>
+                    {% endif %}
+                     <a class="nav-link " href="{% url 'documentos_usuario' %}" title="Clases Inactivas">
+                        <i class="bi bi-file-text"></i>Tus Documentos
+                    </a>
+                </nav>
 
-    {% endwith %}
-    {% endwith %}
-    {% endwith %}
-{% else %}
-    <p>No hay archivo asociado.</p>
-{% endif %}
+                <!-- MENÚ USUARIO EN EL NAV (MANTENIENDO LAS URLS ORIGINALES) -->
+                <div class="sidebar-nav-footer">
+                    <a class="nav-link" href="{% url 'perfil_usuario' %}">
+                        <i class="bi bi-person"></i>Mi perfil
+                    </a>
+                    <a class="nav-link" href="{% url 'cerrar_sesion' %}">
+                        <i class="bi bi-box-arrow-right"></i>Cerrar sesión
+                    </a>
+                </div>
+            </div>
 
-{# ================= ENTREGA DEL ESTUDIANTE ================= #}
+            
+            <!-- CONTENIDO PRINCIPAL -->
+            <div class="container-main">
+                <!-- HEADER -->
+                <div class="page-header">
+                    <h2><i class="bi bi-file-earmark-text me-3"></i>Detalle del Trabajo</h2>
+                    <p class="mb-0">
+                        <strong>Clase:</strong> 
+                        {% if trabajo.clase %}
+                            <span class="badge bg-secondary">{{ trabajo.clase.nombre }}</span>
+                        {% else %}
+                            <span class="text-muted">No asignado a clase</span>
+                        {% endif %}
+                    </p>
+                </div>
 
-{% if es_estudiante %}
-<hr>
+                <!-- BOTÓN VOLVER (debajo del header) -->
+                <a href="{% if trabajo.clase %}{% url 'gestionar_trabajos' trabajo.clase.id_clase %}{% else %}{% url 'inicio' %}{% endif %}" 
+                   class="btn-volver">
+                    <i class="bi bi-arrow-left"></i> Volver a trabajos
+                </a>
 
-{% if entrega %}
-<h3>📤 Mi Entrega</h3>
+                <!-- CONTENIDO DEL DETALLE -->
+                <div class="row g-4">
+                    <!-- INFO DEL TRABAJO (IZQUIERDA) - MÁS COMPACTA Y PEQUEÑA -->
+                    <div class="col-lg-4 col-lg-info">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="bi bi-info-circle"></i> Información del trabajo
+                            </div>
+                            <div class="card-body">
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="bi bi-text-paragraph"></i> Descripción
+                                    </div>
+                                    <div class="info-value">{{ trabajo.descripcion }}</div>
+                                </div>
 
-{% with entrega.archivo.url_archivo.url as file_url %}
-{% with entrega.archivo.url_archivo.name|lower as file_name %}
-{% with file_name|slice:"-4:" as ext %}
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="bi bi-calendar-check"></i> Fecha de entrega
+                                    </div>
+                                    <div class="info-value">{{ trabajo.fecha_entrega|date:"d/m/Y" }}</div>
+                                </div>
 
-<div class="preview-box">
-    {% if ext == ".jpg" or ext == ".png" or ext == ".gif" or file_name|slice:"-5:" == ".jpeg" %}
-        <img src="{{ file_url }}">
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="bi bi-calendar-plus"></i> Fecha creación
+                                    </div>
+                                    <div class="info-value">{{ trabajo.fecha_creacion }}</div>
+                                </div>
 
-    {% elif ext == ".pdf" %}
-        <canvas id="pdf-entrega"></canvas>
+                                <!-- Información del creador -->
+                                {% if trabajo.usuario %}
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="bi bi-person-badge"></i> Creado por
+                                    </div>
+                                    <div class="info-value">{{ trabajo.usuario.nombres }} {{ trabajo.usuario.apellidos }}</div>
+                                </div>
+                                {% endif %}
+                                
+                                <!-- Estado -->
+                                {% if trabajo.estado %}
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="bi bi-check-circle"></i> Estado
+                                    </div>
+                                    <div class="info-value">
+                                        <span class="status-badge 
+                                            {% if trabajo.estado == 'Entregado' %}entregado
+                                            {% elif trabajo.estado == 'Pendiente' %}pendiente
+                                            {% elif trabajo.estado == 'Entregado con retardo' %}retardo
+                                            {% else %}no-entregado{% endif %}">
+                                            <i class="bi 
+                                                {% if trabajo.estado == 'Entregado' %}bi-check-circle
+                                                {% elif trabajo.estado == 'Pendiente' %}bi-clock
+                                                {% elif trabajo.estado == 'Entregado con retardo' %}bi-exclamation-triangle
+                                                {% else %}bi-x-circle{% endif %} me-1"></i>
+                                            {{ trabajo.estado }}
+                                        </span>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                
+                                <!-- Fecha vencimiento -->
+                                {% if trabajo.fecha_entrega < hoy %}
+                                <div class="alert alert-warning mt-3 mb-0">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>
+                                    Este trabajo ha vencido
+                                </div>
+                                {% endif %}
+                            </div>
 
-    {% elif ext == ".doc" or file_name|slice:"-5:" == ".docx" %}
-        <img src="{% static 'icons/doc.png' %}" class="file-icon">
+                            <div class="d-flex flex-column gap-2 mt-3">
+                                {% if rol == 4 %}
+                                    <a href="{% url 'entregar_trabajo' trabajo.id_trabajos %}"
+                                    class="btn btn-primary">
+                                        <i class="bi bi-upload me-2"></i> Entregar trabajo
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'ver_entregas_trabajo' trabajo.id_trabajos %}"
+                                    class="btn btn-success">
+                                        <i class="bi bi-clipboard-check me-2"></i> Ver entregas
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
 
-    {% elif ext == ".xls" or file_name|slice:"-5:" == ".xlsx" %}
-        <img src="{% static 'icons/xls.png' %}" class="file-icon">
+                    <!-- PANEL DERECHO - ARCHIVOS DEL TRABAJO CON NUEVO DISEÑO (MÁS GRANDE) -->
+                    <div class="col-lg-8 col-lg-files">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <i class="bi bi-paperclip"></i> Archivos adjuntos
+                                {% with trabajo.archivos.all as archivos %}
+                                {% if archivos %}
+                                <span class="badge bg-light text-dark ms-2">{{ archivos|length }}</span>
+                                {% endif %}
+                                {% endwith %}
+                            </div>
+                            <div class="card-body p-0 d-flex flex-column">
+                                {% with trabajo.archivos.all as archivos %}
+                                {% if archivos %}
+                                    <div class="files-container 
+                                        {% if archivos|length == 1 %}single-file-container
+                                        {% elif archivos|length == 2 %}two-files-container
+                                        {% elif archivos|length == 3 %}three-files-container
+                                        {% elif archivos|length == 4 %}four-files-container
+                                        {% elif archivos|length == 5 %}five-files-container
+                                        {% elif archivos|length >= 6 %}six-files-container{% endif %}">
+                                        
+                                        {% for archivo in archivos %}
+                                            {% with archivo.url_archivo.url as file_url %}
+                                            {% with archivo.url_archivo.name|lower as file_name %}
+                                            {% with file_name|slice:"-4:" as ext %}
+                                            {% with file_name|slice:"-5:" as ext5 %}
+                                            <div class="file-item">
+                                                <div class="file-icon-container">
+                                                    {% if ext == ".jpg" or ext == ".png" or ext == ".gif" or ext5 == ".jpeg" %}
+                                                        <img src="{{ file_url }}" alt="Vista previa" class="file-icon-large">
+                                                    {% elif ext == ".pdf" %}
+                                                        <img src="{% static 'icons/pdf.png' %}" class="file-icon-large" alt="PDF">
+                                                    {% elif ext == ".doc" or ext5 == ".docx" %}
+                                                        <img src="{% static 'icons/doc.png' %}" class="file-icon-large" alt="Word">
+                                                    {% elif ext == ".xls" or ext5 == ".xlsx" %}
+                                                        <img src="{% static 'icons/xls.png' %}" class="file-icon-large" alt="Excel">
+                                                    {% elif ext == ".ppt" or ext5 == ".pptx" %}
+                                                        <img src="{% static 'icons/ppt.png' %}" class="file-icon-large" alt="PowerPoint">
+                                                    {% elif ext == ".zip" or ext == ".rar" %}
+                                                        <img src="{% static 'icons/zip.png' %}" class="file-icon-large" alt="Archivo comprimido">
+                                                    {% else %}
+                                                        <img src="{% static 'icons/document.png' %}" class="file-icon-large" alt="Documento">
+                                                    {% endif %}
+                                                </div>
+                                                
+                                                <div class="file-name-container">
+                                                    <div class="file-name-text" title="{{ archivo.url_archivo.name|cut:'archivos/' }}">
+                                                        {{ archivo.url_archivo.name|cut:"archivos/"|truncatechars:35 }}
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="file-actions-container">
+                                                    <button class="btn btn-sm btn-outline-primary file-action-btn"
+                                                            onclick="openFilePreview('{{ file_url }}', '{{ file_name }}')"
+                                                            title="Vista previa">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                    <a class="btn btn-sm btn-outline-success file-action-btn" 
+                                                       href="{{ file_url }}" download
+                                                       title="Descargar">
+                                                        <i class="bi bi-download"></i>
+                                                    </a>
+                                                    {% if puede_editar %}
+                                                        {% if rol == 3 %}
+                                                            <button type="button"
+                                                                    class="btn btn-sm btn-outline-danger file-action-btn delete-file-btn"
+                                                                    data-url="{% url 'eliminar_archivo' archivo.id_archivo %}"
+                                                                    data-file-name="{{ archivo.url_archivo.name|cut:'archivos/'|truncatechars:30 }}"
+                                                                    title="Eliminar">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        {% endif %}
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            {% endwith %}
+                                            {% endwith %}
+                                            {% endwith %}
+                                            {% endwith %}
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <div class="no-files-container">
+                                        <i class="bi bi-file-earmark-x no-files-icon"></i>
+                                        <p class="text-muted">No hay archivos adjuntos.</p>
+                                    </div>
+                                {% endif %}
+                                {% endwith %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    {% elif ext == ".ppt" or file_name|slice:"-5:" == ".pptx" %}
-        <img src="{% static 'icons/ppt.png' %}" class="file-icon">
+    <!-- BOTÓN FLOTANTE PARA EDITAR (solo visible si puede_editar) -->
+    {% if puede_editar %}
+    <button class="floating-edit-btn" id="openFloatingForm">
+        <i class="bi bi-pencil"></i>
+    </button>
 
-    {% else %}
-        <img src="{% static 'icons/document.png' %}" class="file-icon">
+    <!-- OVERLAY Y FORMULARIO FLOTANTE CENTRADO -->
+    <div class="floating-form-overlay" id="floatingFormOverlay">
+        <div class="floating-form" id="floatingForm">
+            <div class="floating-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-pencil-square me-2"></i>Editar trabajo
+                </h5>
+                <button type="button" class="close-floating" id="closeFloatingForm">
+                    &times;
+                </button>
+            </div>
+
+            <div class="floating-body">
+                <form method="POST" enctype="multipart/form-data" id="editForm">
+                    {% csrf_token %}
+
+                    <div class="form-columns">
+                        <!-- COLUMNA IZQUIERDA -->
+                        <div class="form-column-left">
+
+                            <!-- DESCRIPCIÓN -->
+                            <div class="mb-4">
+                                <label class="form-label">
+                                    <i class="bi bi-text-paragraph me-2"></i>Descripción
+                                </label>
+
+                                <textarea
+                                    name="descripcion"
+                                    id="id_descripcion"
+                                    class="form-control {% if trabajo_form.descripcion.errors %}is-invalid{% endif %}"
+                                    rows="5"
+                                    placeholder="Describe el trabajo..."
+                                >{{ trabajo_form.descripcion.value|default:trabajo.descripcion }}</textarea>
+
+                                <div id="descripcion-error" class="error-text" style="display: none;">
+                                    <i class="bi bi-exclamation-circle"></i>
+                                    <span id="descripcion-error-text"></span>
+                                </div>
+                            </div>
+
+                            <!-- FECHA ENTREGA -->
+                            <div class="mb-4">
+                                <label class="form-label">
+                                    <i class="bi bi-calendar-check me-2"></i>Fecha de entrega
+                                </label>
+
+                                <input
+                                    type="date"
+                                    name="fecha_entrega"
+                                    id="id_fecha_entrega"
+                                    value="{{ trabajo_form.fecha_entrega.value|default:trabajo.fecha_entrega|date:'Y-m-d' }}"
+                                    class="form-control {% if trabajo_form.fecha_entrega.errors %}is-invalid{% endif %}">
+
+                                <div id="fecha_entrega-error" class="error-text" style="display: none;">
+                                    <i class="bi bi-exclamation-circle"></i>
+                                    <span id="fecha_entrega-error-text"></span>
+                                </div>
+                            </div>
+
+                            <div class="mt-4">
+                                <button type="button"
+                                        id="submitEditForm"
+                                        class="btn btn-primary w-100 py-2">
+                                    <i class="bi bi-check-circle me-2"></i>Guardar cambios
+                                </button>
+
+                                <button type="button"
+                                        id="deleteWorkBtn"
+                                        class="btn btn-danger w-100 mt-2 py-2">
+                                    <i class="bi bi-trash me-2"></i>Eliminar trabajo
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- COLUMNA DERECHA -->
+                        <div class="form-column-right">
+                            <div class="mb-4">
+                                <label class="form-label">
+                                    <i class="bi bi-cloud-arrow-up me-2"></i>Agregar archivos
+                                </label>
+
+                                <div class="drop-zone" id="dropZone">
+                                    <i class="bi bi-cloud-arrow-up"></i>
+                                    <p class="drop-text mb-1">Arrastra y suelta archivos aquí</p>
+                                    <p class="drop-subtext mb-0">o haz clic para seleccionar</p>
+
+                                    <input type="file"
+                                           name="nuevos_archivos[]"
+                                           id="fileInput"
+                                           class="d-none"
+                                           multiple>
+
+                                    <div class="file-count-badge"
+                                         id="fileCountBadge"
+                                         style="display: none;">0</div>
+                                </div>
+
+                                <small class="text-muted d-block mt-2">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Los archivos se cargarán automáticamente. Formatos permitidos: PDF, Word, Excel, PowerPoint, imágenes, ZIP, etc.
+                                </small>
+
+                                <div class="file-preview-container" id="filePreview">
+                                    <p class="text-muted small m-0">
+                                        Arrastra o selecciona archivos para cargarlos
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     {% endif %}
-</div>
 
-<p>
-    <strong>Estado:</strong> {{ entrega.estado }}<br>
-    <strong>Fecha entrega:</strong> {{ entrega.fecha_entrega }}
-</p>
+    <!-- MODAL DE PREVIEW -->
+    <div id="modalPreview">
+        <button id="closeModal">&times;</button>
+        <div class="modal-content">
+            <div id="previewContent"></div>
+        </div>
+    </div>
 
-<a href="{{ file_url }}" target="_blank">⬇ Descargar mi entrega</a>
+    <!-- MODAL DE ÉXITO (MODIFICADO PARA NO CERRARSE AUTOMÁTICAMENTE) -->
+    <div class="modal fade" id="modalExito" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-check-circle me-2"></i>Operación exitosa
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <i class="bi bi-check-circle-fill text-success" style="font-size: 3.5rem;"></i>
+                    <p class="mt-3 fs-5" id="mensajeExito">La operación se ha completado correctamente.</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-success" id="acceptSuccessBtn" data-bs-dismiss="modal">
+                        Aceptar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-{% endwith %}
-{% endwith %}
-{% endwith %}
+    <!-- MODAL DE CONFIRMACIÓN PARA ELIMINAR TRABAJO -->
+    <div class="modal fade delete-confirmation-modal" id="deleteWorkModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-exclamation-triangle me-2"></i>Confirmar eliminación
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <i class="bi bi-trash text-danger" style="font-size: 3rem;"></i>
+                    <p class="mt-3 fs-5">¿Estás seguro de que deseas eliminar este trabajo?</p>
+                    <p class="text-muted">Esta acción no se puede deshacer. Se eliminarán todos los archivos asociados.</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteWork">
+                        <i class="bi bi-trash me-2"></i>Eliminar trabajo
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-{% else %}
-<a href="{% url 'entregar_trabajo' trabajo.id_trabajos %}" class="btn">
-    📤 Entregar trabajo
-</a>
-{% endif %}
-{% endif %}
+    <!-- NUEVO MODAL DE ELIMINAR ARCHIVO (DISEÑO SOLICITADO) -->
+    <div class="modal fade delete-file-modal" id="deleteFileModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title w-100 text-center">
+                        <i class="bi bi-exclamation-triangle me-2"></i>¿Seguro que quieres eliminar este archivo?
+                    </h5>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-icon">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                    </div>
+                    <p class="modal-message" id="deleteFileMessage">¿Estás seguro de eliminar el archivo "..."?</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteFile">
+                        <i class="bi bi-trash me-2"></i>Eliminar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-{# ================= PDF PREVIEW ================= #}
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-{% if archivo and archivo.url_archivo.name|lower|slice:"-4:" == ".pdf" %}
-<script>
-pdfjsLib.getDocument("{{ archivo.url_archivo.url }}").promise.then(pdf => {
-    pdf.getPage(1).then(page => {
-        const viewport = page.getViewport({ scale: 1.2 });
-        const canvas = document.getElementById('pdf-trabajo');
-        const ctx = canvas.getContext('2d');
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
-        page.render({ canvasContext: ctx, viewport: viewport });
-    });
-});
-</script>
-{% endif %}
+    <!-- Configuración de Django para JS -->
+    <script>
+        // Configuración global para JS
+        window.DJANGO_DATA = {
+            puedeEditar: {% if puede_editar %}true{% else %}false{% endif %},
+            messages: [
+                {% for message in messages %}
+                    {% if message.tags == 'success' %}
+                        { type: 'success', message: '{{ message|escapejs }}' },
+                    {% endif %}
+                {% endfor %}
+            ],
+            redirectUrl: "{% if trabajo.clase %}{% url 'gestionar_trabajos' trabajo.clase.id_clase %}{% else %}{% url 'inicio' %}{% endif %}",
+            trabajoId: {{ trabajo.id_trabajos }},
+            claseId: {{ trabajo.clase.id_clase }},
+            rol: {{ rol }}
+        };
+    </script>
 
-{% if es_estudiante and entrega and entrega.archivo.url_archivo.name|lower|slice:"-4:" == ".pdf" %}
-<script>
-pdfjsLib.getDocument("{{ entrega.archivo.url_archivo.url }}").promise.then(pdf => {
-    pdf.getPage(1).then(page => {
-        const viewport = page.getViewport({ scale: 1.2 });
-        const canvas = document.getElementById('pdf-entrega');
-        const ctx = canvas.getContext('2d');
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
-        page.render({ canvasContext: ctx, viewport: viewport });
-    });
-});
-</script>
-{% endif %}
+    <!-- JS Personalizado -->
+    <script src="{% static 'js/trabajos/detalle_trabajo.js' %}"></script>
 
+    <!-- Inicializar edición si aplica -->
+    {% if puede_editar %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initEdicionTrabajo();
+        });
+    </script>
+    {% endif %}
 </body>
 </html>

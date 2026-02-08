@@ -1,0 +1,91 @@
+<!-- TABLA (solo desktop) -->
+<div class="table-container">
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th><i class="bi bi-person"></i> Nombre</th>
+                <th><i class="bi bi-envelope"></i> Correo</th>
+                <th><i class="bi bi-shield"></i> Rol</th>
+                <th><i class="bi bi-gear"></i> Cambiar Rol</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if usuarios %}
+                {% for usuario in usuarios %}
+                <tr>
+                    <td>
+                        <div class="user-icon">
+                            <i class="bi bi-person"></i>
+                        </div>
+                        <div class="user-info">
+                            {{ usuario.nombres }} {{ usuario.apellidos }}
+                        </div>
+                    </td>
+                    <td><i class="bi bi-envelope email-icon"></i> {{ usuario.correo }}</td>
+                    <td><i class="bi bi-shield role-icon"></i> {{ usuario.id_tipo_rol.nombre }}</td>
+                    <td>
+                        <form method="POST" action="{% url 'gestion_usuarios' %}" style="display:flex; gap: 5px;">
+                            {% csrf_token %}
+                            <input type="hidden" name="usuario_id" value="{{ usuario.id_usuarios }}">
+                            <select name="nuevo_rol" class="form-select">
+                                {% for rol in roles %}
+                                    <option value="{{ rol.id_rol }}" {% if usuario.id_tipo_rol.id_rol == rol.id_rol %}selected{% endif %}>
+                                        {{ rol.nombre }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <button type="button" class="btn btn-primary btn-update-role">
+                                <i class="bi bi-arrow-repeat"></i> Actualizar
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr class="no-users">
+                    <td colspan="4" class="text-center py-5">
+                        <div class="no-users-container">
+                            <i class="bi bi-people display-4 text-muted d-block mb-3"></i>
+                            <p class="fs-4 text-secondary">No se encontraron usuarios</p>
+                        </div>
+                    </td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+
+<!-- CARDS (solo móvil) -->
+<div class="cards-container">
+    {% if usuarios %}
+        {% for usuario in usuarios %}
+        <div class="card-item">
+            <p><i class="bi bi-person"></i> <strong>Nombre:</strong> <span>{{ usuario.nombres }} {{ usuario.apellidos }}</span></p>
+            <p><i class="bi bi-envelope"></i> <strong>Correo:</strong> <span>{{ usuario.correo }}</span></p>
+            <p><i class="bi bi-shield"></i> <strong>Rol:</strong> <span>{{ usuario.id_tipo_rol.nombre }}</span></p>
+
+            <div class="card-actions">
+                <form method="POST" action="{% url 'gestion_usuarios' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="usuario_id" value="{{ usuario.id_usuarios }}">
+                    <select name="nuevo_rol" class="form-select form-select-sm">
+                        {% for rol in roles %}
+                            <option value="{{ rol.id_rol }}" {% if usuario.id_tipo_rol.id_rol == rol.id_rol %}selected{% endif %}>
+                                {{ rol.nombre }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <button type="button" class="btn btn-primary btn-sm btn-update-role">
+                        <i class="bi bi-arrow-repeat"></i> Actualizar
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="card-item text-center py-5">
+            <i class="bi bi-people display-4 text-muted d-block mb-3"></i>
+            <p class="fs-4 text-secondary">No se encontraron usuarios</p>
+        </div>
+    {% endif %}
+</div>

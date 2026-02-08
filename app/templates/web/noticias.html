@@ -1,0 +1,392 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noticias - Estudiosos</title>
+    <link rel="icon" href="{% static 'img/Logo tipo Estudiosos_Mesa de trabajo 1 copia 1 (2) (1).png' %}" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="{% static 'css/web/noticias.css' %}">
+</head>
+<body>
+    <!-- Alertas -->
+    <div class="alert-container">
+        {% if messages %}
+            {% for message in messages %}
+                {% with message.tags as tags %}
+                <div class="alert-toast {% if tags == 'success' %}success{% elif tags == 'error' %}error{% elif tags == 'warning' %}warning{% elif tags == 'info' %}info{% else %}info{% endif %}">
+                    <div class="alert-toast-icon">
+                        {% if tags == 'success' %}
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                        {% elif tags == 'error' %}
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                        {% elif tags == 'warning' %}
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                        {% else %}
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        {% endif %}
+                    </div>
+                    <div class="alert-toast-content">
+                        <div class="alert-toast-title">
+                            {% if tags == 'success' %}Éxito{% elif tags == 'error' %}Error{% elif tags == 'warning' %}Advertencia{% else %}Información{% endif %}
+                        </div>
+                        <div class="alert-toast-message">{{ message }}</div>
+                    </div>
+                    <button class="alert-toast-close">&times;</button>
+                    <div class="alert-toast-progress" style="color: {% if tags == 'success' %}#2ecc71{% elif tags == 'error' %}#e74c3c{% elif tags == 'warning' %}#f1c40f{% else %}#3498db{% endif %}"></div>
+                </div>
+                {% endwith %}
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- Modal de Confirmación para WhatsApp -->
+    <div class="whatsapp-modal-overlay" id="whatsappModalOverlay"></div>
+    <div class="whatsapp-modal" id="whatsappModal">
+        <button class="whatsapp-modal-close" id="whatsappModalClose">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="whatsapp-modal-header">
+            <i class="fab fa-whatsapp"></i>
+            <h2 class="whatsapp-modal-title">Contactar por WhatsApp</h2>
+        </div>
+        <div class="whatsapp-modal-body">
+            <p class="whatsapp-modal-text">
+                ¿Deseas obtener más información sobre:
+            </p>
+            <div class="whatsapp-modal-course-name" id="whatsappModalCourseName">Nombre del Curso</div>
+            <p class="whatsapp-modal-text">
+                Serás redirigido a WhatsApp para contactar con nuestro equipo de asesores.
+            </p>
+        </div>
+        <div class="whatsapp-modal-footer">
+            <button class="whatsapp-modal-btn whatsapp-modal-btn-cancel" id="whatsappModalCancel">
+                <i class="fas fa-times"></i> Cancelar
+            </button>
+            <a href="#" class="whatsapp-modal-btn whatsapp-modal-btn-whatsapp" id="whatsappModalLink" target="_blank">
+                <i class="fab fa-whatsapp"></i> Ir a WhatsApp
+            </a>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header id="header">
+        <nav>
+            <div class="logo-container">
+                <div class="logo-icon">
+                    <img src="{% static 'img/Logo_nav_web.png' %}" alt="Estudiosos" class="logo-icon-img">
+                </div>
+            </div>
+            <ul class="nav-center" id="navMenu">
+                <li><a href="{% url 'index' %}">Inicio</a></li>
+                <li><a href="{% url 'nuestras_clases' %}">Nuestras Clases</a></li>
+                <li><a href="{% url 'mostrar_cursos' %}">Cursos</a></li>
+                <li><a href="{% url 'masterclass' %}">Nuestra Masterclass</a></li>
+                <li><a href="{% url 'noticias' %}">Novedades</a></li>
+            </ul>
+            <div class="nav-right">
+                {% if usuario_autenticado %}
+                    <div class="user-welcome">
+                        <i class="fas fa-user-circle"></i> {{ usuario_nombre }}
+                    </div>
+
+                    {% if rol == 1 %}
+                        <a href="{% url 'panel_administrador' %}" class="btn-login">Panel Admin</a>
+                    {% endif %}
+
+                    {% if request.session.usuario_rol == 3 or request.session.usuario_rol == 4 %}
+                        <a href="{% url 'clases_activas' %}" class="btn-login">{% if rol == 3 %}Panel Profesor{% elif rol == 4 %}Panel Estudiante{% endif %}</a>
+                    {% endif %}
+                    
+                    <a href="{% url 'cerrar_sesion' %}" class="btn-register">Cerrar Sesión</a>
+                    
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn-login">Iniciar Sesión</a>
+                    <a href="{% url 'registrar' %}" class="btn-register">Registrarse</a>
+                {% endif %}
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Mobile Menu Overlay -->
+        <div class="nav-mobile-overlay" id="mobileOverlay"></div>
+        
+        <!-- Mobile Menu -->
+        <div class="nav-mobile-menu" id="mobileMenu">
+            <div class="nav-mobile-header">
+                <div class="nav-mobile-logo">
+                    <div class="logo-icon">
+                        <img src="{% static 'img/Logo tipo Estudiosos_Mesa de trabajo 1 copia 14.png' %}" alt="Estudiosos" class="logo-icon-img">
+                    </div>
+                </div>
+                <button class="nav-mobile-close" id="mobileCloseBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <ul class="nav-mobile-links">
+                <li><a href="{% url 'index' %}" class="mobile-link">Inicio</a></li>
+                <li><a href="{% url 'nuestras_clases' %}" class="mobile-link">Nuestras Clases</a></li>
+                <li><a href="{% url 'mostrar_cursos' %}" class="mobile-link">Cursos</a></li>
+                <li><a href="{% url 'masterclass' %}" class="mobile-link">Nuestra Masterclass</a></li>
+                <li><a href="{% url 'noticias' %}" class="mobile-link">Novedades</a></li>
+            </ul>
+            <div class="nav-mobile-actions">
+                {% if usuario_autenticado %}
+                    <a href="{% url 'cerrar_sesion' %}" class="btn-register">Cerrar Sesión</a>
+                {% else %}
+                    <a href="{% url 'registrar' %}" class="btn-register">Registrarse</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Page Header -->
+        <section class="page-header">
+            <h1>Últimas Noticias y Actualizaciones</h1>
+            <p>Mantente informado sobre las últimas novedades, inscripciones abiertas y próximos cursos en Estudiosos. Tu desarrollo profesional comienza aquí.</p>
+        </section>
+
+        <!-- Main Content -->
+        <div class="container my-5">
+            <!-- ÚLTIMAS NOTICIAS -->
+            <section class="mb-5">
+                <div class="section-header">
+                    <h2><i class="fas fa-newspaper"></i> Últimas Noticias</h2>
+                </div>
+
+                <div class="row g-4">
+                    {% for item in noticias %}
+                    <div class="col-lg-4 col-md-6">
+                        <div class="news-card">
+                            <div class="news-category">Noticia</div>
+                            
+                            <div class="news-card-header">
+                                {% if item.imagen %}
+                                <img src="{{ item.imagen.url }}" alt="{{ item.titulo }}">
+                                {% else %}
+                                <div class="news-icon-placeholder">
+                                    <i class="fa-solid fa-newspaper"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="news-card-body">
+                                <h3 class="news-card-title">{{ item.titulo }}</h3>
+                                <p class="news-card-text">{{ item.descripcion|truncatechars:140 }}</p>
+                                
+                                <div class="news-meta">
+                                    <div class="news-date">
+                                        <i class="fas fa-calendar-alt"></i>
+                                        {{ item.fecha_creacion|date:"d M Y" }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="empty-message">
+                        <i class="fa-solid fa-newspaper"></i>
+                        <h3>No hay noticias disponibles</h3>
+                        <p>Pronto publicaremos nuevas noticias y actualizaciones importantes.</p>
+                        <button class="btn-news" onclick="window.location.href='{% url 'index' %}'">Volver al Inicio</button>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+        </div>
+
+        <!-- INSCRIPCIONES ABIERTAS - Fondo ancho completo -->
+        <section class="inscripciones-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2><i class="fas fa-file-signature"></i> Inscripciones Abiertas</h2>
+                </div>
+
+                <div class="row g-4">
+                    {% for item in inscripciones %}
+                    <div class="col-lg-4 col-md-6">
+                        <div class="news-card">
+                            <div class="news-category" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">Inscripción</div>
+                            
+                            <div class="news-card-header">
+                                {% if item.imagen %}
+                                <img src="{{ item.imagen.url }}" alt="{{ item.titulo }}">
+                                {% else %}
+                                <div class="news-icon-placeholder">
+                                    <div class="check-icon-circle">
+                                        <i class="fa-solid fa-check"></i>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="news-card-body">
+                                <h3 class="news-card-title">{{ item.titulo }}</h3>
+                                <p class="news-card-text">{{ item.descripcion|truncatechars:140 }}</p>
+                                
+                                <div class="news-meta">
+                                    <div class="news-date">
+                                        <i class="fas fa-calendar-day"></i>
+                                        {% if item.fecha_inicio and item.fecha_fin %}
+                                        {{ item.fecha_inicio|date:"d M" }} - {{ item.fecha_fin|date:"d M Y" }}
+                                        {% elif item.fecha_inicio %}
+                                        {{ item.fecha_inicio|date:"d M Y" }}
+                                        {% endif %}
+                                    </div>
+                                    <div class="news-duration" style="background: #e8f5e9; color: #28a745;">Disponible</div>
+                                </div>
+                                
+                                <div class="news-card-footer">
+                                    <button class="btn-news" onclick="window.location.href='{% url 'mostrar_cursos' %}'">
+                                        Inscribirse
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="empty-message">
+                        <i class="fa-solid fa-file-signature"></i>
+                        <h3>No hay inscripciones abiertas</h3>
+                        <p>Actualmente no hay procesos de inscripción disponibles. Vuelve pronto para nuevas oportunidades.</p>
+                        <button class="btn-news" onclick="window.location.href='{% url 'mostrar_cursos' %}'">Ver Cursos</button>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+
+        <!-- PRÓXIMOS CURSOS - Diseño como cards de modalidades -->
+        <div class="container my-5">
+            <section class="mb-5">
+                <div class="section-header">
+                    <h2><i class="fas fa-graduation-cap"></i> Próximos Cursos</h2>
+                </div>
+
+                <div class="row g-4">
+                    {% for item in cursos %}
+                    <div class="col-lg-6 col-md-12">
+                        <div class="curso-card">
+                            <div class="curso-card-header">
+                                <div class="curso-icon">
+                                    {% if item.icono %}
+                                    <i class="fa-solid {{ item.icono }}"></i>
+                                    {% else %}
+                                    <i class="fa-solid fa-graduation-cap"></i>
+                                    {% endif %}
+                                </div>
+                                <h3>{{ item.titulo }}</h3>
+                            </div>
+                            <div class="curso-card-body">
+                                <div class="curso-card-content">
+                                    <p class="news-card-text">{{ item.descripcion|truncatechars:140 }}</p>
+                                    
+                                    <div class="curso-meta">
+                                        <div class="curso-date">
+                                            <i class="fas fa-calendar-check"></i>
+                                            {% if item.fecha_inicio %}
+                                            Inicia: {{ item.fecha_inicio|date:"d M Y" }}
+                                            {% else %}
+                                            Próximamente
+                                            {% endif %}
+                                        </div>
+                                        <div class="curso-status">Nuevo</div>
+                                    </div>
+                                </div>
+                                <div class="curso-card-footer">
+                                    <button class="btn-news" onclick="openWhatsAppModal('{{ item.titulo|escapejs }}')">Más Información</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="empty-message">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                        <h3>No hay cursos programados</h3>
+                        <p>Estamos preparando nuevos cursos y programas educativos. ¡Vuelve pronto para descubrirlos!</p>
+                        <button class="btn-news" onclick="window.location.href='{% url 'mostrar_cursos' %}'">Explorar Cursos</button>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+        </div>
+
+        <!-- CTA Section -->
+        <section class="cta-section" id="contacto">
+            <div class="cta-content">
+                <h2>¿Quieres Estar al Día?</h2>
+                <p>
+                    Suscríbete a nuestro boletín informativo y recibe las últimas noticias, 
+                    anuncios de cursos y oportunidades educativas directamente en tu correo.
+                </p>
+                <a href="{% url 'registrar' %}" class="btn-white">Registrate Ahora</a>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-about">
+                <div class="footer-logo">
+                    <div class="footer-logo-icon">E</div>
+                    <div class="footer-logo-text">ESTUDIOSOS</div>
+                </div>
+                <p>
+                    Academia educativa comprometida con la excelencia en la formación 
+                    y el desarrollo integral de profesionales.
+                </p>
+            </div>
+            <div class="footer-links">
+                <h4>Enlaces</h4>
+                <ul>
+                    <li><a href="{% url 'index' %}">Inicio</a></li>
+                    <li><a href="{% url 'nuestras_clases' %}">Nuestras Clases</a></li>
+                    <li><a href="{% url 'mostrar_cursos' %}">Cursos</a></li>
+                    <li><a href="{% url 'noticias' %}">Noticias</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Categorías</h4>
+                <ul>
+                    <li><a href="#">Noticias</a></li>
+                    <li><a href="#">Inscripciones</a></li>
+                    <li><a href="#">Cursos</a></li>
+                    <li><a href="#">Eventos</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Contacto</h4>
+                <ul>
+                    <li><a href="#">info@estudiosos.com</a></li>
+                    <li><a href="#">+57 300 123 4567</a></li>
+                    <li><a href="#">Bogotá, Colombia</a></li>
+                    <li><a href="#">Lun-Vie 8am-6pm</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Estudiosos. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- JavaScript Personalizado -->
+    <script src="{% static 'js/web/noticias.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,494 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entregar trabajo - {{ trabajo.descripcion|truncatechars:30 }}</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS Personalizado -->
+    <link rel="stylesheet" href="{% static 'css/trabajos/ver_entrega_estudiante.css' %}">
+</head>
+<body>
+
+    <!-- BOTÓN HAMBURGUESA -->
+    <button class="hamburger-btn" id="hamburgerBtn" title="Menú">
+        <i class="bi bi-list"></i>
+    </button>
+
+    <!-- OVERLAY PARA CERRAR NAV -->
+    <div class="nav-overlay" id="navOverlay"></div>
+
+    <!-- CONTENEDOR DE ALERTAS (NUEVO DISEÑO CLEAN BORDE) -->
+    <div class="alert-container">
+        {% if messages %}
+            {% for message in messages %}
+                {% if message.tags == 'success' %}
+                    <div class="alert-toast success">
+                        <div class="alert-toast-icon">
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                        </div>
+                        <div class="alert-toast-content">
+                            <div class="alert-toast-title">Éxito</div>
+                            <div class="alert-toast-message">{{ message }}</div>
+                        </div>
+                        <button class="alert-toast-close">&times;</button>
+                        <div class="alert-toast-progress" style="color: #2ecc71"></div>
+                    </div>
+                {% elif message.tags == 'error' or message.tags == 'danger' %}
+                    <div class="alert-toast error">
+                        <div class="alert-toast-icon">
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="15" y1="9" x2="9" y2="15"></line>
+                                <line x1="9" y1="9" x2="15" y2="15"></line>
+                            </svg>
+                        </div>
+                        <div class="alert-toast-content">
+                            <div class="alert-toast-title">Error</div>
+                            <div class="alert-toast-message">{{ message }}</div>
+                        </div>
+                        <button class="alert-toast-close">&times;</button>
+                        <div class="alert-toast-progress" style="color: #e74c3c"></div>
+                    </div>
+                {% elif message.tags == 'warning' %}
+                    <div class="alert-toast warning">
+                        <div class="alert-toast-icon">
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                <line x1="12" y1="9" x2="12" y2="13"></line>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                            </svg>
+                        </div>
+                        <div class="alert-toast-content">
+                            <div class="alert-toast-title">Advertencia</div>
+                            <div class="alert-toast-message">{{ message }}</div>
+                        </div>
+                        <button class="alert-toast-close">&times;</button>
+                        <div class="alert-toast-progress" style="color: #f1c40f"></div>
+                    </div>
+                {% elif message.tags == 'info' %}
+                    <div class="alert-toast info">
+                        <div class="alert-toast-icon">
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="16" x2="12" y2="12"></line>
+                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                            </svg>
+                        </div>
+                        <div class="alert-toast-content">
+                            <div class="alert-toast-title">Información</div>
+                            <div class="alert-toast-message">{{ message }}</div>
+                        </div>
+                        <button class="alert-toast-close">&times;</button>
+                        <div class="alert-toast-progress" style="color: #3498db"></div>
+                    </div>
+                {% else %}
+                    <div class="alert-toast info">
+                        <div class="alert-toast-icon">
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="16" x2="12" y2="12"></line>
+                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                            </svg>
+                        </div>
+                        <div class="alert-toast-content">
+                            <div class="alert-toast-title">Mensaje</div>
+                            <div class="alert-toast-message">{{ message }}</div>
+                        </div>
+                        <button class="alert-toast-close">&times;</button>
+                        <div class="alert-toast-progress" style="color: #3498db"></div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <div class="container-fluid p-0">
+        <!-- LAYOUT PRINCIPAL -->
+        <div class="main-layout">
+            <!-- NAVEGACIÓN (CON EL DISEÑO DEL CÓDIGO 1 PERO LAS URLS DEL CÓDIGO 2) -->
+            <div class="sidebar-nav">
+                <div class="logo-section">
+                    <!-- Imagen del logo como en el Código 1 -->
+                    <img src="{% static 'img/Logo tipo Estudiosos_Mesa de trabajo 1 copia 14.png' %}" alt="Logo Estudiosos">
+                    <span>Estudiosos</span>
+                </div>
+                <nav class="nav flex-column">
+
+                    <a class="nav-link" href="{% url 'panel_inicio' trabajo.clase.id_clase %}">
+                        <i class="bi bi-house-door"></i>Inicio
+                    </a>
+                    
+                    
+                    {% if trabajo.clase %}
+                    <a class="nav-link active" href="{% url 'gestionar_trabajos' trabajo.clase.id_clase %}">
+                        <i class="bi bi-file-text"></i>Trabajos
+                    </a>
+                    
+                    <a class="nav-link" href="{% url 'inscritos_clase' trabajo.clase.id_clase %}">
+                        <i class="bi bi-people"></i>Inscritos
+                    </a>
+                    
+                    <a class="nav-link" href="{% url 'clases_virtuales' trabajo.clase.id_clase %}">
+                        <i class="bi bi-camera-video"></i>Clases virtuales
+                    </a>
+                    
+                    <a class="nav-link" href="{% url 'comentarios_clase' trabajo.clase.id_clase %}">
+                        <i class="bi bi-chat-dots"></i>Comentarios
+                    </a>
+                    {% endif %}
+
+                    {% if modo_admin %}
+                    <a class="nav-link" href="{% url 'panel_administrador' %}" title="Panel de Administración">
+                        <i class="bi bi-shield-lock-fill"></i>Panel de Administración
+                    </a>
+                    {% endif %}
+                     <a class="nav-link " href="{% url 'documentos_usuario' %}" title="Clases Inactivas">
+                        <i class="bi bi-file-text"></i>Tus Documentos
+                    </a>
+                </nav>
+
+                <!-- MENÚ USUARIO EN EL NAV -->
+                <div class="sidebar-nav-footer">
+                    <a class="nav-link" href="{% url 'perfil_usuario' %}">
+                        <i class="bi bi-person"></i>Mi perfil
+                    </a>
+                    <a class="nav-link" href="{% url 'cerrar_sesion' %}">
+                        <i class="bi bi-box-arrow-right"></i>Cerrar sesión
+                    </a>
+                </div>
+            </div>
+            
+            <!-- CONTENIDO PRINCIPAL -->
+            <div class="container-main">
+                <!-- HEADER (ESTILO CÓDIGO 1) -->
+                <div class="page-header">
+                    <h2><i class="bi bi-cloud-upload me-3"></i>Entregar Trabajo</h2>
+                    <p class="mb-0">
+                        <strong>Clase:</strong> 
+                        {% if trabajo.clase %}
+                            <span class="badge bg-secondary">{{ trabajo.clase.nombre }}</span>
+                        {% else %}
+                            <span class="text-muted">No asignado a clase</span>
+                        {% endif %}
+                    </p>
+                </div>
+
+                <!-- BOTÓN VOLVER (ESTILO CÓDIGO 1) -->
+                <a href="{% url 'detalle_trabajo' trabajo.id_trabajos %}" 
+                   class="btn-volver">
+                    <i class="bi bi-arrow-left"></i> Volver al detalle
+                </a>
+
+                <!-- CONTENIDO DEL DETALLE (SOLO 2 CARDS) -->
+                <div class="row g-4">
+                    <!-- CARD IZQUIERDA - INFORMACIÓN DEL TRABAJO Y ESTUDIANTE -->
+                    <div class="col-lg-info">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <i class="bi bi-info-circle"></i> Detalle del Trabajo
+                            </div>
+                            <div class="detail-card-body">
+                                <div class="detail-sections-container">
+                                    <!-- Sección izquierda: Información del trabajo -->
+                                    <div class="detail-section detail-section-left">
+                                        <div class="detail-section-header">
+                                            <i class="bi bi-file-earmark-text"></i>
+                                            <h5>Información del Trabajo</h5>
+                                        </div>
+                                        
+                                        <div class="info-row">
+                                            <div class="info-row-label">
+                                                <i class="bi bi-text-paragraph"></i> Descripción
+                                            </div>
+                                            <div class="info-row-value">{{ trabajo.descripcion }}</div>
+                                        </div>
+
+                                        <div class="info-row">
+                                            <div class="info-row-label">
+                                                <i class="bi bi-calendar-check"></i> Fecha de entrega
+                                            </div>
+                                            <div class="info-row-value">{{ trabajo.fecha_entrega|date:"d/m/Y" }}</div>
+                                        </div>
+
+                                        <div class="info-row">
+                                            <div class="info-row-label">
+                                                <i class="bi bi-calendar-plus"></i> Fecha creación
+                                            </div>
+                                            <div class="info-row-value">{{ trabajo.fecha_creacion }}</div>
+                                        </div>
+
+                                        <!-- Estado de la entrega -->
+                                        <div class="info-row">
+                                            <div class="info-row-label">
+                                                <i class="bi bi-check-circle"></i> Estado actual
+                                            </div>
+                                            <div class="info-row-value">
+                                                <span class="status-badge 
+                                                    {% if entrega.estado == 'Entregado' %}entregado
+                                                    {% elif entrega.estado == 'Pendiente' %}pendiente
+                                                    {% elif entrega.estado == 'Entregado con retardo' %}retardo
+                                                    {% else %}pendiente{% endif %}">
+                                                    <i class="bi 
+                                                        {% if entrega.estado == 'Entregado' %}bi-check-circle
+                                                        {% elif entrega.estado == 'Pendiente' %}bi-clock
+                                                        {% elif entrega.estado == 'Entregado con retardo' %}bi-exclamation-triangle
+                                                        {% else %}bi-clock{% endif %} me-1"></i>
+                                                    {{ entrega.estado|default:"Pendiente" }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Sección derecha: Información del estudiante -->
+                                    <div class="detail-section detail-section-right">
+                                        <div class="detail-section-header">
+                                            <i class="bi bi-person-circle"></i>
+                                            <h5>Información del Estudiante</h5>
+                                        </div>
+                                        
+                                        <div class="info-row">
+                                            <div class="info-row-label">
+                                                <i class="bi bi-person"></i> Estudiante
+                                            </div>
+                                            <div class="info-row-value">{{ user.nombres }} {{ user.apellidos }}</div>
+                                        </div>
+                                        
+                                        <div class="info-row">
+                                            <div class="info-row-label">
+                                                <i class="bi bi-envelope"></i> Email
+                                            </div>
+                                            <div class="info-row-value">{{ user.email }}</div>
+                                        </div>
+                                        
+                                        <div class="info-row">
+                                            <div class="info-row-label">
+                                                <i class="bi bi-card-text"></i> Usuario
+                                            </div>
+                                            <div class="info-row-value">{{ user.username }}</div>
+                                        </div>
+                                        
+                                        {% if user.telefono %}
+                                        <div class="info-row">
+                                            <div class="info-row-label">
+                                                <i class="bi bi-telephone"></i> Teléfono
+                                            </div>
+                                            <div class="info-row-value">{{ user.telefono }}</div>
+                                        </div>
+                                        {% endif %}
+                                         {% if entrega %}
+                                        <h5>Calificación</h5>
+
+                                        <form method="post">
+                                            {% csrf_token %}
+
+                                            <div class="mb-2">
+                                                <label>Nota (0 - 5)</label>
+                                                <input type="number"
+                                                    name="nota"
+                                                    step="0.01"
+                                                    min="0"
+                                                    max="5"
+                                                    class="form-control"
+                                                    value="{{ calificacion.nota|default:'' }}"
+                                                    required>
+                                            </div>
+
+                                            <div class="mb-2">
+                                                <label>Observaciones</label>
+                                                <textarea name="observaciones"
+                                                        class="form-control"
+                                                        rows="3">{{ calificacion.observaciones|default:'' }}</textarea>
+                                            </div>
+
+                                            <button type="submit"
+                                                    name="calificar"
+                                                    class="btn btn-success">
+                                                {% if calificacion %}Actualizar{% else %}Calificar{% endif %}
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                    </div>
+                                    
+                                </div>
+                                
+                                <!-- Alerta de vencimiento -->
+                                {% if trabajo.fecha_entrega < hoy %}
+                                <div class="alert alert-warning mt-3 mb-0">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>
+                                    Este trabajo ha vencido
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CARD DERECHA - ARCHIVOS ENTREGADOS -->
+                    <div class="col-lg-files">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <i class="bi bi-paperclip"></i> Archivos entregados
+                                {% with entrega.archivos.all as archivos %}
+                                {% if archivos %}
+                                <span class="badge bg-light text-dark ms-2">{{ archivos|length }}</span>
+                                {% endif %}
+                                {% endwith %}
+                            </div>
+                            <div class="card-body p-0 d-flex flex-column">
+                                {% with entrega.archivos.all as archivos %}
+                                {% if archivos %}
+                                    <div class="files-container 
+                                        {% if archivos|length == 1 %}single-file-container
+                                        {% elif archivos|length == 2 %}two-files-container
+                                        {% elif archivos|length == 3 %}three-files-container
+                                        {% elif archivos|length == 4 %}four-files-container
+                                        {% elif archivos|length == 5 %}five-files-container
+                                        {% elif archivos|length >= 6 %}six-files-container{% endif %}">
+                                        
+                                        {% for archivo in archivos %}
+                                            {% with archivo.archivo.url as file_url %}
+                                            {% with archivo.archivo.name|lower as file_name %}
+                                            {% with file_name|slice:"-4:" as ext %}
+                                            {% with file_name|slice:"-5:" as ext5 %}
+                                            <div class="file-item">
+                                                <div class="file-icon-container">
+                                                    {% if ext == ".jpg" or ext == ".png" or ext == ".gif" or ext5 == ".jpeg" %}
+                                                        <img src="{{ file_url }}" alt="Vista previa" class="file-icon-large">
+                                                    {% elif ext == ".pdf" %}
+                                                        <img src="{% static 'icons/pdf.png' %}" class="file-icon-large" alt="PDF">
+                                                    {% elif ext == ".doc" or ext5 == ".docx" %}
+                                                        <img src="{% static 'icons/doc.png' %}" class="file-icon-large" alt="Word">
+                                                    {% elif ext == ".xls" or ext5 == ".xlsx" %}
+                                                        <img src="{% static 'icons/xls.png' %}" class="file-icon-large" alt="Excel">
+                                                    {% elif ext == ".ppt" or ext5 == ".pptx" %}
+                                                        <img src="{% static 'icons/ppt.png' %}" class="file-icon-large" alt="PowerPoint">
+                                                    {% elif ext == ".zip" or ext == ".rar" %}
+                                                        <img src="{% static 'icons/zip.png' %}" class="file-icon-large" alt="Archivo comprimido">
+                                                    {% else %}
+                                                        <img src="{% static 'icons/document.png' %}" class="file-icon-large" alt="Documento">
+                                                    {% endif %}
+                                                </div>
+                                                
+                                                <div class="file-name-container">
+                                                    <div class="file-name-text" title="{{ archivo.archivo.name|cut:'archivos/' }}">
+                                                        {{ archivo.archivo.name|cut:"entregas/"|truncatechars:35 }}
+                                                    </div>
+                                                    <small class="text-muted">{{ archivo.fecha_subido|date:"d/m/Y H:i" }}</small>
+                                                </div>
+                                                
+                                                <div class="file-actions-container">
+                                                    <button class="btn btn-sm btn-outline-primary file-action-btn"
+                                                            onclick="openFilePreview('{{ file_url }}', '{{ file_name }}')"
+                                                            title="Vista previa">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                    <a class="btn btn-sm btn-outline-success file-action-btn" 
+                                                       href="{{ file_url }}" download
+                                                       title="Descargar">
+                                                        <i class="bi bi-download"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            {% endwith %}
+                                            {% endwith %}
+                                            {% endwith %}
+                                            {% endwith %}
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <div class="no-files-container">
+                                        <i class="bi bi-file-earmark-x no-files-icon"></i>
+                                        <p class="text-muted">No has entregado archivos aún.</p>
+                                    </div>
+                                {% endif %}
+                                {% endwith %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- MODAL DE PREVIEW (ESTILO CÓDIGO 1) -->
+    <div id="modalPreview">
+        <button id="closeModal">&times;</button>
+        <div class="modal-content">
+            <div id="previewContent"></div>
+        </div>
+    </div>
+
+    <!-- MODAL DE ÉXITO (IGUAL AL CÓDIGO 1) -->
+    <div class="modal fade" id="modalExito" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-check-circle me-2"></i>Operación exitosa
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <i class="bi bi-check-circle-fill text-success" style="font-size: 3.5rem;"></i>
+                    <p class="mt-3 fs-5" id="mensajeExito">La operación se ha completado correctamente.</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-success" data-bs-dismiss="modal">
+                        Aceptar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE CONFIRMACIÓN (ESTILO CÓDIGO 1) -->
+    <div class="modal fade" id="modalConfirmacion" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-exclamation-triangle me-2"></i>Confirmar acción
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="mensajeConfirmacion">¿Estás seguro de realizar esta acción?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-warning" id="btnConfirmar">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- JavaScript Personalizado -->
+    <script src="{% static 'js/trabajos/ver_entrega_estudiante.js' %}"></script>
+
+    <!-- Variables Django para JavaScript -->
+    <script>
+        // Variables globales que pueden ser necesarias en el JS
+        const djangoSettings = {
+            staticUrl: "{% static '' %}",
+            currentUserId: "{{ user.id_usuarios|default:'0' }}",
+            trabajoId: "{{ trabajo.id_trabajos }}",
+            esProfesor: {% if es_profesor %}true{% else %}false{% endif %}
+        };
+    </script>
+
+</body>
+</html>

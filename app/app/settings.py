@@ -46,16 +46,28 @@ INSTALLED_APPS = [
     'web',
     'administrador',
     'clases',
+    'perfil',
     
     
     
     # Application Para actualizacion
     'channels',
+    # Application Para Paises
+   
+    'django_countries',
+    
+    # Application Para Tareas Asincronas
+    'django_celery_results',
 ]
 
+   
+
+
 MIDDLEWARE = [
+    
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -76,6 +88,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                
+                
             ],
         },
     },
@@ -187,3 +201,49 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 CSRF_TRUSTED_ORIGINS = [
     'https://estudiosos.onrender.com',
 ]
+
+
+
+# Celery Configuration Options
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_BACKEND = 'django-db'
+
+TIME_ZONE = 'America/Bogota'
+CELERY_TIMEZONE = TIME_ZONE
+
+
+# GMAIL SMTP CONFIGURATION
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'altosdefontibon.cr@gmail.com'
+EMAIL_HOST_PASSWORD = 'heho zywq sayt pexm'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+
+
+# ---------------------------------------
+# 📧 CORREO PRODUCCIÓN (SendGrid)
+# ---------------------------------------
+#EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
+
+#SENDGRID_API_KEY = os.getenv("EMAIL_HOST_PASSWORD")
+#DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "altosdefontibon.cr@gmail.com")
+
+#SENDGRID_SANDBOX_MODE_IN_DEBUG = False
+#SENDGRID_ECHO_TO_STDOUT = True
+
+
+#Tiempo de sesion en segundos
+# Tiempo máximo de inactividad (en segundos)
+# 20 minutos = 1200 segundos
+SESSION_COOKIE_AGE = 1200  
+
+# Mantiene la sesión viva solo si hay actividad
+SESSION_SAVE_EVERY_REQUEST = True
+
+# NO cerrar al cerrar el navegador
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False

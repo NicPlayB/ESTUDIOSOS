@@ -1,0 +1,304 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estudiosos - Modalidades de Clases</title>
+    <link rel="icon" href="{% static 'img/Logo tipo Estudiosos_Mesa de trabajo 1 copia 1 (2) (1).png' %}" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/web/nuestras_clases.css' %}">
+</head>
+<body>
+    <!-- Alertas -->
+    <div class="alert-container">
+        {% if messages %}
+            {% for message in messages %}
+                {% with message.tags as tags %}
+                <div class="alert-toast {% if tags == 'success' %}success{% elif tags == 'error' %}error{% elif tags == 'warning' %}warning{% elif tags == 'info' %}info{% else %}info{% endif %}">
+                    <div class="alert-toast-icon">
+                        {% if tags == 'success' %}
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                        {% elif tags == 'error' %}
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                        {% elif tags == 'warning' %}
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                        {% else %}
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        {% endif %}
+                    </div>
+                    <div class="alert-toast-content">
+                        <div class="alert-toast-title">
+                            {% if tags == 'success' %}Éxito{% elif tags == 'error' %}Error{% elif tags == 'warning' %}Advertencia{% else %}Información{% endif %}
+                        </div>
+                        <div class="alert-toast-message">{{ message }}</div>
+                    </div>
+                    <button class="alert-toast-close">&times;</button>
+                    <div class="alert-toast-progress" style="color: {% if tags == 'success' %}#2ecc71{% elif tags == 'error' %}#e74c3c{% elif tags == 'warning' %}#f1c40f{% else %}#3498db{% endif %}"></div>
+                </div>
+                {% endwith %}
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- Modal de Confirmación para WhatsApp -->
+    <div class="whatsapp-modal-overlay" id="whatsappModalOverlay"></div>
+    <div class="whatsapp-modal" id="whatsappModal">
+        <button class="whatsapp-modal-close" id="whatsappModalClose">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="whatsapp-modal-header">
+            <i class="fab fa-whatsapp"></i>
+            <h2 class="whatsapp-modal-title">Contactar por WhatsApp</h2>
+        </div>
+        <div class="whatsapp-modal-body">
+            <p class="whatsapp-modal-text">
+                ¿Deseas obtener más información sobre:
+            </p>
+            <div class="whatsapp-modal-course-name" id="whatsappModalCourseName">Modalidad del Curso</div>
+            <p class="whatsapp-modal-text">
+                Serás redirigido a WhatsApp para contactar con nuestro equipo de asesores.
+            </p>
+        </div>
+        <div class="whatsapp-modal-footer">
+            <button class="whatsapp-modal-btn whatsapp-modal-btn-cancel" id="whatsappModalCancel">
+                <i class="fas fa-times"></i> Cancelar
+            </button>
+            <a href="#" class="whatsapp-modal-btn whatsapp-modal-btn-whatsapp" id="whatsappModalLink" target="_blank">
+                <i class="fab fa-whatsapp"></i> Ir a WhatsApp
+            </a>
+        </div>
+    </div>
+
+    <!-- HEADER IDÉNTICO AL CÓDIGO 1 -->
+    <header id="header">
+        <nav>
+            <div class="logo-container">
+                <div class="logo-icon">
+                    <img src="{% static 'img/Logo_nav_web.png' %}" alt="Estudiosos" class="logo-icon-img">
+                </div>
+            </div>
+            <ul class="nav-center" id="navMenu">
+                <li><a href="{% url 'index' %}">Inicio</a></li>
+                <li><a href="{% url 'nuestras_clases' %}">Nuestras Clases</a></li>
+                <li><a href="{% url 'mostrar_cursos' %}">Cursos</a></li>
+                <li><a href="{% url 'masterclass' %}">Nuestra Masterclass</a></li>
+                <li><a href="{% url 'noticias' %}">Novedades</a></li>
+            </ul>
+            <div class="nav-right">
+                {% if usuario_autenticado %}
+                    <div class="user-welcome">
+                        <i class="fas fa-user-circle"></i> {{ usuario_nombre }}
+                    </div>
+
+                    {% if rol == 1 %}
+                        <a href="{% url 'panel_administrador' %}" class="btn-login">Panel Admin</a>
+                    {% endif %}
+
+                    {% if request.session.usuario_rol == 3 or request.session.usuario_rol == 4 %}
+                        <a href="{% url 'clases_activas' %}" class="btn-login">{% if rol == 3 %}Panel Profesor{% elif rol == 4 %}Panel Estudiante{% endif %}</a>
+                    {% endif %}
+                    
+                    <a href="{% url 'cerrar_sesion' %}" class="btn-register">Cerrar Sesión</a>
+
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn-login">Iniciar Sesión</a>
+                    <a href="{% url 'registrar' %}" class="btn-register">Registrarse</a>
+                {% endif %}
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Mobile Menu Overlay -->
+        <div class="nav-mobile-overlay" id="mobileOverlay"></div>
+        
+        <!-- Mobile Menu -->
+        <div class="nav-mobile-menu" id="mobileMenu">
+            <div class="nav-mobile-header">
+                <div class="nav-mobile-logo">
+                    <div class="logo-icon">
+                        <img src="{% static 'img/Logo tipo Estudiosos_Mesa de trabajo 1 copia 14.png' %}" alt="Estudiosos" class="logo-icon-img">
+                    </div>
+                </div>
+                <button class="nav-mobile-close" id="mobileCloseBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <ul class="nav-mobile-links">
+                <li><a href="{% url 'index' %}" class="mobile-link">Inicio</a></li>
+                <li><a href="{% url 'nuestras_clases' %}" class="mobile-link">Nuestras Clases</a></li>
+                <li><a href="{% url 'mostrar_cursos' %}" class="mobile-link">Cursos</a></li>
+                <li><a href="{% url 'masterclass' %}" class="mobile-link">Nuestra Masterclass</a></li>
+                <li><a href="{% url 'noticias' %}" class="mobile-link">Novedades</a></li>
+            </ul>
+            <div class="nav-mobile-actions">
+                {% if usuario_autenticado %}
+                    <a href="{% url 'cerrar_sesion' %}" class="btn-register">Cerrar Sesión</a>
+                {% else %}
+                    <a href="{% url 'registrar' %}" class="btn-register">Registrarse</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- Page Header -->
+    <section class="page-header" id="inicio">
+        <h1>Modalidades de Aprendizaje</h1>
+        <p>En Estudiosos ofrecemos diferentes formas de aprender adaptadas a tus necesidades y estilo de vida. Descubre cuál es la mejor opción para ti.</p>
+    </section>
+
+    <!-- Modalidades Section -->
+    <section class="modalidades">
+        <div class="modalidades-container">
+            <div class="modalidades-intro">
+                <h2>Elige Tu Forma de Aprender</h2>
+                <p>Nuestras dos modalidades de enseñanza están diseñadas para ofrecerte la mejor experiencia educativa, ya sea que prefieras la interacción presencial o la flexibilidad virtual.</p>
+            </div>
+            
+            <div class="cards-container">
+                <!-- Card Presencial -->
+                <div class="modalidad-card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-school"></i>
+                        </div>
+                        <h3>Clases Presenciales</h3>
+                        <p>Interacción directa en nuestras instalaciones</p>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-content">
+                            <h4>Experiencia de aprendizaje completa</h4>
+                            <p>
+                                Clases participativas y altamente interactivas que fomentan la comunicación directa entre estudiantes e instructores. Espacios equipados con tecnología moderna y materiales actualizados.
+                            </p>
+                            <p>
+                                Actividades prácticas, talleres y simulaciones que refuerzan el conocimiento teórico. Asesoramiento personalizado y acompañamiento permanente para garantizar tu progreso.
+                            </p>
+                            
+                            <ul class="features-list">
+                                <li>Programas adaptados a necesidades individuales</li>
+                                <li>Ambientes cómodos, seguros y estimulantes</li>
+                                <li>Ejercicios prácticos y evaluaciones continuas</li>
+                                <li>Trabajo en equipo que fortalece comunicación</li>
+                                <li>Construcción de redes profesionales</li>
+                            </ul>
+                            
+                            <p>
+                                Ideal para quienes valoran la interacción social directa y el aprendizaje colaborativo en un entorno controlado.
+                            </p>
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn-card" data-modalidad="Clases Presenciales">
+                                Solicitar Información
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card Virtual -->
+                <div class="modalidad-card virtual">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-laptop"></i>
+                        </div>
+                        <h3>Clases Virtuales</h3>
+                        <p>Aprende desde cualquier lugar</p>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-content">
+                            <h4>Flexibilidad y accesibilidad total</h4>
+                            <p>
+                                Educación de calidad sin importar tu ubicación geográfica. Plataformas digitales avanzadas con contenidos estructurados y materiales audiovisuales.
+                            </p>
+                            <p>
+                                Metodologías innovadoras que promueven autonomía y aprendizaje activo. Recursos multimedia, videoconferencias en vivo y herramientas interactivas.
+                            </p>
+                            
+                            <ul class="features-list">
+                                <li>Acceso desde cualquier dispositivo con internet</li>
+                                <li>Materiales descargables y recursos complementarios</li>
+                                <li>Evaluaciones en línea y seguimiento personalizado</li>
+                                <li>Flexibilidad de horarios y ritmo personal</li>
+                                <li>Comunicación constante con instructores</li>
+                            </ul>
+                            
+                            <p>
+                                Perfecto para quienes equilibran estudios con otras responsabilidades, buscando comodidad sin sacrificar calidad educativa.
+                            </p>
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn-card" data-modalidad="Clases Virtuales">
+                                Solicitar Información
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section" id="contacto">
+        <div class="cta-content">
+            <h2>¿No Sabes Cuál Modalidad Elegir?</h2>
+            <p>
+                Nuestros asesores educativos están listos para ayudarte a elegir la modalidad que mejor se adapte a tus objetivos y estilo de vida. Contáctanos para una consulta gratuita.
+            </p>
+            <a href="#" class="btn-white" id="btnAsesoria">Contactar Asesor</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-about">
+                <div class="footer-logo">
+                    <div class="footer-logo-icon">E</div>
+                    <div class="footer-logo-text">ESTUDIOSOS</div>
+                </div>
+                <p>
+                    Academia educativa comprometida con la excelencia en la formación 
+                    y el desarrollo integral de profesionales.
+                </p>
+            </div>
+            <div class="footer-links">
+                <h4>Enlaces</h4>
+                <ul>
+                    <li><a href="{% url 'index' %}">Inicio</a></li>
+                    <li><a href="{% url 'nuestras_clases' %}">Nuestras Clases</a></li>
+                    <li><a href="{% url 'mostrar_cursos' %}">Cursos</a></li>
+                    <li><a href="{% url 'masterclass' %}">Masterclass</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Modalidades</h4>
+                <ul>
+                    <li><a href="{% url 'nuestras_clases' %}">Clases Presenciales</a></li>
+                    <li><a href="{% url 'nuestras_clases' %}">Clases Virtuales</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Contacto</h4>
+                <ul>
+                    <li><a href="mailto:info@estudiosos.com">info@estudiosos.com</a></li>
+                    <li><a href="tel:+573001234567">+57 300 123 4567</a></li>
+                    <li><a href="#">Bogotá, Colombia</a></li>
+                    <li><a href="#">Lun-Vie 8am-6pm</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Estudiosos. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="{% static 'js/web/nuestras_clases.js' %}"></script>
+</body>
+</html>

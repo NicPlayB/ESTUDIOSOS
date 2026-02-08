@@ -1,0 +1,114 @@
+<!-- TABLA (solo desktop) -->
+<div class="table-container">
+    {% if usuarios %}
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th><i class="bi bi-person"></i> Nombre</th>
+                    <th><i class="bi bi-card-text"></i> Documento</th>
+                    <th><i class="bi bi-envelope"></i> Correo</th>
+                    <th><i class="bi bi-shield"></i> Rol</th>
+                    <th><i class="bi bi-gear"></i> Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for usuario in usuarios %}
+                <tr>
+                    <td>
+                        <div class="user-icon">
+                            <i class="bi bi-person"></i>
+                        </div>
+                        <div class="user-info">
+                            {{ usuario.nombres }} {{ usuario.apellidos }}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-card-text me-2"></i>
+                            <span>{{ usuario.documento }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-envelope me-2"></i>
+                            <span class="text-truncate">{{ usuario.correo }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-shield me-2"></i>
+                            {% if usuario.id_tipo_rol.id_rol == 3 %}
+                                <span class="badge bg-primary">Profesor</span>
+                            {% else %}
+                                <span class="badge bg-success">Estudiante</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        {% if usuario.id_tipo_rol.id_rol == 3 %}
+                            <form method="post" action="{% url 'clases_activas' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="profesor_id" value="{{ usuario.id_usuarios }}">
+                                <button class="btn btn-primary btn-sm">
+                                    <i class="bi bi-eye"></i> Ver clases
+                                </button>
+                            </form>
+                        {% else %}
+                            <span class="text-muted">—</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty-table-message">
+            <i class="bi bi-people"></i>
+            <p>No se encontraron usuarios</p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- CARDS (solo móvil) -->
+<div class="cards-container">
+    {% if usuarios %}
+        {% for usuario in usuarios %}
+        <div class="card-item">
+            <p><i class="bi bi-person"></i> <strong>Nombre:</strong> 
+                <span>{{ usuario.nombres }} {{ usuario.apellidos }}</span>
+            </p>
+            <p><i class="bi bi-card-text"></i> <strong>Documento:</strong> 
+                <span>{{ usuario.documento }}</span>
+            </p>
+            <p><i class="bi bi-envelope"></i> <strong>Correo:</strong> 
+                <span>{{ usuario.correo }}</span>
+            </p>
+            <p><i class="bi bi-shield"></i> <strong>Rol:</strong> 
+                <span>
+                    {% if usuario.id_tipo_rol.id_rol == 3 %}
+                        <span class="badge bg-primary">Profesor</span>
+                    {% else %}
+                        <span class="badge bg-success">Estudiante</span>
+                    {% endif %}
+                </span>
+            </p>
+
+            <div class="card-actions">
+                {% if usuario.id_tipo_rol.id_rol == 3 %}
+                    <a href="{% url 'clases_activas' %}?profesor_id={{ usuario.id_usuarios }}"
+                       class="btn btn-primary btn-sm w-100 d-flex align-items-center justify-content-center">
+                        <i class="bi bi-eye me-2"></i> Ver clases
+                    </a>
+                {% else %}
+                    <span class="text-muted text-center w-100 d-block">No hay acciones disponibles</span>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-table-message">
+            <i class="bi bi-people"></i>
+            <p>No se encontraron usuarios</p>
+        </div>
+    {% endif %}
+</div>

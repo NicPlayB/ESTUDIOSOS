@@ -1,131 +1,422 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Clases virtuales</title>
+    <!-- Configuración básica del documento -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>Clases Virtuales - {{ clase.nombre }}</title>
 
-<style>
-body { font-family: Arial; background:#f4f6f9; padding:20px }
-.card { background:#fff; padding:15px; border-radius:6px; margin-bottom:10px }
-button { padding:6px 10px; margin:4px }
-.modal {
-    display:none;
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,.4);
-}
-.modal-content {
-    background:#fff;
-    width:400px;
-    margin:10% auto;
-    padding:20px;
-    border-radius:6px;
-}
-.close { float:right; cursor:pointer }
-</style>
-
-<script>
-function abrirModal(id){
-    document.getElementById(id).style.display='block'
-}
-function cerrarModal(id){
-    document.getElementById(id).style.display='none'
-}
-</script>
+    <!-- Enlaces a frameworks y fuentes externas -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS personalizado -->
+    <link rel="stylesheet" href="{% static 'css/clases_virtuales/clases_virtuales.css' %}">
 </head>
-
 <body>
 
-<h2>Clases virtuales – {{ clase.nombre }}</h2>
+    <!-- BOTÓN HAMBURGUESA -->
+    <button class="hamburger-btn" id="hamburgerBtn" title="Menú">
+        <i class="bi bi-list"></i>
+    </button>
 
-<nav>
-        <h3>Menú</h3>
+    <!-- OVERLAY PARA CERRAR NAV -->
+    <div class="nav-overlay" id="navOverlay"></div>
 
-        <a href="{% url 'clases_activas' %}">Clases activas</a><br>
-
-        <a href="{% url 'ver_trabajos' clase.id_clase %}">Trabajos</a><br>
-
-        <a href="{% url 'inscritos_clase' clase.id_clase %}">Inscritos</a><br>
-
-        <a href="{% url 'clases_virtuales' clase.id_clase %}">Clases virtuales</a><br>
-
-        <a href="{% url 'comentarios_clase' clase.id_clase %}">Comentarios</a>
-    </nav>
-
-<button onclick="abrirModal('modalCrear')">➕ Crear clase virtual</button>
-
-{% for cv in clases_virtuales %}
-<div class="card">
-    <strong>{{ cv.descripcion }}</strong><br>
-    📅 {{ cv.fecha_de_clase|date:"d/m/Y H:i" }}<br>
-    🔗 <a href="{{ cv.url_clase }}" target="_blank">Entrar</a><br>
-
-    <button onclick="abrirModal('modalEditar{{ cv.id_clase_virtual }}')">✏️ Editar</button>
-    <button onclick="abrirModal('modalEliminar{{ cv.id_clase_virtual }}')">🗑️ Eliminar</button>
-</div>
-
-<!-- MODAL EDITAR -->
-<div class="modal" id="modalEditar{{ cv.id_clase_virtual }}">
-    <div class="modal-content">
-        <span class="close" onclick="cerrarModal('modalEditar{{ cv.id_clase_virtual }}')">✖</span>
-
-        <h3>Editar clase virtual</h3>
-
-        <form method="post">
-            {% csrf_token %}
-            <input type="hidden" name="editar">
-            <input type="hidden" name="id_clase_virtual" value="{{ cv.id_clase_virtual }}">
-
-            <input type="text" name="descripcion" value="{{ cv.descripcion }}" required><br><br>
-            <input type="datetime-local" name="fecha_de_clase"
-                   value="{{ cv.fecha_de_clase|date:'Y-m-d\\TH:i' }}" required><br><br>
-            <input type="url" name="url_clase" value="{{ cv.url_clase }}" required><br><br>
-
-            <button type="submit">Guardar</button>
-        </form>
+    <!-- CONTENEDOR DE ALERTAS (NUEVO DISEÑO CLEAN BORDE) -->
+    <div class="alert-container">
+        {% if messages %}
+            {% for message in messages %}
+                {% if message.tags != 'success' %}
+                    {% if message.tags == 'success' %}
+                        <div class="alert-toast success">
+                            <div class="alert-toast-icon">
+                                <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                </svg>
+                            </div>
+                            <div class="alert-toast-content">
+                                <div class="alert-toast-title">Éxito</div>
+                                <div class="alert-toast-message">{{ message }}</div>
+                            </div>
+                            <button class="alert-toast-close">&times;</button>
+                            <div class="alert-toast-progress" style="color: #2ecc71"></div>
+                        </div>
+                    {% elif message.tags == 'error' or message.tags == 'danger' %}
+                        <div class="alert-toast error">
+                            <div class="alert-toast-icon">
+                                <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="15" y1="9" x2="9" y2="15"></line>
+                                    <line x1="9" y1="9" x2="15" y2="15"></line>
+                                </svg>
+                            </div>
+                            <div class="alert-toast-content">
+                                <div class="alert-toast-title">Error</div>
+                                <div class="alert-toast-message">{{ message }}</div>
+                            </div>
+                            <button class="alert-toast-close">&times;</button>
+                            <div class="alert-toast-progress" style="color: #e74c3c"></div>
+                        </div>
+                    {% elif message.tags == 'warning' %}
+                        <div class="alert-toast warning">
+                            <div class="alert-toast-icon">
+                                <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                                </svg>
+                            </div>
+                            <div class="alert-toast-content">
+                                <div class="alert-toast-title">Advertencia</div>
+                                <div class="alert-toast-message">{{ message }}</div>
+                            </div>
+                            <button class="alert-toast-close">&times;</button>
+                            <div class="alert-toast-progress" style="color: #f1c40f"></div>
+                        </div>
+                    {% elif message.tags == 'info' %}
+                        <div class="alert-toast info">
+                            <div class="alert-toast-icon">
+                                <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                </svg>
+                            </div>
+                            <div class="alert-toast-content">
+                                <div class="alert-toast-title">Información</div>
+                                <div class="alert-toast-message">{{ message }}</div>
+                            </div>
+                            <button class="alert-toast-close">&times;</button>
+                            <div class="alert-toast-progress" style="color: #3498db"></div>
+                        </div>
+                    {% else %}
+                        <div class="alert-toast info">
+                            <div class="alert-toast-icon">
+                                <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                </svg>
+                            </div>
+                            <div class="alert-toast-content">
+                                <div class="alert-toast-title">Mensaje</div>
+                                <div class="alert-toast-message">{{ message }}</div>
+                            </div>
+                            <button class="alert-toast-close">&times;</button>
+                            <div class="alert-toast-progress" style="color: #3498db"></div>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
     </div>
-</div>
 
-<!-- MODAL ELIMINAR -->
-<div class="modal" id="modalEliminar{{ cv.id_clase_virtual }}">
-    <div class="modal-content">
-        <h3>¿Eliminar clase virtual?</h3>
-        <p>{{ cv.descripcion }}</p>
+    <div class="container-fluid p-0">
+        <!-- LAYOUT PRINCIPAL -->
+        <div class="main-layout">
+            <!-- NAVEGACIÓN (CON EL DISEÑO DEL CÓDIGO 1 PERO LAS URLS DEL CÓDIGO 2) -->
+            <div class="sidebar-nav">
+                <div class="logo-section">
+                    <!-- Imagen del logo como en el Código 1 -->
+                    <img src="{% static 'img/Logo tipo Estudiosos_Mesa de trabajo 1 copia 14.png' %}" alt="Logo Estudiosos">
+                    <span>Estudiosos</span>
+                </div>
+                <nav class="nav flex-column">
+                    <a class="nav-link " href="{% url 'panel_inicio' clase.id_clase %}">
+                        <i class="bi bi-house-door"></i>Inicio
+                    </a>
 
-        <form method="post">
-            {% csrf_token %}
-            <input type="hidden" name="eliminar">
-            <input type="hidden" name="id_clase_virtual" value="{{ cv.id_clase_virtual }}">
-            <button type="submit">Sí, eliminar</button>
-            <button type="button" onclick="cerrarModal('modalEliminar{{ cv.id_clase_virtual }}')">
-                Cancelar
-            </button>
-        </form>
+                    
+                    
+                    <a class="nav-link" href="{% url 'gestionar_trabajos' clase.id_clase %}">
+                        <i class="bi bi-file-text"></i>Trabajos
+                    </a>
+                    
+                    <a class="nav-link" href="{% url 'inscritos_clase' clase.id_clase %}">
+                        <i class="bi bi-people"></i>Inscritos
+                    </a>
+                    
+                    <a class="nav-link active" href="{% url 'clases_virtuales' clase.id_clase %}">
+                        <i class="bi bi-camera-video"></i>Clases virtuales
+                    </a>
+                    
+                    <a class="nav-link" href="{% url 'comentarios_clase' clase.id_clase %}">
+                        <i class="bi bi-chat-dots"></i>Comentarios
+                    </a>
+                    
+                    {% if modo_admin %}
+                    <a class="nav-link" href="{% url 'panel_administrador' %}" title="Panel de Administración">
+                        <i class="bi bi-shield-lock-fill"></i>Panel de Administración
+                    </a>
+                    {% endif %}
+                     <a class="nav-link " href="{% url 'documentos_usuario' %}" title="Clases Inactivas">
+                        <i class="bi bi-file-text"></i>Tus Documentos
+                    </a>
+                </nav>
+
+                <!-- MENÚ USUARIO EN EL NAV (igual que código 1) -->
+                <div class="sidebar-nav-footer">
+                    <a class="nav-link" href="{% url 'perfil_usuario' %}">
+                        <i class="bi bi-person"></i>Mi perfil
+                    </a>
+                    <a class="nav-link" href="{% url 'cerrar_sesion' %}">
+                        <i class="bi bi-box-arrow-right"></i>Cerrar sesión
+                    </a>
+                </div>
+            </div>
+
+            <!-- CONTENIDO PRINCIPAL -->
+            <div class="container-main">
+                <!-- HEADER -->
+                <div class="page-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2><i class="bi bi-camera-video me-3"></i>Clases Virtuales </h2>
+                            <p class="text-muted mb-0 mt-2">
+                                <i class="bi bi-key me-1"></i>Código: <span class="badge bg-secondary">{{ clase.codigo_clase }}</span>
+                            </p>
+                        </div>
+                        <div>
+                            
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LISTA DE CLASES VIRTUALES -->
+                <div class="clases-virtuales-container" id="clasesVirtualesList">
+                    <!-- Este contenido será reemplazado por el partial -->
+                    {% include "clases_virtuales/partials/lista_clases_virtuales.html" %}
+                </div>
+            </div>
+        </div>
     </div>
-</div>
 
-{% endfor %}
+    <!-- BOTÓN FLOTANTE PARA CREAR CLASE VIRTUAL -->
+     {% if rol == 3 %}
+    <button class="floating-create-btn"
+            data-bs-toggle="modal"
+            data-bs-target="#modalCrear"
+            title="Crear clase virtual">
+        <i class="bi bi-plus-lg"></i>
+    </button>
+    {% endif %}
 
-<!-- MODAL CREAR -->
-<div class="modal" id="modalCrear">
-    <div class="modal-content">
-        <span class="close" onclick="cerrarModal('modalCrear')">✖</span>
-
-        <h3>Nueva clase virtual</h3>
-
-        <form method="post">
-            {% csrf_token %}
-            <input type="hidden" name="crear">
-
-            {{ form.descripcion }}
-            {{ form.fecha_de_clase }}
-            {{ form.url_clase }}
-
-            <br><br>
-            <button type="submit">Crear</button>
-        </form>
+    <!-- MODAL CREAR CLASE VIRTUAL -->
+    <div class="modal fade" id="modalCrear" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-plus-circle me-2"></i>
+                        Nueva Clase Virtual
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                
+                <form method="post" class="modal-form" id="formCrear">
+                    {% csrf_token %}
+                    <input type="hidden" name="crear">
+                    
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Descripción</label>
+                            <input type="text" 
+                                   name="descripcion" 
+                                   class="form-control"
+                                   placeholder="Ej: Clase de matemáticas - Tema 1"
+                                   required>
+                            <div class="error-text" id="error-descripcion-crear" style="display: none;"></div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Fecha y Hora</label>
+                            <input type="datetime-local" 
+                                   name="fecha_de_clase"
+                                   class="form-control"
+                                   required>
+                            <div class="error-text" id="error-fecha-crear" style="display: none;"></div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">URL de la Clase</label>
+                            <input type="url" 
+                                   name="url_clase" 
+                                   class="form-control"
+                                   required
+                                   placeholder="https://meet.google.com/xxx-xxxx-xxx">
+                            <div class="error-text" id="error-url-crear" style="display: none;"></div>
+                            <div class="form-text">
+                                Ejemplo: https://meet.google.com/xxx-xxxx-xxx
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="submitCrear">
+                            <i class="bi bi-check-circle me-1"></i>Crear Clase
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-</div>
 
+    <!-- MODAL EDITAR CLASE VIRTUAL -->
+    <div class="modal fade" id="modalEditar" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-pencil me-2"></i>
+                        Editar Clase Virtual
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                
+                <form method="post" class="modal-form" id="formEditar">
+                    {% csrf_token %}
+                    <input type="hidden" name="editar">
+                    <input type="hidden" name="id_clase_virtual" id="editClaseId">
+                    
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Descripción</label>
+                            <input type="text" 
+                                   name="descripcion" 
+                                   id="editDescripcion"
+                                   class="form-control"
+                                   required>
+                            <div class="error-text" id="error-descripcion-editar" style="display: none;"></div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Fecha y Hora</label>
+                            <input type="datetime-local" 
+                                   name="fecha_de_clase"
+                                   id="editFecha"
+                                   class="form-control"
+                                   required>
+                            <div class="error-text" id="error-fecha-editar" style="display: none;"></div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">URL de la Clase</label>
+                            <input type="url" 
+                                   name="url_clase" 
+                                   id="editUrl"
+                                   class="form-control"
+                                   required
+                                   placeholder="https://meet.google.com/xxx-xxxx-xxx">
+                            <div class="error-text" id="error-url-editar" style="display: none;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-warning" id="submitEditar">
+                            <i class="bi bi-check-circle me-1"></i>Guardar Cambios
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL ELIMINAR CLASE VIRTUAL -->
+    <div class="modal fade confirmation-modal" id="modalEliminar" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Confirmar eliminación
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="text-center mb-3">
+                        <i class="bi bi-trash text-danger" style="font-size: 3rem;"></i>
+                    </div>
+                    <p class="text-center">
+                        ¿Estás seguro de que deseas eliminar la clase virtual?
+                    </p>
+                    <p class="text-center">
+                        <strong id="eliminarDescripcion"></strong>
+                    </p>
+                    <p class="text-muted small text-center">
+                        <i class="bi bi-info-circle"></i>
+                        Esta acción no se puede deshacer.
+                    </p>
+                </div>
+
+                <div class="modal-footer justify-content-center">
+                    <form method="post" id="formEliminar">
+                        {% csrf_token %}
+                        <input type="hidden" name="eliminar">
+                        <input type="hidden" name="id_clase_virtual" id="eliminarClaseId">
+                        
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-danger" id="submitEliminar">
+                            <i class="bi bi-trash me-1"></i>Sí, eliminar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE CONFIRMACIÓN EXITOSA -->
+    <div class="modal fade" id="modalExito" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-check-circle me-2"></i>
+                        Operación exitosa
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
+                    <p class="mt-3" id="mensajeExito">La operación se ha completado correctamente.</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-success" data-bs-dismiss="modal" id="btnAceptarExito">
+                        Aceptar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script de Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Variables globales de Django -->
+    <script>
+        // Variables globales que serán usadas por el archivo JS externo
+        window.USER_ROL = {{ rol }};
+        window.CLASE_ID = {{ clase.id_clase }};
+        window.CSRF_TOKEN = "{{ csrf_token }}";
+        window.CLASES_VIRTUALES_URL = "{% url 'clases_virtuales' clase.id_clase %}";
+        window.WEBSOCKET_URL = (window.location.protocol === "https:" ? "wss://" : "ws://") + 
+                               window.location.host + "/ws/clases_virtuales/clase/" + window.CLASE_ID + "/";
+    </script>
+
+    <!-- JavaScript personalizado -->
+    <script src="{% static 'js/clases_virtuales/clases_virtuales.js' %}"></script>
 </body>
 </html>

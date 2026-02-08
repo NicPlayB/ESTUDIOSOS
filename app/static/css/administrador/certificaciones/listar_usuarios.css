@@ -1,0 +1,629 @@
+/* static/css/certificaciones.css */
+
+/* ===== VARIABLES Y ESTILOS BASE ===== */
+/* Definición de variables CSS para colores y efectos (sistema de diseño) */
+:root {
+    --primary-orange: #ff6b35;
+    --dark-orange: #e94e1b;
+    --primary-dark: #7c2d12;
+    --primary-medium: #c2410c;
+    --primary-light: #ea580c;
+    --accent-orange: #f97316;
+    --success-orange: #fb923c;
+    --background: #fff7ed;
+    --surface: #ffffff;
+    --text-primary: #431407;
+    --text-secondary: #78716c;
+    --text-light: #fffbeb;
+    --border: #f5d0b5;
+    --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Reset básico y configuración de tipografía */
+* {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Estilos generales del cuerpo con gradiente de fondo */
+body {
+    background: linear-gradient(135deg, var(--background) 0%, #fff1e6 100%);
+    color: var(--text-primary);
+    line-height: 1.6;
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+
+/* ===== SIDEBAR ===== */
+/* Botón hamburguesa para mostrar/ocultar sidebar en móviles */
+.hamburger-btn {
+    position: fixed;
+    top: 1.5rem;
+    left: 1.5rem;
+    z-index: 1100;
+    background: var(--primary-dark);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow);
+    transition: all 0.2s ease;
+    display: none;
+}
+
+.hamburger-btn.hide {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.hamburger-btn:hover {
+    background: var(--primary-medium);
+    transform: scale(1.05);
+}
+
+.hamburger-btn i {
+    font-size: 1.5rem;
+}
+
+/* Sidebar de navegación principal */
+.sidebar-nav {
+    background: linear-gradient(180deg, var(--primary-dark) 0%, var(--primary-medium) 100%);
+    width: 280px;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-lg);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow-y: auto;
+}
+
+.sidebar-nav::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar-nav::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* Sección del logo en el sidebar */
+.logo-section {
+    padding: 2rem 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+    color: var(--text-light);
+}
+
+.logo-section img {
+    height: 90px;
+    margin-bottom: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.logo-section span {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    display: block;
+}
+
+nav.nav {
+    flex: 1;
+    padding: 1.5rem 0;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    padding: 0.875rem 1.5rem;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    position: relative;
+    margin: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-weight: 500;
+    border: none;
+    background: transparent;
+}
+
+.nav-link::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 0;
+    background: var(--accent-orange);
+    border-radius: 0 12px 12px 0;
+    transition: width 0.2s ease;
+}
+
+.nav-link:hover, .nav-link.active {
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    transform: translateX(4px);
+}
+
+.nav-link.active::before {
+    width: 4px;
+}
+
+.nav-link i {
+    width: 24px;
+    text-align: center;
+    font-size: 1.5rem;
+}
+
+.sidebar-nav-footer {
+    padding: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.main-layout {
+    margin-left: 280px;
+    min-height: 100vh;
+    transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.container-main {
+    padding: 2.5rem;
+}
+
+.nav-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    display: none;
+    backdrop-filter: blur(2px);
+}
+
+.nav-overlay.show {
+    display: block;
+}
+
+/* ===== ESTILOS ESPECÍFICOS ===== */
+.page-header {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+}
+
+.page-header h2 {
+    color: var(--primary-orange);
+    font-weight: 700;
+    margin: 0;
+    font-size: 2.5rem;
+}
+
+/* Estilos base para botones */
+.btn {
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-orange) 0%, var(--dark-orange) 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 107, 53, 0.4);
+    color: white;
+}
+
+.btn-outline-primary {
+    background: transparent;
+    border: 2px solid var(--primary-orange);
+    color: var(--primary-orange);
+}
+
+.btn-outline-primary:hover {
+    background: var(--primary-orange);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 0.875rem;
+}
+
+/* Contenedor de búsqueda */
+.search-container {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+}
+
+.search-container h3 {
+    color: var(--primary-orange);
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.search-container h3 i {
+    font-size: 1.3rem;
+}
+
+/* Formulario de búsqueda */
+#form-busqueda {
+    margin: 0;
+}
+
+#form-busqueda .form-control {
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+}
+
+#form-busqueda .form-control:focus {
+    border-color: var(--primary-orange);
+    box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+}
+
+#form-busqueda .btn {
+    padding: 0.75rem 1.5rem;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* Tabla responsiva */
+.table-responsive-cards {
+    background: white;
+    border-radius: 20px;
+    padding: 0;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+/* Estilos para la tabla */
+.table {
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-bottom: 0;
+    border-radius: 20px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.table thead th {
+    background: rgb(255, 107, 53);
+    color: white;
+    border: none;
+    padding: 1.25rem 1.5rem;
+    font-weight: 600;
+    font-size: 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    border-radius: 0 !important;
+}
+
+/* Bordes redondeados para la cabecera */
+.table thead th:first-child {
+    border-top-left-radius: 20px !important;
+}
+
+.table thead th:last-child {
+    border-top-right-radius: 20px !important;
+}
+
+.table tbody tr {
+    transition: all 0.2s ease;
+}
+
+.table tbody tr:hover {
+    background-color: rgba(255, 107, 53, 0.05);
+    transform: translateY(-2px);
+}
+
+.table tbody td {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: middle;
+    font-size: 1rem;
+}
+
+/* Estilos para íconos en la tabla */
+.table tbody td:first-child {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 60px;
+}
+
+.user-icon {
+    background: linear-gradient(135deg, var(--primary-orange) 0%, var(--dark-orange) 100%);
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.user-info {
+    flex: 1;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    min-width: 0;
+}
+
+/* Badges para estado */
+.badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.bg-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+}
+
+.bg-warning {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+}
+
+.bg-danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+}
+
+.bg-secondary {
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%) !important;
+}
+
+/* Cards para móvil */
+.table-responsive-cards .table-container {
+    display: block;
+}
+
+.table-responsive-cards .cards-container {
+    display: none;
+}
+
+.card-item {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    transition: all 0.3s ease;
+}
+
+.card-item:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-orange);
+}
+
+/* Cards para móvil */
+.card-item p {
+    margin-bottom: 0.75rem;
+    color: var(--text-primary);
+    font-size: 1rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    line-height: 1.4;
+}
+
+.card-item p i {
+    color: var(--primary-orange);
+    width: 20px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.card-item p strong {
+    color: var(--primary-dark);
+    font-weight: 600;
+    min-width: 80px;
+    flex-shrink: 0;
+}
+
+.card-item p span {
+    flex: 1;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    min-width: 0;
+}
+
+.card-actions {
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border);
+}
+
+/* Mensaje cuando no hay datos */
+.empty-table-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    width: 100%;
+    text-align: center;
+    color: var(--text-secondary);
+}
+
+.empty-table-message i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    color: #d1d5db;
+}
+
+.empty-table-message p {
+    font-size: 1.2rem;
+    margin: 0;
+}
+
+/* Cuando no hay usuarios, ocultar la tabla/cards y mostrar solo el mensaje */
+.table-container:has(.empty-table-message) table {
+    display: none;
+}
+
+.cards-container:has(.empty-table-message) .card-item {
+    display: none;
+}
+
+/* Estilo para tabla cuando hay pocos registros */
+.table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Asegurar que la tabla ocupe solo el espacio necesario */
+.table-container table {
+    width: 100%;
+    table-layout: auto;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .hamburger-btn {
+        display: flex;
+    }
+
+    .sidebar-nav {
+        transform: translateX(-100%);
+    }
+
+    .sidebar-nav.show {
+        transform: translateX(0);
+    }
+
+    .main-layout {
+        margin-left: 0;
+    }
+
+    .container-main {
+        padding: 1.5rem;
+        padding-top: 5rem;
+    }
+
+    .page-header {
+        padding: 1.5rem;
+    }
+
+    .page-header h2 {
+        font-size: 1.8rem;
+    }
+
+    .search-container {
+        padding: 1.5rem;
+    }
+
+    /* Mostrar cards en móvil */
+    .table-responsive-cards .table-container {
+        display: none !important;
+    }
+
+    .table-responsive-cards .cards-container {
+        display: block !important;
+        padding: 1.5rem;
+    }
+
+    .empty-table-message {
+        min-height: 250px;
+    }
+
+    .empty-table-message i {
+        font-size: 3rem;
+    }
+
+    /* Ajuste del formulario en móvil */
+    #form-busqueda .btn {
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .btn {
+        width: 100%;
+        justify-content: center;
+        margin-bottom: 10px;
+    }
+}
+
+@media (max-width: 576px) {
+    .container-main {
+        padding: 1rem;
+        padding-top: 4.5rem;
+    }
+
+    .page-header h2 {
+        font-size: 1.5rem;
+    }
+
+    .search-container {
+        padding: 1.25rem;
+    }
+
+    .search-container h3 {
+        font-size: 1.3rem;
+    }
+
+    .card-item {
+        padding: 1.25rem;
+    }
+
+    .empty-table-message {
+        min-height: 200px;
+    }
+}

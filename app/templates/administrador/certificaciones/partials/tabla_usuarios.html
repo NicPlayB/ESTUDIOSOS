@@ -1,0 +1,103 @@
+<!-- TABLA (solo desktop) -->
+<div class="table-container">
+    {% if usuarios %}
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th><i class="bi bi-person"></i> Nombre</th>
+                    <th><i class="bi bi-card-text"></i> Documento</th>
+                    <th><i class="bi bi-info-circle"></i> Estado</th>
+                    <th><i class="bi bi-gear"></i> Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in usuarios %}
+                <tr>
+                    <td>
+                        <div class="user-icon">
+                            <i class="bi bi-person"></i>
+                        </div>
+                        <div class="user-info">
+                            {{ u.nombres }} {{ u.apellidos }}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-card-text me-2"></i>
+                            <span>{{ u.documento }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-info-circle me-2"></i>
+                            {% if u.estado == 'Activo' %}
+                                <span class="badge bg-success">Activo</span>
+                            {% elif u.estado == 'Inactivo' %}
+                                <span class="badge bg-danger">Inactivo</span>
+                            {% elif u.estado == 'Pendiente' %}
+                                <span class="badge bg-warning">Pendiente</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ u.estado }}</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        <a href="{% url 'certificados_usuario' u.id_usuarios %}"
+                           class="btn btn-primary btn-sm d-inline-flex align-items-center">
+                            <i class="bi bi-eye me-1"></i> Ver Certificados
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <!-- Mostrar mensaje centrado cuando no hay usuarios -->
+        <div class="empty-table-message">
+            <i class="bi bi-people"></i>
+            <p>No hay usuarios registrados</p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- CARDS (solo móvil) -->
+<div class="cards-container">
+    {% if usuarios %}
+        {% for u in usuarios %}
+        <div class="card-item">
+            <p><i class="bi bi-person"></i> <strong>Nombre:</strong> 
+                <span>{{ u.nombres }} {{ u.apellidos }}</span>
+            </p>
+            <p><i class="bi bi-card-text"></i> <strong>Documento:</strong> 
+                <span>{{ u.documento }}</span>
+            </p>
+            <p><i class="bi bi-info-circle"></i> <strong>Estado:</strong> 
+                <span>
+                    {% if u.estado == 'Activo' %}
+                        <span class="badge bg-success">Activo</span>
+                    {% elif u.estado == 'Inactivo' %}
+                        <span class="badge bg-danger">Inactivo</span>
+                    {% elif u.estado == 'Pendiente' %}
+                        <span class="badge bg-warning">Pendiente</span>
+                    {% else %}
+                        <span class="badge bg-secondary">{{ u.estado }}</span>
+                    {% endif %}
+                </span>
+            </p>
+
+            <div class="card-actions">
+                <a href="{% url 'certificados_usuario' u.id_usuarios %}"
+                   class="btn btn-primary btn-sm w-100 d-flex align-items-center justify-content-center">
+                    <i class="bi bi-eye me-2"></i> Ver Certificados
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <!-- Mostrar mensaje centrado cuando no hay usuarios -->
+        <div class="empty-table-message">
+            <i class="bi bi-people"></i>
+            <p>No hay usuarios registrados</p>
+        </div>
+    {% endif %}
+</div>

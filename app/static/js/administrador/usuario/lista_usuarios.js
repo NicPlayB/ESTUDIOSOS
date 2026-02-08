@@ -1,0 +1,307 @@
+/* ================= SIDEBAR ================= */
+const hamburgerBtn = document.getElementById('hamburgerBtn');
+const sidebarNav = document.querySelector('.sidebar-nav');
+const navOverlay = document.getElementById('navOverlay');
+
+function toggleNav() {
+    sidebarNav.classList.toggle('show');
+    navOverlay.classList.toggle('show');
+    hamburgerBtn.classList.toggle('hide');
+}
+
+function closeNav() {
+    sidebarNav.classList.remove('show');
+    navOverlay.classList.remove('show');
+    hamburgerBtn.classList.remove('hide');
+}
+
+hamburgerBtn?.addEventListener('click', toggleNav);
+navOverlay?.addEventListener('click', closeNav);
+
+document.querySelectorAll('.sidebar-nav .nav-link').forEach(link => {
+    link.addEventListener('click', closeNav);
+});
+
+/* ================= WEBSOCKET ================= */
+const socket = new WebSocket("ws://" + window.location.host + "/ws/usuarios/");
+
+socket.onopen = () => console.log("Conexión WebSocket establecida");
+socket.onclose = () => console.log("Conexión WebSocket cerrada");
+
+socket.onmessage = function(event) {
+    const data = JSON.parse(event.data);
+    if(data.action === "refresh") {
+        const tablaDiv = document.getElementById("tablaUsuarios");
+        tablaDiv.innerHTML = data.html;
+        
+        setTimeout(() => {
+            adjustTableVisibility();
+        }, 100);
+        
+        injectCSRF();
+        setupUpdateButtons();
+        
+        if (data.message && data.message.includes('éxito')) {
+            mostrarModalExito(data.message);
+        }
+    }
+};
+
+/* ================= LIVE SEARCH ================= */
+const searchInput = document.getElementById("searchInput");
+const rolSelect = document.getElementById("rolSelect");
+const tablaUsuarios = document.getElementById("tablaUsuarios");
+
+let timer;
+const delay = 400;
+
+function liveSearch() {
+    const params = new URLSearchParams({
+        search: searchInput.value,
+        rol: rolSelect.value
+    });
+
+    fetch(`?${params.toString()}`, {
+        headers: { 
+            "X-Requested-With": "XMLHttpRequest",
+            "X-CSRFToken": getCSRFToken()
+        }
+    })
+    .then(res => res.text())
+    .then(html => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const nuevaTabla = doc.querySelector('#tablaUsuarios');
+        
+        if (nuevaTabla) {
+            tablaUsuarios.innerHTML = nuevaTabla.innerHTML;
+        } else {
+            tablaUsuarios.innerHTML = html;
+        }
+        
+        setTimeout(() => {
+            adjustTableVisibility();
+        }, 100);
+        
+        injectCSRF();
+        setupUpdateButtons();
+    })
+    .catch(error => console.error('Error en la búsqueda:', error));
+}
+
+searchInput.addEventListener("keyup", () => {
+    clearTimeout(timer);
+    timer = setTimeout(liveSearch, delay);
+});
+
+rolSelect.addEventListener("change", liveSearch);
+
+document.getElementById("searchForm").addEventListener("submit", e => {
+    e.preventDefault();
+    liveSearch();
+});
+
+/* ================= CSRF TOKEN ================= */
+function getCSRFToken() {
+    const metaToken = document.querySelector('meta[name="csrf-token"]');
+    if (metaToken) return metaToken.content;
+    
+    const formToken = document.querySelector('[name="csrfmiddlewaretoken"]');
+    if (formToken) return formToken.value;
+    
+    const allTokens = document.querySelectorAll('[name="csrfmiddlewaretoken"]');
+    if (allTokens.length > 0) return allTokens[0].value;
+    
+    console.warn("No se pudo encontrar el token CSRF");
+    return '';
+}
+
+function injectCSRF() {
+    const token = getCSRFToken();
+    if (!token) {
+        console.error("No hay token CSRF disponible para inyectar");
+        return;
+    }
+    
+    tablaUsuarios.querySelectorAll("form").forEach(form => {
+        if (!form.querySelector('[name="csrfmiddlewaretoken"]')) {
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = "csrfmiddlewaretoken";
+            input.value = token;
+            form.prepend(input);
+        }
+    });
+}
+
+/* ================= FUNCIÓN PARA AJUSTAR VISIBILIDAD ================= */
+function adjustTableVisibility() {
+    const tableContainer = document.querySelector('.table-container');
+    const cardsContainer = document.querySelector('.cards-container');
+    
+    if (!tableContainer || !cardsContainer) return;
+    
+    if (window.innerWidth > 768) {
+        tableContainer.style.display = 'block';
+        cardsContainer.style.display = 'none';
+    } else {
+        tableContainer.style.display = 'none';
+        cardsContainer.style.display = 'block';
+    }
+}
+
+/* ================= MODAL MANAGEMENT ================= */
+let currentForm = null;
+
+function setupUpdateButtons() {
+    document.querySelectorAll(".btn-update-role").forEach(button => {
+        button.onclick = function(e) {
+            e.preventDefault();
+            
+            const form = this.closest('form');
+            const usuarioId = form.querySelector('input[name="usuario_id"]').value;
+            
+            let usuarioNombre, usuarioRolActual;
+            const tableRow = form.closest('tr');
+            const cardItem = form.closest('.card-item');
+            
+            if (tableRow) {
+                usuarioNombre = tableRow.querySelector('td:nth-child(1) .user-info').textContent;
+                usuarioRolActual = tableRow.querySelector('td:nth-child(3)').textContent;
+            } else if (cardItem) {
+                const paragraphs = cardItem.querySelectorAll('p');
+                usuarioNombre = paragraphs[0].querySelector('span').textContent;
+                usuarioRolActual = paragraphs[2].querySelector('span').textContent;
+            }
+            
+            const nuevoRol = form.querySelector('select[name="nuevo_rol"]');
+            const nuevoRolTexto = nuevoRol.options[nuevoRol.selectedIndex].text;
+            
+            currentForm = form;
+            
+            document.getElementById('userDetails').innerHTML = 
+                `<p><i class="bi bi-person"></i> <strong>Usuario:</strong> ${usuarioNombre}</p>
+                 <p><i class="bi bi-shield"></i> <strong>Rol actual:</strong> ${usuarioRolActual}</p>
+                 <p><i class="bi bi-arrow-right-circle"></i> <strong>Nuevo rol:</strong> ${nuevoRolTexto}</p>`;
+            
+            const modal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+            modal.show();
+        };
+    });
+}
+
+/* ================= CONFIRMATION MODAL ================= */
+document.getElementById('confirmUpdate').addEventListener('click', async function() {
+    if (currentForm) {
+        const formData = new FormData(currentForm);
+        const csrfToken = getCSRFToken();
+        
+        if (!csrfToken) {
+            alert('Error de seguridad: No se encontró el token CSRF. Por favor, recarga la página.');
+            return;
+        }
+        
+        try {
+            const response = await fetch(currentForm.action, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            });
+            
+            const contentType = response.headers.get("content-type");
+            let result;
+            
+            if (contentType && contentType.includes("application/json")) {
+                result = await response.json();
+            } else {
+                const text = await response.text();
+                try {
+                    result = JSON.parse(text);
+                } catch (e) {
+                    console.warn("Respuesta no es JSON, recargando página...");
+                    location.reload();
+                    return;
+                }
+            }
+            
+            if (result.success) {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('confirmationModal'));
+                if (modal) {
+                    modal.hide();
+                }
+                
+                mostrarModalExito(result.message || 'Rol actualizado correctamente');
+                
+                if (socket.readyState === WebSocket.OPEN) {
+                    socket.send(JSON.stringify({ action: 'refresh' }));
+                } else {
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
+                }
+            } else {
+                alert('Error al actualizar el rol: ' + (result.message || 'Error desconocido'));
+            }
+        } catch (error) {
+            console.error('Error en la petición:', error);
+            
+            if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+                alert('Error de conexión: No se pudo conectar con el servidor. Verifica tu conexión a internet.');
+            } else {
+                alert('Error: ' + error.message);
+            }
+        }
+    }
+});
+
+/* ================= MODAL DE ÉXITO ================= */
+function mostrarModalExito(msg) {
+    document.getElementById('mensajeExito').textContent = msg;
+    const modalElement = document.getElementById('modalExito');
+    const modal = new bootstrap.Modal(modalElement);
+    
+    modalElement.addEventListener('hidden.bs.modal', function () {
+        location.reload();
+    }, { once: true });
+    
+    modal.show();
+}
+
+/* ================= MANEJO DE MENSAJES DE DJANGO ================= */
+function handleDjangoMessages() {
+    // Verificar si hay mensajes de Django definidos
+    if (typeof djangoMessages !== 'undefined' && djangoMessages.length > 0) {
+        djangoMessages.forEach(function(msg) {
+            if (msg.tags === 'success') {
+                setTimeout(function() {
+                    mostrarModalExito(msg.message);
+                }, 100);
+            }
+        });
+    }
+}
+
+/* ================= INITIALIZATION ================= */
+document.addEventListener("DOMContentLoaded", function() {
+    adjustTableVisibility();
+    
+    window.addEventListener('resize', adjustTableVisibility);
+    
+    injectCSRF();
+    setupUpdateButtons();
+    
+    // Manejar mensajes de Django
+    handleDjangoMessages();
+    
+    // Cerrar automáticamente alertas después de 5 segundos
+    setTimeout(function() {
+        var alerts = document.querySelectorAll('.alert-auto-close');
+        alerts.forEach(function(alert) {
+            var bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+            bsAlert.close();
+        });
+    }, 5000);
+});

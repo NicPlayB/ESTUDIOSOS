@@ -44,13 +44,13 @@ def rol_requerido(roles_permitidos):
                     return redirect("panel_admin")
 
                 elif rol_id == 2:  # Usuario
-                    return redirect("panel_usuario")
+                    return redirect("index")
 
                 elif rol_id == 3:  # Profesor
-                    return redirect("panel_profesor")
+                    return redirect("clases_activas")
 
                 elif rol_id == 4:  # Estudiante
-                    return redirect("panel_estudiante")
+                    return redirect("clases_activas")
 
                 return redirect("login")
 

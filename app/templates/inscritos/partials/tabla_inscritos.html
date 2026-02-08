@@ -1,0 +1,53 @@
+{% if inscritos %}
+    <table class="table-modern">
+        <thead>
+            <tr>
+                <th style="width: 40%">Nombre</th>
+                <th style="width: 40%">Email</th>
+                <th style="width: 20%">Fecha inscripción</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for inscripcion in inscritos %}
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <i class="bi bi-person-circle" style="font-size: 1.5rem; color: #ff6b35;"></i>
+                            </div>
+                            <div>
+                                <strong>{{ inscripcion.usuario.nombres }}</strong>
+                                {% if inscripcion.usuario.apellidos %}
+                                    <br>
+                                    <small class="text-muted">{{ inscripcion.usuario.apellidos }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <a href="mailto:{{ inscripcion.usuario.correo }}" 
+                           class="email-link">
+                            <i class="bi bi-envelope"></i>
+                            {{ inscripcion.usuario.correo }}
+                        </a>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-calendar-event me-2" style="color: #78716c;"></i>
+                            <span>{{ inscripcion.fecha_inscripcion|date:"d/m/Y H:i" }}</span>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <div class="empty-state">
+        <i class="bi bi-people-fill"></i>
+        <h4>No hay estudiantes inscritos</h4>
+        <p>Los estudiantes pueden unirse a esta clase usando el código:</p>
+        <div class="class-code mx-auto" style="max-width: 200px; margin-top: 1rem;">
+            {{ clase.codigo_clase }}
+        </div>
+    </div>
+{% endif %}

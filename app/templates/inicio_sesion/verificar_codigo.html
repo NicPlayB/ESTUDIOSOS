@@ -1,0 +1,120 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificar Código - Estudiosos</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- CSS Personalizado -->
+    <link rel="stylesheet" href="{% static 'css/inicio_sesion/verificar_codigo.css' %}">
+</head>
+<body>
+    <!-- Alertas -->
+    <div class="alert-container">
+        {% if messages %}
+            {% for message in messages %}
+                {% with message.tags as tags %}
+                <div class="alert-toast {% if tags == 'success' %}success{% elif tags == 'error' %}error{% elif tags == 'warning' %}warning{% elif tags == 'info' %}info{% else %}info{% endif %}">
+                    <div class="alert-toast-icon">
+                        {% if tags == 'success' %}
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                        {% elif tags == 'error' %}
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                        {% elif tags == 'warning' %}
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                        {% else %}
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        {% endif %}
+                    </div>
+                    <div class="alert-toast-content">
+                        <div class="alert-toast-title">
+                            {% if tags == 'success' %}Éxito{% elif tags == 'error' %}Error{% elif tags == 'warning' %}Advertencia{% else %}Información{% endif %}
+                        </div>
+                        <div class="alert-toast-message">{{ message }}</div>
+                    </div>
+                    <button class="alert-toast-close">&times;</button>
+                    <div class="alert-toast-progress" style="color: {% if tags == 'success' %}#2ecc71{% elif tags == 'error' %}#e74c3c{% elif tags == 'warning' %}#f1c40f{% else %}#3498db{% endif %}"></div>
+                </div>
+                {% endwith %}
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <div class="login-container">
+        <div class="welcome-side">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+            
+            <div class="welcome-content-wrapper">
+                <a href="#" class="logo-container" title="Ir al inicio">
+                    <div class="logo">
+                        <img src="{% static 'img/Logo tipo Estudiosos_Mesa de trabajo 1 copia 14.png' %}" alt="Logo Estudiosos">
+                    </div>
+                </a>
+                
+                <h1>Verifica tu Identidad</h1>
+                <p>Hemos enviado un código de verificación a tu correo electrónico. Ingresa el código de 6 dígitos para continuar con la recuperación de tu contraseña.</p>
+            </div>
+        </div>
+
+        <div class="form-side">
+            <h2>Verificar Código</h2>
+            <p class="welcome-message">Ingresa el código de 6 dígitos que recibiste</p>
+            
+            <form method="POST" id="verificationForm">
+                {% csrf_token %}
+                
+                <div class="info-box">
+                    <i class="fa-solid fa-info-circle"></i>
+                    <span>Revisa tu bandeja de entrada y carpeta de spam. El código expira en 10 minutos.</span>
+                </div>
+                
+                <div class="input-group">
+                    <input type="text" 
+                           name="codigo" 
+                           id="id_codigo" 
+                           value="{{ form.codigo.value|default:'' }}"
+                           placeholder=" " 
+                           required
+                           pattern="[0-9]{6}"
+                           title="Por favor ingresa un código de 6 dígitos"
+                           class="code-input {% if form.codigo.errors %}is-invalid{% endif %}"
+                           maxlength="6"
+                           autocomplete="one-time-code">
+                </div>
+                
+                {% if form.codigo.errors %}
+                    <div class="error-box">
+                        <i class="fa-solid fa-circle-exclamation"></i>
+                        <span>{{ form.codigo.errors.0 }}</span>
+                    </div>
+                {% endif %}
+
+                <div class="resend-container">
+                    <a href="#" class="resend-link" id="resend-code-link">
+                        <i class="fa-solid fa-paper-plane"></i> Reenviar código
+                    </a>
+                    <span id="countdown-timer" class="countdown" style="display: none;"></span>
+                </div>
+
+                <button type="submit" class="login-btn" id="verifyBtn">
+                    <i class="fa-solid fa-shield-alt"></i>
+                    VERIFICAR CÓDIGO
+                </button>
+
+                <div class="register-link">
+                    <a href="{% url 'login' %}">¿Recordaste tu contraseña? Inicia sesión aquí</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript Personalizado -->
+    <script src="{% static 'js/inicio_sesion/verificar_codigo.js' %}"></script>
+</body>
+</html>

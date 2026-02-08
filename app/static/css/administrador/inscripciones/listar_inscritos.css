@@ -1,0 +1,684 @@
+/* static/css/lista_inscritos.css */
+
+/* ===== VARIABLES Y ESTILOS BASE DEL CÓDIGO 1 ===== */
+/* Definición de variables CSS para colores y efectos (sistema de diseño) */
+:root {
+    --primary-orange: #ff6b35;
+    --dark-orange: #e94e1b;
+    --primary-dark: #7c2d12;
+    --primary-medium: #c2410c;
+    --primary-light: #ea580c;
+    --accent-orange: #f97316;
+    --success-orange: #fb923c;
+    --background: #fff7ed;
+    --surface: #ffffff;
+    --text-primary: #431407;
+    --text-secondary: #78716c;
+    --text-light: #fffbeb;
+    --border: #f5d0b5;
+    --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Reset básico y configuración de tipografía */
+* {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Estilos generales del cuerpo con gradiente de fondo */
+body {
+    background: linear-gradient(135deg, var(--background) 0%, #fff1e6 100%);
+    color: var(--text-primary);
+    line-height: 1.6;
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+
+/* ===== SIDEBAR DEL CÓDIGO 1 (EXACTO) ===== */
+/* Botón hamburguesa para mostrar/ocultar sidebar en móviles */
+.hamburger-btn {
+    position: fixed;
+    top: 1.5rem;
+    left: 1.5rem;
+    z-index: 1100;
+    background: var(--primary-dark);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow);
+    transition: all 0.2s ease;
+    display: none; /* Oculto por defecto, visible solo en móviles */
+}
+
+.hamburger-btn.hide {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.hamburger-btn:hover {
+    background: var(--primary-medium);
+    transform: scale(1.05);
+}
+
+.hamburger-btn i {
+    font-size: 1.5rem;
+}
+
+/* Sidebar de navegación principal */
+.sidebar-nav {
+    background: linear-gradient(180deg, var(--primary-dark) 0%, var(--primary-medium) 100%);
+    width: 280px;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-lg);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow-y: auto;
+}
+
+.sidebar-nav::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar-nav::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* Sección del logo en el sidebar */
+.logo-section {
+    padding: 2rem 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+    color: var(--text-light);
+}
+
+.logo-section img {
+    height: 90px;
+    margin-bottom: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.logo-section span {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    display: block;
+}
+
+nav.nav {
+    flex: 1;
+    padding: 1.5rem 0;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    padding: 0.875rem 1.5rem;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    position: relative;
+    margin: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-weight: 500;
+    border: none;
+    background: transparent;
+}
+
+.nav-link::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 0;
+    background: var(--accent-orange);
+    border-radius: 0 12px 12px 0;
+    transition: width 0.2s ease;
+}
+
+.nav-link:hover, .nav-link.active {
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    transform: translateX(4px);
+}
+
+.nav-link.active::before {
+    width: 4px;
+}
+
+.nav-link i {
+    width: 24px;
+    text-align: center;
+    font-size: 1.5rem;
+}
+
+.sidebar-nav-footer {
+    padding: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.main-layout {
+    margin-left: 280px;
+    min-height: 100vh;
+    transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.container-main {
+    padding: 2.5rem;
+}
+
+.nav-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    display: none;
+    backdrop-filter: blur(2px);
+}
+
+.nav-overlay.show {
+    display: block;
+}
+
+/* ===== ESTILOS ESPECÍFICOS DEL CÓDIGO 1 APLICADOS ===== */
+.secondary-orange { color: #ff8c42; }
+.light-orange { background: #fff3e6; }
+
+/* Cabecera de la página */
+.page-header {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+}
+
+.page-header h2 {
+    color: var(--primary-orange);
+    font-weight: 700;
+    margin: 0;
+    font-size: 2.5rem;
+}
+
+.btn-volver {
+    display: inline-flex;
+    align-items: center;
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-decoration: none;
+    margin-bottom: 25px;
+    transition: all 0.3s ease;
+    font-size: 1.1rem;
+    padding: 8px 0;
+}
+
+.btn-volver:hover {
+    color: var(--primary-orange);
+    transform: scale(1.05);
+}
+
+.btn-volver i {
+    margin-right: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-volver:hover i {
+    transform: translateX(-3px);
+}
+
+/* Estilos base para botones */
+.btn {
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-orange) 0%, var(--dark-orange) 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 107, 53, 0.4);
+    color: white;
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: linear-gradient(135deg, #5a6268 0%, #4e555b 100%);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(108, 117, 125, 0.4);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+}
+
+/* Contenedor de alertas fijo en la esquina superior derecha */
+.alert-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    max-width: 380px;
+}
+
+/* Estilos para alertas */
+.alert {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.alert i.alert-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.alert-success {
+    background: linear-gradient(180deg, #10b981 0%, #6ee7b7 100%);
+    color: white;
+}
+
+.alert-danger {
+    background: linear-gradient(180deg, #dc2626 0%, #f87171 100%);
+    color: white;
+}
+
+.alert-warning {
+    background: linear-gradient(180deg, #d97706 0%, #fbbf24 100%);
+    color: white;
+}
+
+/* Clase para alertas que se cierran automáticamente con animación */
+.alert-auto-close {
+    animation: slideIn 0.5s ease-out, fadeOut 0.5s ease-in 5s forwards;
+}
+
+/* Animaciones para las alertas */
+@keyframes slideIn {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; transform: translateX(0); }
+    to { opacity: 0; transform: translateX(400px); }
+}
+
+/* ===== ESTILOS PARA LA TABLA DE INSCRITOS ===== */
+/* Contenedor de la tabla con diseño propio */
+.table-container-custom {
+    background: white;
+    border-radius: 20px;
+    padding: 0;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+/* Estilos para la tabla */
+.table {
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-bottom: 0;
+    border-radius: 20px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.table thead th {
+    background: rgb(255, 107, 53);
+    color: white;
+    border: none;
+    padding: 1.25rem 1.5rem;
+    font-weight: 600;
+    font-size: 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    border-radius: 0 !important;
+}
+
+/* Bordes redondeados para la cabecera */
+.table thead th:first-child {
+    border-top-left-radius: 20px !important;
+}
+
+.table thead th:last-child {
+    border-top-right-radius: 20px !important;
+}
+
+.table tbody tr {
+    transition: all 0.2s ease;
+}
+
+.table tbody tr:hover {
+    background-color: rgba(255, 107, 53, 0.05);
+    transform: translateY(-2px);
+}
+
+.table tbody td {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: middle;
+    font-size: 1rem;
+}
+
+/* Estilo para enlaces de WhatsApp */
+.whatsapp-link {
+    color: #25D366 !important;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-decoration: none !important;
+}
+
+.whatsapp-link:hover {
+    color: #128C7E !important;
+    transform: scale(1.05);
+}
+
+.whatsapp-link i {
+    margin-right: 5px;
+}
+
+/* Iconos en los headers */
+.table thead th i {
+    margin-right: 8px;
+    font-size: 1.1rem;
+}
+
+/* Estado badges */
+.estado-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.estado-activo {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+}
+
+.estado-pendiente {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+}
+
+.estado-finalizado {
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    color: white;
+}
+
+/* ESTILO ESPECIAL PARA CUANDO NO HAY INSCRIPCIONES */
+.empty-table-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    width: 100%;
+    text-align: center;
+    color: var(--text-secondary);
+}
+
+.empty-table-message i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    color: #d1d5db;
+}
+
+.empty-table-message p {
+    font-size: 1.2rem;
+    margin: 0;
+}
+
+/* ===== MODAL DE CONFIRMACIÓN WHATSAPP ===== */
+.whatsapp-modal .modal-content {
+    border-radius: 20px;
+    overflow: hidden;
+    border: none;
+}
+
+.whatsapp-modal .modal-header {
+    background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+    color: white;
+    border-bottom: none;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.whatsapp-modal .modal-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.whatsapp-modal .modal-title i {
+    font-size: 1.2rem;
+}
+
+.whatsapp-modal .modal-body {
+    padding: 2.5rem 2rem;
+    text-align: center;
+}
+
+.whatsapp-modal .modal-icon {
+    font-size: 4rem;
+    color: #25D366;
+    margin-bottom: 1.5rem;
+    display: block;
+}
+
+.whatsapp-modal .modal-text {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+}
+
+.whatsapp-modal .user-details {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+    text-align: left;
+}
+
+.whatsapp-modal .user-details p {
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.whatsapp-modal .user-details i {
+    color: var(--primary-orange);
+    width: 20px;
+}
+
+.whatsapp-modal .modal-footer {
+    padding: 1.5rem 2rem;
+    gap: 1rem;
+    justify-content: center;
+    border-top: none;
+    background: #f8f9fa;
+}
+
+.whatsapp-modal .btn-confirm-whatsapp {
+    background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+    color: white;
+    border: none;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    border-radius: 10px;
+    min-width: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.whatsapp-modal .btn-cancel {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    border-radius: 10px;
+    min-width: 150px;
+}
+
+.whatsapp-modal .btn-confirm-whatsapp:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+}
+
+.whatsapp-modal .btn-cancel:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .hamburger-btn {
+        display: flex;
+    }
+
+    .sidebar-nav {
+        transform: translateX(-100%);
+    }
+
+    .sidebar-nav.show {
+        transform: translateX(0);
+    }
+
+    .main-layout {
+        margin-left: 0;
+    }
+
+    .container-main {
+        padding: 1.5rem;
+        padding-top: 5rem;
+    }
+
+    .page-header {
+        padding: 1.5rem;
+    }
+
+    .page-header h2 {
+        font-size: 1.8rem;
+    }
+
+    .table-container-custom {
+        overflow-x: auto;
+    }
+
+    .table {
+        font-size: 0.9rem;
+    }
+
+    .table thead th,
+    .table tbody td {
+        padding: 1rem;
+    }
+
+    .empty-table-message {
+        padding: 3rem 1.5rem;
+    }
+
+    .empty-table-message i {
+        font-size: 3rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .container-main {
+        padding: 1rem;
+        padding-top: 4.5rem;
+    }
+
+    .page-header h2 {
+        font-size: 1.5rem;
+    }
+
+    .whatsapp-modal .modal-body {
+        padding: 2rem 1rem;
+    }
+
+    .whatsapp-modal .modal-icon {
+        font-size: 3rem;
+    }
+}
+
+/* Estilo para tabla cuando hay pocos registros */
+.table tbody:has(tr:only-child) {
+    border-bottom: none;
+}
+
+.table tbody tr:last-child td {
+    border-bottom: none;
+}

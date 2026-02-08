@@ -1,96 +1,381 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <!-- Configuración básica del documento -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trabajos - {{ clase.nombre }}</title>
-</head>
 
+    <!-- Enlaces a frameworks y fuentes externas -->
+    <!-- Bootstrap para estilos y componentes responsive -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Iconos de Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Fuente de Google para una tipografía moderna -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS Personalizado -->
+    <link rel="stylesheet" href="{% static 'css/trabajos/lista_trabajos.css' %}">
+</head>
 <body>
 
-    <!-- ===== MENÚ ===== -->
-    <nav>
-        <h3>Menú</h3>
+    <!-- BOTÓN HAMBURGUESA -->
+    <button class="hamburger-btn" id="hamburgerBtn" title="Menú">
+        <i class="bi bi-list"></i>
+    </button>
 
-        <a href="{% url 'clases_activas' %}">Clases activas</a><br>
+    <!-- OVERLAY PARA CERRAR NAV -->
+    <div class="nav-overlay" id="navOverlay"></div>
 
-        <a href="{% url 'ver_trabajos' clase.id_clase %}">Trabajos</a><br>
+    <!-- NUEVO CONTENEDOR DE ALERTAS CLEAN (BORDE) -->
+    <div class="alert-container">
+        {% if messages %}
+            {% for message in messages %}
+                {% if message.tags != 'success' %}
+                    {% if message.tags == 'error' %}
+                        <div class="alert-toast error">
+                            <div class="alert-toast-icon">
+                                <!-- SVG para error -->
+                                <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="15" y1="9" x2="9" y2="15"></line>
+                                    <line x1="9" y1="9" x2="15" y2="15"></line>
+                                </svg>
+                            </div>
+                            <div class="alert-toast-content">
+                                <div class="alert-toast-title">Error</div>
+                                <div class="alert-toast-message">{{ message }}</div>
+                            </div>
+                            <button class="alert-toast-close">&times;</button>
+                            <div class="alert-toast-progress" style="color: var(--alert-error)"></div>
+                        </div>
+                    {% elif message.tags == 'warning' %}
+                        <div class="alert-toast warning">
+                            <div class="alert-toast-icon">
+                                <!-- SVG para warning -->
+                                <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                                </svg>
+                            </div>
+                            <div class="alert-toast-content">
+                                <div class="alert-toast-title">Advertencia</div>
+                                <div class="alert-toast-message">{{ message }}</div>
+                            </div>
+                            <button class="alert-toast-close">&times;</button>
+                            <div class="alert-toast-progress" style="color: var(--alert-warning)"></div>
+                        </div>
+                    {% elif message.tags == 'info' %}
+                        <div class="alert-toast info">
+                            <div class="alert-toast-icon">
+                                <!-- SVG para info -->
+                                <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                </svg>
+                            </div>
+                            <div class="alert-toast-content">
+                                <div class="alert-toast-title">Información</div>
+                                <div class="alert-toast-message">{{ message }}</div>
+                            </div>
+                            <button class="alert-toast-close">&times;</button>
+                            <div class="alert-toast-progress" style="color: var(--alert-info)"></div>
+                        </div>
+                    {% else %}
+                        <div class="alert-toast info">
+                            <div class="alert-toast-icon">
+                                <!-- SVG para info por defecto -->
+                                <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                </svg>
+                            </div>
+                            <div class="alert-toast-content">
+                                <div class="alert-toast-title">Mensaje</div>
+                                <div class="alert-toast-message">{{ message }}</div>
+                            </div>
+                            <button class="alert-toast-close">&times;</button>
+                            <div class="alert-toast-progress" style="color: var(--alert-info)"></div>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    </div>
 
-        <a href="{% url 'inscritos_clase' clase.id_clase %}">Inscritos</a><br>
-
-        <a href="{% url 'clases_virtuales' clase.id_clase %}">Clases virtuales</a><br>
-
-        <a href="{% url 'comentarios_clase' clase.id_clase %}">Comentarios</a>
-    </nav>
-
-    <hr>
-
-    <!-- ===== HEADER ===== -->
-    <h1>Trabajos - {{ clase.nombre }}</h1>
-    <p><strong>Código:</strong> {{ clase.codigo_clase }}</p>
-
-    {% if clase.usuario == request.usuario %}
-        <p>
-            <a href="{% url 'crear_trabajo' clase.id_clase %}">
-                Crear trabajo
-            </a>
-        </p>
-    {% endif %}
-
-    <hr>
-
-    <!-- ===== MENSAJES ===== -->
-    {% if messages %}
-        {% for message in messages %}
-            <p>
-                <strong>{{ message.tags|upper }}:</strong>
-                {{ message }}
-            </p>
-        {% endfor %}
-    {% endif %}
-
-    <hr>
-
-    <!-- ===== LISTA DE TRABAJOS ===== -->
-    <h2>Lista de trabajos</h2>
-
-    {% if trabajos %}
-        {% for trabajo in trabajos %}
-
-            <div>
-                <h3>{{ trabajo.descripcion }}</h3>
-
-                <p>
-                    <strong>Estado:</strong> {{ trabajo.estado }}
-                </p>
-
-                <p>
-                    <strong>ID:</strong> {{ trabajo.id_trabajos }}
-                </p>
-
-                <p>
-                    <strong>Fecha de creación:</strong>
-                    {{ trabajo.fecha_creacion|date:"d/m/Y H:i" }}
-                </p>
-
-                <p>
-                    <strong>Fecha de entrega:</strong>
-                    {{ trabajo.fecha_entrega|date:"d/m/Y" }}
-                </p>
-
-                <p>
-                    <a href="{% url 'detalle_trabajo' trabajo.id_trabajos %}">
-                        Ver detalles
+    <div class="container-fluid p-0">
+        <!-- LAYOUT PRINCIPAL -->
+        <div class="main-layout">
+            <!-- NAVEGACIÓN (CON EL DISEÑO DEL CÓDIGO 1 PERO LAS URLS DEL CÓDIGO 2) -->
+            <div class="sidebar-nav">
+                <div class="logo-section">
+                    <!-- IMAGEN DEL LOGO DEL CÓDIGO 1 -->
+                    <img src="{% static 'img/Logo tipo Estudiosos_Mesa de trabajo 1 copia 14.png' %}" alt="Logo Estudiosos">
+                    <span>Estudiosos</span>
+                </div>
+                <nav class="nav flex-column">
+                    <!-- Enlaces de navegación principales - MANTENIENDO LAS URLS ORIGINALES DEL CÓDIGO 2 -->
+                    <a class="nav-link" href="{% url 'panel_inicio' clase.id_clase %}">
+                        <i class="bi bi-house-door"></i>Inicio
                     </a>
-                </p>
+
+                    <!-- Enlace activo actual (Trabajos) - MANTENIENDO LA URL ORIGINAL -->
+                    <a class="nav-link active" href="{% url 'gestionar_trabajos' clase.id_clase %}">
+                        <i class="bi bi-file-text"></i>Trabajos
+                    </a>
+                    
+                    <a class="nav-link" href="{% url 'inscritos_clase' clase.id_clase %}">
+                        <i class="bi bi-people"></i>Inscritos
+                    </a>
+                    
+                    <a class="nav-link" href="{% url 'clases_virtuales' clase.id_clase %}">
+                        <i class="bi bi-camera-video"></i>Clases virtuales
+                    </a>
+                    
+                    <a class="nav-link" href="{% url 'comentarios_clase' clase.id_clase %}">
+                        <i class="bi bi-chat-dots"></i>Comentarios
+                    </a>
+
+                    {% if modo_admin %}
+                    <a class="nav-link" href="{% url 'panel_administrador' %}" title="Panel de Administración">
+                        <i class="bi bi-shield-lock-fill"></i>Panel de Administración
+                    </a>
+                    {% endif %}
+                     <a class="nav-link " href="{% url 'documentos_usuario' %}" title="Clases Inactivas">
+                        <i class="bi bi-file-text"></i>Tus Documentos
+                    </a>
+                </nav>
+
+                <!-- MENÚ USUARIO EN EL NAV (MANTENIENDO LAS URLS ORIGINALES) -->
+                <div class="sidebar-nav-footer">
+                    <a class="nav-link" href="{% url 'perfil_usuario' %}">
+                        <i class="bi bi-person"></i>Mi perfil
+                    </a>
+                    <a class="nav-link" href="{% url 'cerrar_sesion' %}">
+                        <i class="bi bi-box-arrow-right"></i>Cerrar sesión
+                    </a>
+                </div>
             </div>
 
-            <hr>
+            <!-- CONTENIDO PRINCIPAL -->
+            <div class="container-main">
+                <!-- HEADER -->
+                <div class="page-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <!-- Título principal de la página -->
+                            <h2><i class="bi bi-journal-text me-3"></i>Trabajos - {{ clase.nombre }}</h2>
+                            <!-- Código de la clase como badge -->
+                            <p class="text-muted mb-0 mt-2">
+                                <i class="bi bi-key me-1"></i>Código: <span class="badge bg-secondary">{{ clase.codigo_clase }}</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
 
-        {% endfor %}
-    {% else %}
-        <p>No hay trabajos disponibles para esta clase.</p>
+                <!-- LISTA DE TRABAJOS EN COLUMNA ÚNICA -->
+                <div class="trabajos-container">
+                    <!-- Iterar sobre cada trabajo en la lista -->
+                    {% for trabajo in trabajos %}
+                        <!-- Enlace a la página de detalle del trabajo -->
+                        <a href="{% url 'detalle_trabajo' trabajo.id_trabajos %}" class="card-trabajo-link">
+                            <div class="card card-trabajo">
+                                <div class="card-body">
+                                    <div class="card-trabajo-content">
+                                        <!-- Contenedor de la descripción -->
+                                        <div class="descripcion-container">
+                                            <!-- La descripción estará limitada a 3 líneas en todas las resoluciones -->
+                                            <div class="trabajo-descripcion trabajo-descripcion-fade-container" id="descripcion-{{ trabajo.id_trabajos }}">
+                                                {{ trabajo.descripcion }}
+                                            </div>
+                                            
+                                            <!-- Información de fechas -->
+                                            <div class="trabajo-info">
+                                                <p class="card-text mb-1">
+                                                    <strong><i class="bi bi-calendar-check me-1"></i>Entrega:</strong>
+                                                    {{ trabajo.fecha_entrega|date:"d/m/Y" }}
+                                                </p>
+                                                <p class="card-text text-muted">
+                                                    <small>
+                                                        <i class="bi bi-clock me-1"></i>
+                                                        Creado el {{ trabajo.fecha_creacion|date:"d/m/Y H:i" }}
+                                                    </small>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Botón de ver detalles -->
+                                        <div class="ver-detalles-btn">
+                                            <button class="btn btn-sm">
+                                                <i class="bi bi-eye me-1"></i>Ver detalles
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    {% empty %}
+                        <!-- Mensaje cuando no hay trabajos -->
+                        <div class="no-trabajos-container d-flex flex-column align-items-center justify-content-center w-100">
+                            <div class="no-trabajos-icon mb-3">
+                                <i class="bi bi-journal-x"></i>
+                            </div>
+                            <div class="no-trabajos-msg">
+                                No hay trabajos creados aún.<br>
+                                ¡Crea el primero usando el botón "+" abajo!
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTÓN FLOTANTE PARA CREAR TRABAJO -->
+     {% if rol == 3 %}
+    <button class="floating-edit-btn" id="openFloatingForm" title="Crear nuevo trabajo">
+        <i class="bi bi-plus-lg"></i>
+    </button>
     {% endif %}
+
+    <!-- OVERLAY Y FORMULARIO FLOTANTE CENTRADO (IGUAL AL CÓDIGO 1) -->
+    <div class="floating-form-overlay" id="floatingFormOverlay">
+        <div class="floating-form" id="floatingForm">
+             
+            
+            <div class="floating-header">
+                <h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Crear nuevo trabajo</h5>
+                
+                <button type="button" class="close-floating" id="closeFloatingForm">
+                    &times;
+                </button>
+                
+            </div>
+
+           
+            <div class="floating-body">
+                <!-- Formulario para crear nuevo trabajo con enctype para subir archivos -->
+                <form enctype="multipart/form-data" id="trabajoForm">
+                    {% csrf_token %}
+                    
+                    <div class="form-columns">
+                        <!-- COLUMNA IZQUIERDA: CAMPOS DEL FORMULARIO -->
+                        <div class="form-column-left">
+                            <!-- DESCRIPCIÓN -->
+                            <div class="mb-4">
+                                <label class="form-label"><i class="bi bi-text-paragraph me-2"></i>Descripción</label>
+                                {{ trabajo_form.descripcion }}
+                                {% if trabajo_form.descripcion.errors %}
+                                    <div class="error-text">
+                                        <i class="bi bi-exclamation-circle"></i>
+                                        {{ trabajo_form.descripcion.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- FECHA ENTREGA -->
+                            <div class="mb-4">
+                                <label class="form-label"><i class="bi bi-calendar-check me-2"></i>Fecha de entrega</label>
+                                {{ trabajo_form.fecha_entrega }}
+                                {% if trabajo_form.fecha_entrega.errors %}
+                                    <div class="error-text">
+                                        <i class="bi bi-exclamation-circle"></i>
+                                        {{ trabajo_form.fecha_entrega.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Botón para enviar el formulario -->
+                            <div class="mt-4">
+                                <button type="submit" class="btn btn-primary w-100 py-2" id="submitBtn">
+                                    <i class="bi bi-check-circle me-2"></i>Guardar trabajo
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- COLUMNA DERECHA: ZONA DE ARRASTRE DE ARCHIVOS -->
+                        <div class="form-column-right">
+                            <div class="mb-4">
+                                <label class="form-label"><i class="bi bi-cloud-arrow-up me-2"></i>Archivos del trabajo</label>
+                                
+                                <!-- Zona de arrastre de archivos -->
+                                <div class="drop-zone" id="dropZone">
+                                    <i class="bi bi-cloud-arrow-up"></i>
+                                    <p class="drop-text mb-1">Arrastra y suelta archivos aquí</p>
+                                    <p class="drop-subtext mb-0">o haz clic para seleccionar</p>
+                                    <!-- Input de archivos oculto, se activa al hacer clic en la zona -->
+                                    <input type="file" name="archivos" id="fileInput" class="d-none" multiple>
+                                    <!-- Badge que muestra cantidad de archivos seleccionados -->
+                                    <div class="file-count-badge" id="fileCountBadge" style="display: none;">0</div>
+                                </div>
+                                
+                                <!-- Información adicional sobre los archivos -->
+                                <small class="text-muted d-block mt-2">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Los archivos se cargarán automáticamente. Formatos permitidos: PDF, Word, Excel, PowerPoint, imágenes, ZIP, etc.
+                                </small>
+                                
+                                <!-- Vista previa de archivos seleccionados -->
+                                <div class="file-preview-container" id="filePreview">
+                                    <p class="text-muted small m-0">Arrastra o selecciona archivos para cargarlos</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE ÉXITO (IGUAL AL CÓDIGO 1) -->
+    <div class="modal fade" id="modalExito" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-check-circle me-2"></i>Operación exitosa
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <i class="bi bi-check-circle-fill text-success" style="font-size: 3.5rem;"></i>
+                    <p class="mt-3 fs-5" id="mensajeExito">La operación se ha completado correctamente.</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-success" data-bs-dismiss="modal">
+                        Aceptar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script de Bootstrap para funcionalidades de componentes -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Definir variables de Django para el JS externo -->
+    <script>
+        const DJANGO_DATA = {
+            gestionarTrabajosUrl: "{% url 'gestionar_trabajos' clase.id_clase %}",
+            csrfToken: "{{ csrf_token }}",
+            messages: [
+                {% for message in messages %}
+                    {
+                        tags: "{{ message.tags }}",
+                        message: "{{ message|escapejs }}"
+                    },
+                {% endfor %}
+            ]
+        };
+    </script>
+
+    <!-- JS Personalizado -->
+    <script src="{% static 'js/trabajos/lista_trabajos.js' %}"></script>
 
 </body>
 </html>

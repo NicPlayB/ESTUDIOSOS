@@ -1,0 +1,727 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estudiosos</title>
+    <link rel="icon" href="{% static 'img/Logo tipo Estudiosos_Mesa de trabajo 1 copia 1 (2) (1).png' %}" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS Personalizado -->
+    <link rel="stylesheet" href="{% static 'css/web/index.css' %}">
+</head>
+<body class="loading">
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-content">
+            <div class="loading-logo">
+                <img src="{% static 'img/Logo tipo Estudiosos_Mesa de trabajo 1 copia 9.png' %}" alt="Estudiosos Logo" class="loading-logo-img">
+            </div>
+            <div class="loading-text">ESTUDIOSOS</div>
+            <div class="loading-spinner">
+                <div class="spinner-dot"></div>
+                <div class="spinner-dot"></div>
+                <div class="spinner-dot"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alertas -->
+    <div class="alert-container">
+        {% if messages %}
+            {% for message in messages %}
+                {% with message.tags as tags %}
+                <div class="alert-toast {% if tags == 'success' %}success{% elif tags == 'error' %}error{% elif tags == 'warning' %}warning{% elif tags == 'info' %}info{% else %}info{% endif %}">
+                    <div class="alert-toast-icon">
+                        {% if tags == 'success' %}
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                        {% elif tags == 'error' %}
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                        {% elif tags == 'warning' %}
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                        {% else %}
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        {% endif %}
+                    </div>
+                    <div class="alert-toast-content">
+                        <div class="alert-toast-title">
+                            {% if tags == 'success' %}Éxito{% elif tags == 'error' %}Error{% elif tags == 'warning' %}Advertencia{% else %}Información{% endif %}
+                        </div>
+                        <div class="alert-toast-message">{{ message }}</div>
+                    </div>
+                    <button class="alert-toast-close">&times;</button>
+                    <div class="alert-toast-progress" style="color: {% if tags == 'success' %}#2ecc71{% elif tags == 'error' %}#e74c3c{% elif tags == 'warning' %}#f1c40f{% else %}#3498db{% endif %}"></div>
+                </div>
+                {% endwith %}
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- Modal de Confirmación para WhatsApp -->
+    <div class="whatsapp-modal-overlay" id="whatsappModalOverlay"></div>
+    <div class="whatsapp-modal" id="whatsappModal">
+        <button class="whatsapp-modal-close" id="whatsappModalClose">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="whatsapp-modal-header">
+            <i class="fab fa-whatsapp"></i>
+            <h2 class="whatsapp-modal-title">Contactar por WhatsApp</h2>
+        </div>
+        <div class="whatsapp-modal-body">
+            <p class="whatsapp-modal-text">
+                ¿Deseas obtener más información sobre:
+            </p>
+            <div class="whatsapp-modal-course-name" id="whatsappModalCourseName">Nombre del Curso</div>
+            <p class="whatsapp-modal-text">
+                Serás redirigido a WhatsApp para contactar con nuestro equipo de asesores.
+            </p>
+        </div>
+        <div class="whatsapp-modal-footer">
+            <button class="whatsapp-modal-btn whatsapp-modal-btn-cancel" id="whatsappModalCancel">
+                <i class="fas fa-times"></i> Cancelar
+            </button>
+            <a href="#" class="whatsapp-modal-btn whatsapp-modal-btn-whatsapp" id="whatsappModalLink" target="_blank">
+                <i class="fab fa-whatsapp"></i> Ir a WhatsApp
+            </a>
+        </div>
+    </div>
+
+    <header id="header">
+        <nav>
+            <div class="logo-container">
+                <div class="logo-icon">
+                    <img src="{% static 'img/Logo_nav_web.png' %}" alt="Estudiosos" class="logo-icon-img">
+                </div>
+            </div>
+            <ul class="nav-center" id="navMenu">
+                <li><a href="#inicio">Inicio</a></li>
+                <li><a href="{% url 'nuestras_clases' %}">Nuestras Clases</a></li>
+                <li><a href="{% url 'mostrar_cursos' %}">Cursos</a></li>
+                <li><a href="{% url 'masterclass' %}">Nuestra Masterclass</a></li>
+                <li><a href="{% url 'noticias' %}">Novedades</a></li>
+            </ul>
+            <div class="nav-right">
+                {% if usuario_autenticado %}
+                    <div class="user-welcome">
+                        <i class="fas fa-user-circle"></i> {{ usuario_nombre }}
+                    </div>
+
+                    {% if rol == 1 %}
+                        <a href="{% url 'panel_administrador' %}" class="btn-login">Panel Admin</a>
+                    {% endif %}
+
+                    {% if request.session.usuario_rol == 3 or request.session.usuario_rol == 4 %}
+                        <a href="{% url 'clases_activas' %}" class="btn-login">{% if rol == 3 %}Panel Profesor{% elif rol == 4 %}Panel Estudiante{% endif %}</a>
+                    {% endif %}
+                    
+                    <a href="{% url 'cerrar_sesion' %}" class="btn-register">Cerrar Sesión</a>
+
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn-login">Iniciar Sesión</a>
+                    <a href="{% url 'registrar' %}" class="btn-register">Registrarse</a>
+                {% endif %}
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Mobile Menu Overlay -->
+        <div class="nav-mobile-overlay" id="mobileOverlay"></div>
+        
+        <!-- Mobile Menu -->
+        <div class="nav-mobile-menu" id="mobileMenu">
+            <div class="nav-mobile-header">
+                <div class="nav-mobile-logo">
+                    <div class="logo-icon">
+                        <img src="{% static 'img/Logo tipo Estudiosos_Mesa de trabajo 1 copia 14.png' %}" alt="Estudiosos" class="logo-icon-img">
+                    </div>
+                </div>
+                <button class="nav-mobile-close" id="mobileCloseBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <ul class="nav-mobile-links">
+                <li><a href="{% url 'index' %}" class="mobile-link">Inicio</a></li>
+                <li><a href="{% url 'nuestras_clases' %}" class="mobile-link">Nuestras Clases</a></li>
+                <li><a href="{% url 'mostrar_cursos' %}" class="mobile-link">Cursos</a></li>
+                <li><a href="{% url 'masterclass' %}" class="mobile-link">Nuestra Masterclass</a></li>
+                <li><a href="{% url 'noticias' %}" class="mobile-link">Novedades</a></li>
+            </ul>
+            <div class="nav-mobile-actions">
+                {% if usuario_autenticado %}
+                    <a href="{% url 'cerrar_sesion' %}" class="btn-register">Cerrar Sesión</a>
+                {% else %}
+                    <a href="{% url 'registrar' %}" class="btn-register">Registrarse</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <section class="hero" id="inicio">
+        <div class="carousel-container">
+            <!-- Slide 1: Aprender Inglés -->
+            <div class="carousel-slide slide-1 active">
+                <img src="https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=1920&h=1080&fit=crop" alt="Estudiante aprendiendo inglés" class="slide-image">
+                <div class="slide-overlay"></div>
+                <div class="slide-content">
+                    <div class="hero-text-box">
+                        <h1>
+                            ¿Quieres Aprender
+                            <span class="highlight">Inglés?</span>
+                            ¡Estamos Nosotros!
+                        </h1>
+                        <p>
+                            Domina el inglés con Estudiosos y abre las puertas al mundo. Metodología 
+                            práctica, profesores nativos y horarios flexibles que se adaptan a ti.
+                        </p>
+                        <div class="cta-group">
+                            <a href="{% url 'mostrar_cursos' %}" class="btn btn-primary">Ver Cursos de Inglés</a>
+                            <button class="btn btn-secondary" data-info="más información sobre los cursos de inglés">
+                                Solicitar Información
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 2: Clases Privadas -->
+            <div class="carousel-slide slide-2">
+                <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1920&h=1080&fit=crop" alt="Clases privadas" class="slide-image">
+                <div class="slide-overlay"></div>
+                <div class="slide-content">
+                    <div class="hero-text-box">
+                        <h1>
+                            ¿Tienes Dificultades en
+                            <span class="highlight">la Escuela o Universidad?</span>
+                        </h1>
+                        <p>
+                            Nuestras clases privadas están diseñadas para fortalecer tus conocimientos 
+                            exactamente donde más lo necesitas. Atención personalizada y resultados garantizados.
+                        </p>
+                        <div class="cta-group">
+                            <a href="{% url 'mostrar_cursos' %}" class="btn btn-primary">Solicitar Clase Privada</a>
+                            <button class="btn btn-secondary" data-info="más información sobre las clases privadas">
+                                Conocer Más
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 3: Masterclass Drogas -->
+            <div class="carousel-slide slide-3">
+                <img src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=1920&h=1080&fit=crop" alt="Masterclass profesional" class="slide-image">
+                <div class="slide-overlay"></div>
+                <div class="slide-content">
+                    <div class="hero-text-box">
+                        <div class="masterclass-tag">Masterclass Exclusiva</div>
+                        <h1>
+                            Drogas: Perspectiva Criminal
+                            <span class="highlight">y Psicológica</span>
+                        </h1>
+                        <p>
+                            Análisis profundo y multidisciplinario sobre el fenómeno de las adicciones. 
+                            Perspectivas del derecho penal y la psicología clínica.
+                        </p>
+                        <div class="cta-group">
+                            <a href="{% url 'masterclass' %}" class="btn btn-primary">Ver Detalles De la Masterclass</a>
+                            <button class="btn btn-secondary" data-info="asesoría personalizada sobre la masterclass de drogas">
+                                Contacta con uno de nuestros expertos
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Carousel Controls -->
+            <div class="carousel-arrows">
+                <div class="carousel-arrow prev-arrow">‹</div>
+                <div class="carousel-arrow next-arrow">›</div>
+            </div>
+
+            <div class="carousel-controls">
+                <span class="carousel-dot active" data-slide="0"></span>
+                <span class="carousel-dot" data-slide="1"></span>
+                <span class="carousel-dot" data-slide="2"></span>
+            </div>
+        </div>
+    </section>
+
+    <section class="about" id="nosotros">
+        <div class="about-container">
+            <div class="about-content">
+                <div class="about-text">
+                    <h2>¿Por Qué Estudiar Con Nosotros?</h2>
+                    <p>
+                        En Estudiosos transformamos vidas con educación personalizada de calidad. 
+                        Nuestros docentes expertos utilizan metodologías innovadoras que combinan 
+                        teoría con práctica, asegurando que cada conocimiento sea aplicable a tu 
+                        vida real y te impulse hacia el éxito profesional y personal.
+                    </p>
+                </div>
+                <div class="about-image" id="aboutImage">
+                    <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&h=600&fit=crop" alt="Estudiantes felices">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="why-choose">
+        <div class="why-choose-container">
+            <div class="why-grid">
+                <div class="why-item">
+                    <div class="why-icon"><i class="fas fa-graduation-cap"></i></div>
+                    <h3>Metodología Práctica</h3>
+                    <p>Aprendizaje aplicable inmediatamente</p>
+                </div>
+                <div class="why-item">
+                    <div class="why-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+                    <h3>Instructores Expertos</h3>
+                    <p>Profesionales con experiencia comprobada</p>
+                </div>
+                <div class="why-item">
+                    <div class="why-icon"><i class="fas fa-clock"></i></div>
+                    <h3>Horarios Flexibles</h3>
+                    <p>Estudia a tu ritmo y comodidad</p>
+                </div>
+                <div class="why-item">
+                    <div class="why-icon"><i class="fas fa-certificate"></i></div>
+                    <h3>Certificación Avalada</h3>
+                    <p>Valida tus nuevas competencias</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="who-we-are">
+        <div class="who-container">
+            <div class="who-content">
+                <div class="who-image" id="whoImage">
+                    <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&h=600&fit=crop" alt="Equipo de profesores">
+                </div>
+                <div class="who-text">
+                    <h2>¿Quiénes Somos?</h2>
+                    <p>
+                        Estudiosos es una academia educativa fundada con la misión de democratizar el 
+                        acceso a educación de calidad. Somos un equipo multidisciplinario de profesionales 
+                        apasionados por la enseñanza, especializados en diversos procesos de desarrollo 
+                        humano y aprendizaje.
+                    </p>
+                    <p>
+                        Contamos con instructores certificados, psicólogos educativos y especialistas en 
+                        diferentes áreas del conocimiento que trabajan de manera coordinada para ofrecer 
+                        una experiencia educativa integral y transformadora.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="methodology">
+        <div class="methodology-container">
+            <h2>Nuestra Metodología</h2>
+            <p class="methodology-intro">
+                Aplicamos un enfoque pedagógico moderno que garantiza resultados efectivos y duraderos
+            </p>
+            <div class="methodology-timeline">
+                <div class="timeline-item">
+                    <div class="timeline-number">01</div>
+                    <h3>Evaluación Inicial</h3>
+                    <p>Identificamos tu nivel actual y objetivos específicos</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-number">02</div>
+                    <h3>Plan Personalizado</h3>
+                    <p>Diseñamos un programa adaptado a tus necesidades</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-number">03</div>
+                    <h3>Aprendizaje Activo</h3>
+                    <p>Clases interactivas con práctica constante</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-number">04</div>
+                    <h3>Seguimiento Continuo</h3>
+                    <p>Evaluamos tu progreso y ajustamos estrategias</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-number">05</div>
+                    <h3>Resultados Medibles</h3>
+                    <p>Certificación y logro de tus objetivos</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="objective">
+        <div class="objective-container">
+            <div class="objective-content">
+                <div class="objective-text">
+                    <h2>Nuestro Objetivo</h2>
+                    <p>
+                        Mantener a nuestros estudiantes actualizados en temas de interés relevantes, 
+                        optimizando su desarrollo profesional y laboral. Buscamos cerrar las brechas 
+                        educativas, fortalecer competencias y empoderar a cada persona con el conocimiento 
+                        necesario para alcanzar sus metas.
+                    </p>
+                    <p>
+                        Nuestro propósito es formar individuos seguros, capacitados y preparados para 
+                        enfrentar los desafíos del mundo actual con confianza y excelencia.
+                    </p>
+                </div>
+                <div class="objective-image" id="objectiveImage">
+                    <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800&h=600&fit=crop" alt="Objetivos educativos">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="class-modes">
+        <div class="class-modes-container">
+            <div class="mode-banner presencial">
+                <div class="mode-header">
+                    <div class="mode-icon"><i class="fas fa-school"></i></div>
+                    <div class="mode-info">
+                        <h3>Clases Presenciales</h3>
+                        <p>Interacción directa en nuestras instalaciones</p>
+                    </div>
+                </div>
+                <div class="mode-body">
+                    <p style="margin-bottom: 1.5rem; color: var(--color-gris-dark); opacity: 0.85;">
+                        Aprende en un ambiente óptimo con todas las herramientas necesarias para tu éxito académico.
+                    </p>
+                    <div class="mode-btn">
+                        <a href="{% url 'nuestras_clases' %}" class="btn-mode">Más Información</a>
+                    </div>
+                </div>
+            </div>
+            <div class="mode-banner virtual">
+                <div class="mode-header">
+                    <div class="mode-icon"><i class="fas fa-laptop"></i></div>
+                    <div class="mode-info">
+                        <h3>Clases Virtuales</h3>
+                        <p>Aprende desde cualquier lugar</p>
+                    </div>
+                </div>
+                <div class="mode-body">
+                    <p style="margin-bottom: 1.5rem; color: var(--color-gris-dark); opacity: 0.85;">
+                        La misma calidad educativa con la flexibilidad de estudiar desde donde estés.
+                    </p>
+                    <div class="mode-btn">
+                        <a href="{% url 'nuestras_clases' %}" class="btn-mode">Más Información</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="courses" id="cursos">
+        <div class="courses-container">
+            <div class="section-header">
+                <h2>Nuestros Cursos</h2>
+                <p>Programas diseñados para potenciar tu desarrollo profesional</p>
+            </div>
+            <div class="courses-grid">
+                <!-- Inglés Intensivo -->
+                <div class="course-card">
+                    <div class="course-inner">
+                        <div class="course-front">
+                            <img src="https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=800&h=600&fit=crop" alt="Curso de Inglés" class="course-image">
+                            <div class="course-overlay"></div>
+                        </div>
+                        <div class="course-back">
+                            <div class="course-icon"><i class="fas fa-language"></i></div>
+                            <h3>Inglés Intensivo</h3>
+                            <div class="course-body">
+                                <p>Domina el inglés con nuestra metodología conversacional inmersiva</p>
+                                <div class="course-btn">
+                                    <a href="{% url 'mostrar_cursos' %}" class="btn-course">Más Información</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Matemáticas -->
+                <div class="course-card">
+                    <div class="course-inner">
+                        <div class="course-front">
+                            <img src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800&h=600&fit=crop" alt="Curso de Matemáticas" class="course-image">
+                            <div class="course-overlay"></div>
+                        </div>
+                        <div class="course-back">
+                            <div class="course-icon"><i class="fas fa-calculator"></i></div>
+                            <h3>Matemáticas</h3>
+                            <div class="course-body">
+                                <p>Refuerza tus habilidades matemáticas con métodos prácticos y efectivos</p>
+                                <div class="course-btn">
+                                    <a href="{% url 'mostrar_cursos' %}" class="btn-course">Más Información</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Derecho -->
+                <div class="course-card">
+                    <div class="course-inner">
+                        <div class="course-front">
+                            <img src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&h=600&fit=crop" alt="Curso de Derecho" class="course-image">
+                            <div class="course-overlay"></div>
+                        </div>
+                        <div class="course-back">
+                            <div class="course-icon"><i class="fas fa-balance-scale"></i></div>
+                            <h3>Derecho</h3>
+                            <div class="course-body">
+                                <p>Formación jurídica especializada con casos reales y práctica profesional</p>
+                                <div class="course-btn">
+                                    <a href="{% url 'mostrar_cursos' %}" class="btn-course">Más Información</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Psicología -->
+                <div class="course-card">
+                    <div class="course-inner">
+                        <div class="course-front">
+                            <img src="https://images.unsplash.com/photo-1527689368864-3a821dbccc34?w=800&h=600&fit=crop" alt="Curso de Psicología" class="course-image">
+                            <div class="course-overlay"></div>
+                        </div>
+                        <div class="course-back">
+                            <div class="course-icon"><i class="fas fa-brain"></i></div>
+                            <h3>Psicología</h3>
+                            <div class="course-body">
+                                <p>Comprende el comportamiento humano con enfoque científico y humanista</p>
+                                <div class="course-btn">
+                                    <a href="{% url 'mostrar_cursos' %}" class="btn-course">Más Información</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="stats-counter">
+        <img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=1920&h=800&fit=crop" alt="Estadísticas" class="stats-background">
+        <div class="stats-overlay"></div>
+        <div class="stats-container">
+            <div class="stat-item">
+                <h2 class="counter" data-target="1500">0</h2>
+                <p>Estudiantes Graduados</p>
+            </div>
+            <div class="stat-item">
+                <h2 class="counter" data-target="98">0</h2>
+                <p>% Satisfacción</p>
+            </div>
+            <div class="stat-item">
+                <h2 class="counter" data-target="15">0</h2>
+                <p>Años de Experiencia</p>
+            </div>
+            <div class="stat-item">
+                <h2 class="counter" data-target="50">0</h2>
+                <p>Docentes Expertos</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="testimonials" id="testimonios">
+        <div class="testimonials-container">
+            <h2>Lo Que Dicen Nuestros Estudiantes</h2>
+            <div class="testimonials-carousel-wrapper" id="testimonialsWrapper">
+                <div class="testimonials-track" id="testimonialsTrack">
+                    <!-- Original testimonials -->
+                    <div class="testimonial-card">
+                        <p class="testimonial-text">
+                            Los cursos de Estudiosos han transformado mi carrera profesional. 
+                            La calidad del contenido y la experiencia de los instructores es excepcional. 
+                            Ahora me siento mucho más preparado para enfrentar nuevos desafíos laborales.
+                        </p>
+                        <div class="testimonial-author">
+                            <div class="author-avatar">MC</div>
+                            <div class="author-info">
+                                <h4>María Camila Rodríguez</h4>
+                                <p>Gerente de Proyectos</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="testimonial-card">
+                        <p class="testimonial-text">
+                            Excelente metodología de enseñanza. Los conocimientos que adquirí me 
+                            permitieron mejorar mi productividad y desenvolverme mejor en mi área. 
+                            Totalmente recomendado para quienes buscan crecimiento profesional.
+                        </p>
+                        <div class="testimonial-author">
+                            <div class="author-avatar">JA</div>
+                            <div class="author-info">
+                                <h4>Jorge Andrés Martínez</h4>
+                                <p>Emprendedor Digital</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="testimonial-card">
+                        <p class="testimonial-text">
+                            La flexibilidad de horarios y la plataforma intuitiva me permitieron 
+                            estudiar mientras trabajaba. Los certificados que obtuve han sido muy 
+                            valorados en mi empresa. Una inversión que definitivamente vale la pena.
+                        </p>
+                        <div class="testimonial-author">
+                            <div class="author-avatar">LP</div>
+                            <div class="author-info">
+                                <h4>Laura Patricia Gómez</h4>
+                                <p>Analista de Marketing</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="testimonial-card">
+                        <p class="testimonial-text">
+                            Estudiosos me ayudó a desarrollar habilidades que no sabía que necesitaba. 
+                            Los instructores están siempre disponibles para resolver dudas y el 
+                            contenido está actualizado con las últimas tendencias del mercado.
+                        </p>
+                        <div class="testimonial-author">
+                            <div class="author-avatar">CS</div>
+                            <div class="author-info">
+                                <h4>Carlos Sebastián Torres</h4>
+                                <p>Consultor Empresarial</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Duplicated testimonials for seamless loop -->
+                    <div class="testimonial-card">
+                        <p class="testimonial-text">
+                            Los cursos de Estudiosos han transformado mi carrera profesional. 
+                            La calidad del contenido y la experiencia de los instructores es excepcional. 
+                            Ahora me siento mucho más preparado para enfrentar nuevos desafíos laborales.
+                        </p>
+                        <div class="testimonial-author">
+                            <div class="author-avatar">MC</div>
+                            <div class="author-info">
+                                <h4>María Camila Rodríguez</h4>
+                                <p>Gerente de Proyectos</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="testimonial-card">
+                        <p class="testimonial-text">
+                            Excelente metodología de enseñanza. Los conocimientos que adquirí me 
+                            permitieron mejorar mi productividad y desenvolverme mejor en mi área. 
+                            Totalmente recomendado para quienes buscan crecimiento profesional.
+                        </p>
+                        <div class="testimonial-author">
+                            <div class="author-avatar">JA</div>
+                            <div class="author-info">
+                                <h4>Jorge Andrés Martínez</h4>
+                                <p>Emprendedor Digital</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="testimonial-card">
+                        <p class="testimonial-text">
+                            La flexibilidad de horarios y la plataforma intuitiva me permitieron 
+                            estudiar mientras trabajaba. Los certificados que obtuve han sido muy 
+                            valorados en mi empresa. Una inversión que definitivamente vale la pena.
+                        </p>
+                        <div class="testimonial-author">
+                            <div class="author-avatar">LP</div>
+                            <div class="author-info">
+                                <h4>Laura Patricia Gómez</h4>
+                                <p>Analista de Marketing</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="testimonial-card">
+                        <p class="testimonial-text">
+                            Estudiosos me ayudó a desarrollar habilidades que no sabía que necesitaba. 
+                            Los instructores están siempre disponibles para resolver dudas y el 
+                            contenido está actualizado con las últimas tendencias del mercado.
+                        </p>
+                        <div class="testimonial-author">
+                            <div class="author-avatar">CS</div>
+                            <div class="author-info">
+                                <h4>Carlos Sebastián Torres</h4>
+                                <p>Consultor Empresarial</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section" id="contacto">
+        <div class="cta-content">
+            <h2>Comienza Tu Transformación Hoy</h2>
+            <p>
+                Únete a cientos de estudiantes que ya están potenciando su desarrollo 
+                profesional y personal con Estudiosos.
+            </p>
+            <button class="btn btn-white" id="btnInscribete">Inscríbete Ahora</button>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-about">
+                <div class="footer-logo">
+                    <div class="footer-logo-icon">E</div>
+                    <div class="footer-logo-text">ESTUDIOSOS</div>
+                </div>
+                <p>
+                    Academia educativa comprometida con la excelencia en la formación 
+                    y el desarrollo integral de profesionales.
+                </p>
+            </div>
+            <div class="footer-links">
+                <h4>Enlaces</h4>
+                <ul>
+                    <li><a href="#inicio">Inicio</a></li>
+                    <li><a href="#nosotros">Nosotros</a></li>
+                    <li><a href="#cursos">Cursos</a></li>
+                    <li><a href="#testimonios">Testimonios</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Programas</h4>
+                <ul>
+                    <li><a href="#cursos">Desarrollo Profesional</a></li>
+                    <li><a href="#cursos">Desarrollo Humano</a></li>
+                    <li><a href="#cursos">Habilidades Digitales</a></li>
+                    <li><a href="#cursos">Emprendimiento</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Contacto</h4>
+                <ul>
+                    <li><a href="mailto:info@estudiosos.com">info@estudiosos.com</a></li>
+                    <li><a href="tel:+573001234567">+57 300 123 4567</a></li>
+                    <li><a href="#">Bogotá, Colombia</a></li>
+                    <li><a href="#">Lun-Vie 8am-6pm</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Estudiosos. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Personalizado -->
+    <script src="{% static 'js/web/index.js' %}"></script>
+</body>
+</html>

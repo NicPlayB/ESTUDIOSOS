@@ -1,0 +1,82 @@
+<!-- clases_virtuales/partials/lista_clases_virtuales.html -->
+{% if clases_virtuales %}
+    {% for cv in clases_virtuales %}
+        <div class="card card-clase-virtual" id="clase-{{ cv.id_clase_virtual }}">
+            <div class="card-body">
+                <div class="clase-virtual-content">
+                    <!-- Contenedor de la descripción e información -->
+                    <div class="descripcion-container">
+                        <!-- Título/descripción de la clase virtual -->
+                        <h5 class="card-title mb-2">
+                            <i class="bi bi-camera-video me-2"></i>{{ cv.descripcion }}
+                        </h5>
+                        
+                        <!-- Información de fecha y hora -->
+                        <div class="clase-info">
+                            <p class="mb-2">
+                                <i class="bi bi-calendar-event"></i>
+                                <strong>Fecha:</strong> 
+                                <span>{{ cv.fecha_de_clase|date:"d/m/Y H:i" }}</span>
+                                {% now "Y-m-d H:i" as current_time %}
+                                {% if cv.fecha_de_clase|date:"Y-m-d H:i" > current_time %}
+                                    <span class="badge badge-fecha badge-futura ms-2">Próxima</span>
+                                {% else %}
+                                    <span class="badge badge-fecha badge-pasada ms-2">Pasada</span>
+                                {% endif %}
+                            </p>
+                            
+                            <!-- URL de la clase -->
+                            <p class="mb-0">
+                                <i class="bi bi-link-45deg"></i>
+                                <strong>Enlace:</strong>
+                                <a href="{{ cv.url_clase }}" 
+                                   target="_blank" 
+                                   class="clase-url">
+                                    {{ cv.url_clase|truncatechars:50 }}
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Contenedor de botones de acción -->
+                    <div class="acciones-container">
+                        <!-- Botón para entrar a la clase -->
+                        <a href="{{ cv.url_clase }}" 
+                           target="_blank" 
+                           class="btn btn-success">
+                            <i class="bi bi-box-arrow-up-right me-1"></i>Entrar
+                        </a>
+                        
+                        {% if rol == 3 %}
+                        <button class="btn btn-warning btn-editar-clase"
+                                data-clase-id="{{ cv.id_clase_virtual }}"
+                                data-descripcion="{{ cv.descripcion }}"
+                                data-fecha="{{ cv.fecha_de_clase|date:'Y-m-d\\TH:i' }}"
+                                data-url="{{ cv.url_clase }}">
+                            <i class="bi bi-pencil me-1"></i>Editar
+                        </button>
+                        
+                        <!-- Botón para eliminar -->
+                        <button class="btn btn-danger btn-eliminar-clase"
+                                data-clase-id="{{ cv.id_clase_virtual }}"
+                                data-descripcion="{{ cv.descripcion }}">
+                            <i class="bi bi-trash me-1"></i>Eliminar
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <!-- Mensaje cuando no hay clases virtuales -->
+    <div class="no-clases-container">
+        <div class="no-clases-icon">
+            <i class="bi bi-camera-video"></i>
+        </div>
+        <div class="no-clases-msg">
+            No hay clases virtuales programadas aún.<br>
+            ¡Crea la primera usando el botón "+" abajo!
+        </div>
+    </div>
+{% endif %}

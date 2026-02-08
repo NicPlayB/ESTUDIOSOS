@@ -1,0 +1,700 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Cursos</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/administrador/cursos/gestion_cursos.css' %}">
+</head>
+<body>
+
+    <button class="hamburger-btn" id="hamburgerBtn" title="Menú">
+        <i class="bi bi-list"></i>
+    </button>
+
+    <div class="nav-overlay" id="navOverlay"></div>
+
+    <div class="alert-container">
+        {% if messages %}
+            {% for message in messages %}
+                {% if message.tags == 'success' %}
+                    <div class="alert-toast success">
+                        <div class="alert-toast-icon">
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                        </div>
+                        <div class="alert-toast-content">
+                            <div class="alert-toast-title">¡Operación Exitosa!</div>
+                            <div class="alert-toast-message">{{ message }}</div>
+                        </div>
+                        <button class="alert-toast-close" onclick="removeAlertToast(this.parentElement)">&times;</button>
+                        <div class="alert-toast-progress" style="color: var(--alert-success)"></div>
+                    </div>
+                {% elif message.tags == 'error' %}
+                    <div class="alert-toast error">
+                        <div class="alert-toast-icon">
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="15" y1="9" x2="9" y2="15"></line>
+                                <line x1="9" y1="9" x2="15" y2="15"></line>
+                            </svg>
+                        </div>
+                        <div class="alert-toast-content">
+                            <div class="alert-toast-title">¡Error!</div>
+                            <div class="alert-toast-message">{{ message }}</div>
+                        </div>
+                        <button class="alert-toast-close" onclick="removeAlertToast(this.parentElement)">&times;</button>
+                        <div class="alert-toast-progress" style="color: var(--alert-error)"></div>
+                    </div>
+                {% elif message.tags == 'warning' %}
+                    <div class="alert-toast warning">
+                        <div class="alert-toast-icon">
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                <line x1="12" y1="9" x2="12" y2="13"></line>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                            </svg>
+                        </div>
+                        <div class="alert-toast-content">
+                            <div class="alert-toast-title">Advertencia</div>
+                            <div class="alert-toast-message">{{ message }}</div>
+                        </div>
+                        <button class="alert-toast-close" onclick="removeAlertToast(this.parentElement)">&times;</button>
+                        <div class="alert-toast-progress" style="color: var(--alert-warning)"></div>
+                    </div>
+                {% elif message.tags == 'info' %}
+                    <div class="alert-toast info">
+                        <div class="alert-toast-icon">
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="16" x2="12" y2="12"></line>
+                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                            </svg>
+                        </div>
+                        <div class="alert-toast-content">
+                            <div class="alert-toast-title">Información</div>
+                            <div class="alert-toast-message">{{ message }}</div>
+                        </div>
+                        <button class="alert-toast-close" onclick="removeAlertToast(this.parentElement)">&times;</button>
+                        <div class="alert-toast-progress" style="color: var(--alert-info)"></div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+        {% if error %}
+            <div class="alert-toast error">
+                <div class="alert-toast-icon">
+                    <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="15" y1="9" x2="9" y2="15"></line>
+                        <line x1="9" y1="9" x2="15" y2="15"></line>
+                    </svg>
+                </div>
+                <div class="alert-toast-content">
+                    <div class="alert-toast-title">¡Error!</div>
+                    <div class="alert-toast-message">{{ error }}</div>
+                </div>
+                <button class="alert-toast-close" onclick="removeAlertToast(this.parentElement)">&times;</button>
+                <div class="alert-toast-progress" style="color: var(--alert-error)"></div>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="modal fade image-modal" id="imageModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar">&times;</button>
+                <div class="modal-body">
+                    <img id="fullImage" src="" alt="Imagen completa" class="full-image">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid p-0">
+        <div class="main-layout">
+            <div class="sidebar-nav">
+                <div class="logo-section">
+                    <img src="{% static 'img/Logo tipo Estudiosos_Mesa de trabajo 1 copia 14.png' %}" alt="Logo Estudiosos">
+                    <span>Estudiosos</span>
+                </div>
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="{% url 'panel_administrador' %}">
+                        <i class="bi bi-house-door"></i>Inicio
+                    </a>
+                    <a class="nav-link" href="{% url 'gestion_usuarios' %}">
+                        <i class="bi bi-people-fill"></i>Gestión de Usuarios
+                    </a>
+                    <a class="nav-link" href="{% url 'profesores' %}">
+                        <i class="bi bi-person-badge"></i>Profesores
+                    </a>
+                    <a class="nav-link" href="{% url 'certificaciones' %}">
+                        <i class="bi bi-award"></i>Certificaciones
+                    </a>
+                    <a class="nav-link" href="{% url 'documentos_usuario' %}" title="Documentos">
+                        <i class="bi bi-file-text"></i>Tus Documentos
+                    </a>
+                    <a class="nav-link active" href="{% url 'gestion_cursos' %}">
+                        <i class="bi bi-book"></i>Gestión de Cursos
+                    </a>
+                    <a class="nav-link " href="{% url 'gestionar_novedades' %}">
+                        <i class="bi bi-newspaper"></i>Gestión de Contenidos
+                    </a>
+                </nav>
+                <div class="sidebar-nav-footer">
+                    <a class="nav-link" href="{% url 'perfil_usuario' %}" title="Mi perfil">
+                        <i class="bi bi-person"></i>Mi perfil
+                    </a>
+                    <a class="nav-link" href="{% url 'cerrar_sesion' %}" title="Cerrar sesión">
+                        <i class="bi bi-box-arrow-right"></i>Cerrar sesión
+                    </a>
+                </div>
+            </div>
+            
+            <div class="container-main">
+                <div class="page-header">
+                    <h2><i class="bi bi-book me-3"></i>Gestión de Cursos</h2>
+                </div>
+
+                <button class="floating-create-btn"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalCrearCurso"
+                        title="Crear nuevo curso">
+                    <i class="bi bi-plus-lg"></i>
+                </button>
+
+                {% if not cursos %}
+                    <div class="no-cursos-container">
+                        <div class="no-cursos-icon mb-3">
+                            <i class="bi bi-archive"></i>
+                        </div>
+                        <div class="no-cursos-msg">
+                            No hay cursos registrados.<br>
+                            ¡Usa el botón "+" para crear tu primer curso!
+                        </div>
+                    </div>
+                {% endif %}
+                
+                <div class="cursos-container">
+                    {% for curso in cursos %}
+                    <div class="curso-card">
+                        <div class="curso-actions-menu">
+                            <button class="curso-actions-btn" type="button" data-bs-toggle="dropdown" title="Acciones">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <button class="dropdown-item"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modalEditarCurso{{ curso.id_curso }}">
+                                        <i class="bi bi-pencil"></i> Editar
+                                    </button>
+                                </li>
+                                <li>
+                                    <button class="dropdown-item"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modalConfirmarCambioEstado{{ curso.id_curso }}">
+                                        <i class="bi bi-toggle-on"></i>
+                                        {% if curso.estado == 'activo' %}Desactivar{% else %}Activar{% endif %}
+                                    </button>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <button class="dropdown-item text-danger"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modalConfirmarEliminar{{ curso.id_curso }}">
+                                        <i class="bi bi-trash"></i> Eliminar
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+
+                        {% if curso.imagen %}
+                            <img src="{{ curso.imagen.url }}" 
+                                 class="curso-img" 
+                                 alt="{{ curso.nombre }}"
+                                 onclick="verImagenCompleta('{{ curso.imagen.url }}')">
+                        {% else %}
+                            <div class="curso-img" style="display: flex; align-items: center; justify-content: center; color: #6c757d;">
+                                <i class="bi bi-image" style="font-size: 4rem;"></i>
+                            </div>
+                        {% endif %}
+
+                        <div class="curso-card-body">
+                            <div class="curso-card-title">
+                                <i class="bi bi-tag me-2" style="color: var(--primary-orange);"></i>Título
+                            </div>
+                            <div class="curso-card-subtitle">{{ curso.nombre }}</div>
+                            
+                            <div class="curso-card-text">
+                                <i class="bi bi-text-paragraph me-2" style="color: var(--text-secondary);"></i>Descripción
+                            </div>
+                            <div class="curso-card-desc">
+                                {{ curso.descripcion|truncatechars:90 }}
+                            </div>
+                            
+                            <div class="curso-info">
+                                <span class="badge bg-info">
+                                    <i class="bi bi-layers me-1"></i>{{ curso.get_modalidad_display }}
+                                </span>
+                                <span class="badge bg-secondary">
+                                    <i class="bi bi-clock me-1"></i>{{ curso.duracion }} horas
+                                </span>
+                                <span class="badge {% if curso.estado == 'activo' %}bg-success{% else %}bg-danger{% endif %}">
+                                    <i class="bi {% if curso.estado == 'activo' %}bi-toggle-on{% else %}bi-toggle-off{% endif %} me-1"></i>
+                                    {{ curso.estado }}
+                                </span>
+                            </div>
+                            
+                            <div class="curso-footer">
+                                <a href="{% url 'inscritos_por_curso' curso.id_curso %}" 
+                                   class="btn btn-with-icon"
+                                   title="Ver estudiantes inscritos en este curso">
+                                    <i class="bi bi-people-fill"></i> Ver Inscritos
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal fade confirmation-modal" id="modalConfirmarCambioEstado{{ curso.id_curso }}" tabindex="-1">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header bg-warning">
+                                    <h5 class="modal-title">
+                                        <i class="bi bi-exclamation-triangle me-2"></i>Confirmar cambio de estado
+                                    </h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="text-center mb-3">
+                                        <i class="bi bi-toggle-on" style="font-size: 3.5rem; color: var(--primary-light);"></i>
+                                    </div>
+                                    <p class="text-center fs-5">
+                                        ¿Estás seguro de que deseas 
+                                        {% if curso.estado == 'activo' %}desactivar{% else %}activar{% endif %}
+                                        el curso <strong>"{{ curso.nombre }}"</strong>?
+                                    </p>
+                                </div>
+                                <div class="modal-footer justify-content-center">
+                                    <form method="POST" style="width: 100%;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="id_curso" value="{{ curso.id_curso }}">
+                                        <div class="d-flex gap-2 justify-content-center w-100">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                            <button type="submit" name="cambiar_estado" class="btn btn-warning btn-with-icon">
+                                                <i class="bi bi-toggle-on"></i> Sí, {% if curso.estado == 'activo' %}desactivar{% else %}activar{% endif %}
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal fade confirmation-modal" id="modalConfirmarEliminar{{ curso.id_curso }}" tabindex="-1">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header bg-danger text-white">
+                                    <h5 class="modal-title">
+                                        <i class="bi bi-exclamation-triangle me-2"></i>Confirmar eliminación
+                                    </h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="text-center mb-3">
+                                        <i class="bi bi-trash" style="font-size: 3.5rem; color: #dc3545;"></i>
+                                    </div>
+                                    <p class="text-center fs-5">
+                                        ¿Estás seguro de que deseas eliminar el curso 
+                                        <strong>"{{ curso.nombre }}"</strong>?
+                                    </p>
+                                    <p class="text-muted small text-center">
+                                        <i class="bi bi-info-circle"></i>
+                                        Esta acción no se puede deshacer.
+                                    </p>
+                                </div>
+                                <div class="modal-footer justify-content-center">
+                                    <form method="POST" style="width: 100%;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="id_curso" value="{{ curso.id_curso }}">
+                                        <div class="d-flex gap-2 justify-content-center w-100">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                            <button type="submit" name="eliminar_curso" class="btn btn-danger btn-with-icon">
+                                                <i class="bi bi-trash"></i> Sí, eliminar
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal fade {% if mostrar_modal_editar == curso.id_curso|stringformat:'s' %}show{% endif %}" 
+                         id="modalEditarCurso{{ curso.id_curso }}" 
+                         tabindex="-1"
+                         style="{% if mostrar_modal_editar == curso.id_curso|stringformat:'s' %}display:block;{% endif %}"
+                         data-bs-backdrop="static">
+                        <div class="modal-dialog modal-wide modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header bg-primary text-white">
+                                    <h5 class="modal-title"><i class="bi bi-pencil-square me-2"></i>Editar Curso</h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                </div>
+                                <form method="POST" enctype="multipart/form-data" id="editarForm{{ curso.id_curso }}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="id_curso" value="{{ curso.id_curso }}">
+                                    
+                                    <div class="modal-body">
+                                        <div class="form-columns-wide">
+                                            <div class="form-column-left">
+                                                <div class="mb-3">
+                                                    <label class="form-label"><i class="bi bi-tag me-2"></i>Nombre del curso</label>
+                                                    <input type="text" 
+                                                           name="nombre" 
+                                                           value="{% if form.nombre.value %}{{ form.nombre.value }}{% else %}{{ curso.nombre }}{% endif %}" 
+                                                           class="form-control {% if form.nombre.errors %}is-invalid{% endif %}" 
+                                                           required>
+                                                    {% if form.nombre.errors %}
+                                                        <div class="error-text">
+                                                            <i class="bi bi-exclamation-circle"></i> {{ form.nombre.errors.0 }}
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label class="form-label"><i class="bi bi-text-paragraph me-2"></i>Descripción</label>
+                                                    <textarea name="descripcion" 
+                                                              class="form-control {% if form.descripcion.errors %}is-invalid{% endif %}" 
+                                                              rows="5" 
+                                                              required>{% if form.descripcion.value %}{{ form.descripcion.value }}{% else %}{{ curso.descripcion }}{% endif %}</textarea>
+                                                    {% if form.descripcion.errors %}
+                                                        <div class="error-text">
+                                                            <i class="bi bi-exclamation-circle"></i> {{ form.descripcion.errors.0 }}
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label"><i class="bi bi-layers me-2"></i>Modalidad</label>
+                                                        <select name="modalidad" 
+                                                                class="form-select {% if form.modalidad.errors %}is-invalid{% endif %}" 
+                                                                required>
+                                                            {% for value, label in form.modalidad.field.choices %}
+                                                                <option value="{{ value }}" 
+                                                                        {% if form.modalidad.value|stringformat:'s' == value|stringformat:'s' or curso.modalidad == value %}selected{% endif %}>
+                                                                    {{ label }}
+                                                                </option>
+                                                            {% endfor %}
+                                                        </select>
+                                                        {% if form.modalidad.errors %}
+                                                            <div class="error-text">
+                                                                <i class="bi bi-exclamation-circle"></i> {{ form.modalidad.errors.0 }}
+                                                            </div>
+                                                        {% endif %}
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label"><i class="bi bi-clock me-2"></i>Duración (horas)</label>
+                                                        <input type="text" 
+                                                               name="duracion" 
+                                                               value="{% if form.duracion.value %}{{ form.duracion.value }}{% else %}{{ curso.duracion }}{% endif %}" 
+                                                               class="form-control {% if form.duracion.errors %}is-invalid{% endif %}" 
+                                                               placeholder="Ej: 40"
+                                                               required>
+                                                        {% if form.duracion.errors %}
+                                                            <div class="error-text">
+                                                                <i class="bi bi-exclamation-circle"></i> {{ form.duracion.errors.0 }}
+                                                            </div>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label class="form-label"><i class="bi bi-toggle-on me-2"></i>Estado</label>
+                                                    <select name="estado" 
+                                                            class="form-select {% if form.estado.errors %}is-invalid{% endif %}" 
+                                                            required>
+                                                        <option value="activo" 
+                                                                {% if form.estado.value == 'activo' or curso.estado == 'activo' %}selected{% endif %}>Activo</option>
+                                                        <option value="inactivo"
+                                                                {% if form.estado.value == 'inactivo' or curso.estado == 'inactivo' %}selected{% endif %}>Inactivo</option>
+                                                    </select>
+                                                    {% if form.estado.errors %}
+                                                        <div class="error-text">
+                                                            <i class="bi bi-exclamation-circle"></i> {{ form.estado.errors.0 }}
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="form-column-right">
+                                                <div class="mb-4">
+                                                    <label class="form-label">
+                                                        <i class="bi bi-cloud-arrow-up me-2"></i>Imagen del curso
+                                                    </label>
+                                                    
+                                                    <div class="drop-zone" id="dropZoneEditar{{ curso.id_curso }}">
+                                                        {% if curso.imagen %}
+                                                            <div style="margin-bottom: 1rem; text-align: center; max-width: 100%; overflow: hidden;">
+                                                                <img src="{{ curso.imagen.url }}" 
+                                                                     style="max-width: 100%; max-height: 150px; border-radius: 8px; margin-bottom: 10px; object-fit: contain;"
+                                                                     alt="Imagen actual"
+                                                                     onclick="verImagenCompleta('{{ curso.imagen.url }}')">
+                                                                <p class="text-muted small" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Imagen actual</p>
+                                                            </div>
+                                                            <p class="drop-text mb-1">Arrastra una nueva imagen</p>
+                                                            <p class="drop-subtext mb-0">o haz clic para cambiar</p>
+                                                        {% else %}
+                                                            <i class="bi bi-cloud-arrow-up"></i>
+                                                            <p class="drop-text mb-1">Arrastra y suelta la imagen aquí</p>
+                                                            <p class="drop-subtext mb-0">o haz clic para seleccionar</p>
+                                                        {% endif %}
+                                                        
+                                                        <input type="file" 
+                                                               name="imagen" 
+                                                               id="imagenInputEditar{{ curso.id_curso }}" 
+                                                               class="d-none"
+                                                               accept="image/*">
+                                                    </div>
+                                                    
+                                                    <small class="text-muted d-block mt-2">
+                                                        <i class="bi bi-info-circle me-1"></i>
+                                                        Formatos permitidos: JPG, JPEG, PNG (Máx. 5MB)
+                                                    </small>
+                                                    
+                                                    <div class="file-preview-container" id="filePreviewEditar{{ curso.id_curso }}" style="display: none;">
+                                                        <p class="text-muted small m-0">
+                                                            Nueva imagen seleccionada
+                                                        </p>
+                                                    </div>
+                                                    
+                                                    {% if form.imagen.errors %}
+                                                        <div class="error-text">
+                                                            <i class="bi bi-exclamation-circle"></i> {{ form.imagen.errors.0 }}
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                        <button type="submit" name="editar_curso" class="btn btn-primary btn-with-icon">
+                                            <i class="bi bi-check-circle"></i> Guardar cambios
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade {% if mostrar_modal_crear %}show{% endif %}" 
+         id="modalCrearCurso" 
+         tabindex="-1"
+         style="{% if mostrar_modal_crear %}display:block;{% endif %}"
+         data-bs-backdrop="static">
+        
+        <div class="modal-dialog modal-wide modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Crear Nuevo Curso</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+
+                <form method="POST" enctype="multipart/form-data" id="crearCursoForm">
+                    {% csrf_token %}
+
+                    <div class="modal-body">
+                        <div class="form-columns-wide">
+                            <div class="form-column-left">
+                                <div class="mb-3">
+                                    <label class="form-label"><i class="bi bi-tag me-2"></i>Nombre del curso</label>
+                                    <input type="text" 
+                                           name="nombre" 
+                                           value="{% if form.nombre.value %}{{ form.nombre.value }}{% endif %}" 
+                                           class="form-control {% if form.nombre.errors %}is-invalid{% endif %}" 
+                                           required>
+                                    {% if form.nombre.errors %}
+                                        <div class="error-text">
+                                            <i class="bi bi-exclamation-circle"></i> {{ form.nombre.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label"><i class="bi bi-text-paragraph me-2"></i>Descripción</label>
+                                    <textarea name="descripcion" 
+                                              class="form-control {% if form.descripcion.errors %}is-invalid{% endif %}" 
+                                              rows="5" 
+                                              required>{% if form.descripcion.value %}{{ form.descripcion.value }}{% endif %}</textarea>
+                                    {% if form.descripcion.errors %}
+                                        <div class="error-text">
+                                            <i class="bi bi-exclamation-circle"></i> {{ form.descripcion.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label"><i class="bi bi-layers me-2"></i>Modalidad</label>
+                                        <select name="modalidad" 
+                                                class="form-select {% if form.modalidad.errors %}is-invalid{% endif %}" 
+                                                required>
+                                            {% for value, label in form.modalidad.field.choices %}
+                                                <option value="{{ value }}"
+                                                        {% if form.modalidad.value|stringformat:'s' == value|stringformat:'s' %}selected{% endif %}>
+                                                    {{ label }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                        {% if form.modalidad.errors %}
+                                            <div class="error-text">
+                                                <i class="bi bi-exclamation-circle"></i> {{ form.modalidad.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label"><i class="bi bi-clock me-2"></i>Duración (horas)</label>
+                                        <input type="text" 
+                                               name="duracion" 
+                                               value="{% if form.duracion.value %}{{ form.duracion.value }}{% endif %}" 
+                                               class="form-control {% if form.duracion.errors %}is-invalid{% endif %}" 
+                                               placeholder="Ej: 40"
+                                               required>
+                                        {% if form.duracion.errors %}
+                                            <div class="error-text">
+                                                <i class="bi bi-exclamation-circle"></i> {{ form.duracion.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label"><i class="bi bi-toggle-on me-2"></i>Estado</label>
+                                    <select name="estado" 
+                                            class="form-select {% if form.estado.errors %}is-invalid{% endif %}" 
+                                            required>
+                                        <option value="activo" 
+                                                {% if not form.estado.errors and not form.estado.value or form.estado.value == 'activo' %}selected{% endif %}>Activo</option>
+                                        <option value="inactivo"
+                                                {% if form.estado.value == 'inactivo' %}selected{% endif %}>Inactivo</option>
+                                    </select>
+                                    {% if form.estado.errors %}
+                                        <div class="error-text">
+                                            <i class="bi bi-exclamation-circle"></i> {{ form.estado.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="form-column-right">
+                                <div class="mb-4">
+                                    <label class="form-label">
+                                        <i class="bi bi-cloud-arrow-up me-2"></i>Imagen del curso
+                                    </label>
+                                    
+                                    <div class="drop-zone" id="dropZoneCrear">
+                                        <i class="bi bi-cloud-arrow-up"></i>
+                                        <p class="drop-text mb-1">Arrastra y suelta la imagen aquí</p>
+                                        <p class="drop-subtext mb-0">o haz clic para seleccionar</p>
+                                        
+                                        <input type="file" 
+                                               name="imagen" 
+                                               id="imagenInputCrear" 
+                                               class="d-none"
+                                               accept="image/*">
+                                    </div>
+                                    
+                                    <small class="text-muted d-block mt-2">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        Formatos permitidos: JPG, JPEG, PNG (Máx. 5MB)
+                                    </small>
+                                    
+                                    <div class="file-preview-container" id="filePreviewCrear">
+                                        <p class="text-muted small m-0">
+                                            Selecciona una imagen para el curso
+                                        </p>
+                                    </div>
+                                    
+                                    {% if form.imagen.errors %}
+                                        <div class="error-text">
+                                            <i class="bi bi-exclamation-circle"></i> {{ form.imagen.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" name="crear_curso" class="btn btn-primary btn-with-icon">
+                            <i class="bi bi-check-circle"></i> Crear Curso
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {% if exito %}
+    <div class="modal fade show" id="modalExito" tabindex="-1" style="display: block;">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-check-circle me-2"></i>Operación exitosa
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <i class="bi bi-check-circle-fill text-success" style="font-size: 3.5rem;"></i>
+                    <p class="success-modal-curso-name">{{ exito }}</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-success btn-with-icon" data-bs-dismiss="modal">
+                        <i class="bi bi-check-circle"></i> Aceptar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+    {% endif %}
+
+    {% if mostrar_modal_crear or mostrar_modal_editar %}
+    <div class="modal-backdrop fade show"></div>
+    {% endif %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Script para pasar variables de Django a JavaScript -->
+    <script>
+        var djangoVariables = {
+            mostrar_modal_crear: {% if mostrar_modal_crear %}true{% else %}false{% endif %},
+            mostrar_modal_editar: '{{ mostrar_modal_editar|default:"" }}',
+            cursos_ids: [
+                {% for curso in cursos %}
+                    {{ curso.id_curso }}{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ],
+            exito: '{{ exito|default:"" }}'
+        };
+    </script>
+    
+    <script src="{% static 'js/administrador/cursos/gestion_cursos.js' %}"></script>
+</body>
+</html>

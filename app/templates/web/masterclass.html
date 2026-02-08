@@ -1,0 +1,342 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drogas: Perspectiva Criminal y Psicológica - Estudiosos</title>
+    <link rel="icon" href="{% static 'img/Logo tipo Estudiosos_Mesa de trabajo 1 copia 1 (2) (1).png' %}" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/web/masterclass.css' %}">
+</head>
+<body>
+    <!-- Alertas -->
+    <div class="alert-container">
+        {% if messages %}
+            {% for message in messages %}
+                {% with message.tags as tags %}
+                <div class="alert-toast {% if tags == 'success' %}success{% elif tags == 'error' %}error{% elif tags == 'warning' %}warning{% elif tags == 'info' %}info{% else %}info{% endif %}">
+                    <div class="alert-toast-icon">
+                        {% if tags == 'success' %}
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                        {% elif tags == 'error' %}
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                        {% elif tags == 'warning' %}
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                        {% else %}
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        {% endif %}
+                    </div>
+                    <div class="alert-toast-content">
+                        <div class="alert-toast-title">
+                            {% if tags == 'success' %}Éxito{% elif tags == 'error' %}Error{% elif tags == 'warning' %}Advertencia{% else %}Información{% endif %}
+                        </div>
+                        <div class="alert-toast-message">{{ message }}</div>
+                    </div>
+                    <button class="alert-toast-close">&times;</button>
+                    <div class="alert-toast-progress" style="color: {% if tags == 'success' %}#2ecc71{% elif tags == 'error' %}#e74c3c{% elif tags == 'warning' %}#f1c40f{% else %}#3498db{% endif %}"></div>
+                </div>
+                {% endwith %}
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- Modal de Confirmación para WhatsApp -->
+    <div class="whatsapp-modal-overlay" id="whatsappModalOverlay"></div>
+    <div class="whatsapp-modal" id="whatsappModal">
+        <button class="whatsapp-modal-close" id="whatsappModalClose">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="whatsapp-modal-header">
+            <i class="fab fa-whatsapp"></i>
+            <h2 class="whatsapp-modal-title">Contactar por WhatsApp</h2>
+        </div>
+        <div class="whatsapp-modal-body">
+            <p class="whatsapp-modal-text">
+                ¿Deseas obtener más información sobre:
+            </p>
+            <div class="whatsapp-modal-course-name" id="whatsappModalCourseName">Masterclass Drogas</div>
+            <p class="whatsapp-modal-text">
+                Serás redirigido a WhatsApp para contactar con nuestro equipo de asesores.
+            </p>
+        </div>
+        <div class="whatsapp-modal-footer">
+            <button class="whatsapp-modal-btn whatsapp-modal-btn-cancel" id="whatsappModalCancel">
+                <i class="fas fa-times"></i> Cancelar
+            </button>
+            <a href="#" class="whatsapp-modal-btn whatsapp-modal-btn-whatsapp" id="whatsappModalLink" target="_blank">
+                <i class="fab fa-whatsapp"></i> Ir a WhatsApp
+            </a>
+        </div>
+    </div>
+
+    <!-- HEADER IDÉNTICO AL CÓDIGO 1 -->
+    <header id="header">
+        <nav>
+            <div class="logo-container">
+                <div class="logo-icon">
+                    <img src="{% static 'img/Logo_nav_web.png' %}" alt="Estudiosos" class="logo-icon-img">
+                </div>
+            </div>
+            <ul class="nav-center" id="navMenu">
+                <li><a href="{% url 'index' %}">Inicio</a></li>
+                <li><a href="{% url 'nuestras_clases' %}">Nuestras Clases</a></li>
+                <li><a href="{% url 'mostrar_cursos' %}">Cursos</a></li>
+                <li><a href="{% url 'masterclass' %}">Nuestra Masterclass</a></li>
+                <li><a href="{% url 'noticias' %}">Novedades</a></li>
+            </ul>
+            <div class="nav-right">
+                {% if usuario_autenticado %}
+                    <div class="user-welcome">
+                        <i class="fas fa-user-circle"></i> {{ usuario_nombre }}
+                    </div>
+
+                    {% if rol == 1 %}
+                        <a href="{% url 'panel_administrador' %}" class="btn-login">Panel Admin</a>
+                    {% endif %}
+
+                    {% if request.session.usuario_rol == 3 or request.session.usuario_rol == 4 %}
+                        <a href="{% url 'clases_activas' %}" class="btn-login">{% if rol == 3 %}Panel Profesor{% elif rol == 4 %}Panel Estudiante{% endif %}</a>
+                    {% endif %}
+                    
+                    <a href="{% url 'cerrar_sesion' %}" class="btn-register">Cerrar Sesión</a>
+
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn-login">Iniciar Sesión</a>
+                    <a href="{% url 'registrar' %}" class="btn-register">Registrarse</a>
+                {% endif %}
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Mobile Menu Overlay -->
+        <div class="nav-mobile-overlay" id="mobileOverlay"></div>
+        
+        <!-- Mobile Menu -->
+        <div class="nav-mobile-menu" id="mobileMenu">
+            <div class="nav-mobile-header">
+                <div class="nav-mobile-logo">
+                    <div class="logo-icon">
+                        <img src="{% static 'img/Logo tipo Estudiosos_Mesa de trabajo 1 copia 14.png' %}" alt="Estudiosos" class="logo-icon-img">
+                    </div>
+                </div>
+                <button class="nav-mobile-close" id="mobileCloseBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <ul class="nav-mobile-links">
+                <li><a href="{% url 'index' %}" class="mobile-link">Inicio</a></li>
+                <li><a href="{% url 'nuestras_clases' %}" class="mobile-link">Nuestras Clases</a></li>
+                <li><a href="{% url 'mostrar_cursos' %}" class="mobile-link">Cursos</a></li>
+                <li><a href="{% url 'masterclass' %}" class="mobile-link">Nuestra Masterclass</a></li>
+                <li><a href="{% url 'noticias' %}" class="mobile-link">Novedades</a></li>
+            </ul>
+            <div class="nav-mobile-actions">
+                {% if usuario_autenticado %}
+                    <a href="{% url 'cerrar_sesion' %}" class="btn-register">Cerrar Sesión</a>
+                {% else %}
+                    <a href="{% url 'registrar' %}" class="btn-register">Registrarse</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <section class="masterclass-hero" id="inicio">
+        <img src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=1920&h=1080&fit=crop" alt="Masterclass Drogas" class="hero-background">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <div class="hero-text-box">
+                <div class="masterclass-tag">Masterclass Exclusiva</div>
+                <h1>
+                    Drogas: Perspectiva Criminal
+                    <span class="highlight">y Psicológica</span>
+                </h1>
+                <div class="hero-subtitle">"NUNCA QUISE SER UN ADICTO"</div>
+                <p>
+                    Esta masterclass única ofrece un análisis profundo y multidisciplinario sobre el fenómeno de las adicciones, 
+                    combinando perspectivas del derecho penal y la psicología clínica para comprender la complejidad del consumo 
+                    de sustancias psicoactivas y sus implicaciones legales, sociales y de salud mental.
+                </p>
+                <p>
+                    A través de un enfoque integral, exploraremos las dimensiones jurídicas del consumo, tenencia y tráfico de drogas, 
+                    así como los aspectos psicológicos que subyacen a las conductas adictivas. Los participantes obtendrán herramientas 
+                    para identificar, comprender y abordar las adicciones desde una perspectiva científica y legalmente fundamentada.
+                </p>
+
+                <div class="cta-group">
+                    <a href="#aprenderas" class="btn btn-primary">Ver Temario Completo</a>
+                    <button class="btn btn-secondary" onclick="openWhatsAppModal('Masterclass Drogas: Perspectiva Criminal y Psicológica')">
+                        Contactar Asesor
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="target-audience" id="publico">
+        <div class="target-container">
+            <div class="target-content">
+                <div class="target-image" id="targetImage">
+                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&h=600&fit=crop" alt="Audiencia objetivo">
+                </div>
+                <div class="target-text">
+                    <h2>¿A QUIÉN VA DIRIGIDA ESTA MASTERCLASS?</h2>
+                    <p>
+                        Esta masterclass está dirigida a profesionales del derecho, psicólogos, trabajadores sociales, 
+                        estudiantes de estas disciplinas y cualquier persona interesada en comprender la compleja relación 
+                        entre el sistema legal y las adicciones desde una perspectiva científica y humanizada.
+                    </p>
+                    <p>
+                        También es valiosa para educadores, padres de familia, profesionales de la salud y funcionarios 
+                        públicos que trabajan en prevención y tratamiento de adicciones, así como para aquellos que desean 
+                        actualizar sus conocimientos sobre el marco legal vigente en materia de drogas.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="what-you-learn" id="aprenderas">
+        <div class="learn-container">
+            <div class="section-header">
+                <h2>¿QUÉ APRENDERÁS EN ESTA MASTERCLASS?</h2>
+                <p>Obtendrás conocimientos especializados en 8 áreas clave del estudio de las adicciones</p>
+            </div>
+            <div class="learn-grid">
+                <div class="learn-item">
+                    <div class="learn-icon"><i class="fas fa-brain"></i></div>
+                    <h3>Fundamentos neurobiológicos</h3>
+                    <p>De la adicción y su relación con el comportamiento, comprendiendo los mecanismos cerebrales involucrados.</p>
+                </div>
+                <div class="learn-item">
+                    <div class="learn-icon"><i class="fas fa-gavel"></i></div>
+                    <h3>Marco legal actualizado</h3>
+                    <p>Sobre drogas y sustancias controladas en Colombia, incluyendo jurisprudencia relevante.</p>
+                </div>
+                <div class="learn-item">
+                    <div class="learn-icon"><i class="fas fa-stethoscope"></i></div>
+                    <h3>Diagnóstico diferencial</h3>
+                    <p>Entre consumo problemático, uso recreativo y dependencia, con criterios diagnósticos actualizados.</p>
+                </div>
+                <div class="learn-item">
+                    <div class="learn-icon"><i class="fas fa-balance-scale"></i></div>
+                    <h3>Análisis de sentencias</h3>
+                    <p>Relevantes en materia de drogas y adicciones, con casos prácticos de aplicación forense.</p>
+                </div>
+                <div class="learn-item">
+                    <div class="learn-icon"><i class="fas fa-hands-helping"></i></div>
+                    <h3>Estrategias de intervención</h3>
+                    <p>Desde la psicología clínica, con enfoques terapéuticos basados en evidencia científica.</p>
+                </div>
+                <div class="learn-item">
+                    <div class="learn-icon"><i class="fas fa-chart-line"></i></div>
+                    <h3>Reducción de daños</h3>
+                    <p>Y políticas públicas efectivas en la gestión del consumo de sustancias psicoactivas.</p>
+                </div>
+                <div class="learn-item">
+                    <div class="learn-icon"><i class="fas fa-clipboard-check"></i></div>
+                    <h3>Evaluación forense</h3>
+                    <p>En casos relacionados con drogas, incluyendo protocolos de evaluación y peritajes.</p>
+                </div>
+                <div class="learn-item">
+                    <div class="learn-icon"><i class="fas fa-heartbeat"></i></div>
+                    <h3>Abordaje terapéutico integral</h3>
+                    <p>Para personas con trastornos por uso de sustancias, desde una perspectiva biopsicosocial.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="methodology">
+        <div class="methodology-container">
+            <div class="methodology-content">
+                <div class="methodology-text">
+                    <h2>METODOLOGÍA</h2>
+                    <p>
+                        La masterclass se desarrollará a través de sesiones virtuales en vivo con expertos en derecho penal 
+                        y psicología de las adicciones. Nuestro enfoque combina teoría y práctica para garantizar un aprendizaje 
+                        significativo y aplicable.
+                    </p>
+                    
+                    <ul class="methodology-features">
+                        <li>Presentaciones teóricas con evidencia científica actualizada</li>
+                        <li>Análisis de casos prácticos y jurisprudencia relevante</li>
+                        <li>Espacios de discusión y preguntas con los facilitadores</li>
+                        <li>Material de apoyo descargable (presentaciones, lecturas, formularios)</li>
+                        <li>Acceso a la grabación de las sesiones por 30 días</li>
+                        <li>Certificado de participación al completar la masterclass</li>
+                    </ul>
+                </div>
+                <div class="methodology-image" id="methodologyImage">
+                    <img src="https://images.unsplash.com/photo-1576086213369-97a306d36557?w=800&h=600&fit=crop" alt="Metodología de enseñanza">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section" id="contacto">
+        <div class="cta-content">
+            <h2>¿TIENES DUDAS SOBRE LA MASTERCLASS?</h2>
+            <p>
+                Nuestro equipo de asesores está disponible para resolver todas tus preguntas sobre el contenido, 
+                metodología, requisitos o cualquier otro aspecto de esta formación especializada.
+            </p>
+            <button class="btn btn-white" onclick="openWhatsAppModal('Masterclass Drogas - Consulta de asesoría')">
+                Contactar a un asesor
+            </button>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-about">
+                <div class="footer-logo">
+                    <div class="footer-logo-icon">E</div>
+                    <div class="footer-logo-text">ESTUDIOSOS</div>
+                </div>
+                <p>
+                    Academia educativa comprometida con la excelencia en la formación 
+                    y el desarrollo integral de profesionales.
+                </p>
+            </div>
+            <div class="footer-links">
+                <h4>Enlaces</h4>
+                <ul>
+                    <li><a href="{% url 'index' %}">Inicio</a></li>
+                    <li><a href="{% url 'nuestras_clases' %}">Nuestras Clases</a></li>
+                    <li><a href="{% url 'mostrar_cursos' %}">Cursos</a></li>
+                    <li><a href="{% url 'noticias' %}">Novedades</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Masterclass</h4>
+                <ul>
+                    <li><a href="#publico">Público Objetivo</a></li>
+                    <li><a href="#aprenderas">¿Qué Aprenderás?</a></li>
+                    <li><a href="#metodologia">Metodología</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Contacto</h4>
+                <ul>
+                    <li><a href="mailto:info@estudiosos.com">info@estudiosos.com</a></li>
+                    <li><a href="tel:+573001234567">+57 300 123 4567</a></li>
+                    <li><a href="#">Bogotá, Colombia</a></li>
+                    <li><a href="#">Lun-Vie 8am-6pm</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Estudiosos. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="{% static 'js/web/masterclass.js' %}"></script>
+</body>
+</html>

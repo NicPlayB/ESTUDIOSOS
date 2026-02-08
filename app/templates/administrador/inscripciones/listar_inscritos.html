@@ -1,0 +1,235 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <!-- Configuración básica del documento -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Inscritos - Estudiosos</title>
+
+    <!-- Enlaces a frameworks y fuentes externas -->
+    <!-- Bootstrap para estilos y componentes responsive -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Iconos de Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Fuente de Google para una tipografía moderna -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS personalizado -->
+    <link rel="stylesheet" href="{% static 'css/administrador/inscripciones/listar_inscritos.css' %}">
+</head>
+<body>
+
+    <!-- BOTÓN HAMBURGUESA -->
+    <button class="hamburger-btn" id="hamburgerBtn" title="Menú">
+        <i class="bi bi-list"></i>
+    </button>
+
+    <!-- OVERLAY PARA CERRAR NAV -->
+    <div class="nav-overlay" id="navOverlay"></div>
+
+    <!-- CONTENEDOR DE ALERTAS -->
+    <div class="alert-container">
+        {% if messages %}
+            {% for message in messages %}
+                {% if message.tags != 'success' %}
+                <div class="alert alert-dismissible fade show alert-auto-close 
+                    {% if message.tags == 'error' %}alert-danger
+                    {% elif message.tags == 'warning' %}alert-warning
+                    {% elif message.tags == 'info' %}alert-info
+                    {% else %}alert-secondary{% endif %}"
+                    role="alert">
+                    {% if message.tags == 'success' %}
+                        <i class="bi bi-check-circle-fill alert-icon"></i>
+                    {% elif message.tags == 'error' %}
+                        <i class="bi bi-x-circle-fill alert-icon"></i>
+                    {% elif message.tags == 'warning' %}
+                        <i class="bi bi-exclamation-triangle-fill alert-icon"></i>
+                    {% elif message.tags == 'info' %}
+                        <i class="bi bi-info-circle-fill alert-icon"></i>
+                    {% else %}
+                        <i class="bi bi-bell-fill alert-icon"></i>
+                    {% endif %}
+                    <span>{{ message }}</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <div class="container-fluid p-0">
+        <!-- LAYOUT PRINCIPAL -->
+        <div class="main-layout">
+            <!-- NAVEGACIÓN -->
+            <div class="sidebar-nav">
+                <div class="logo-section">
+                    <!-- IMAGEN DEL LOGO DEL CÓDIGO 1 -->
+                    <img src="{% static 'img/Logo tipo Estudiosos_Mesa de trabajo 1 copia 14.png' %}" alt="Logo Estudiosos">
+                    <span>Estudiosos</span>
+                </div>
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="{% url 'panel_administrador' %}">
+                        <i class="bi bi-house-door"></i>Inicio
+                    </a>
+
+                    <a class="nav-link" href="{% url 'gestion_usuarios' %}">
+                        <i class="bi bi-people-fill"></i>Gestión de Usuarios
+                    </a>
+                    
+                    <a class="nav-link" href="{% url 'profesores' %}">
+                        <i class="bi bi-person-badge"></i>Profesores
+                    </a>
+                    
+                    <a class="nav-link" href="{% url 'certificaciones' %}">
+                        <i class="bi bi-award"></i>Certificaciones
+                    </a>
+
+                    <a class="nav-link" href="{% url 'documentos_usuario' %}" title="Documentos">
+                        <i class="bi bi-file-text"></i>Tus Documentos
+                    </a>
+
+                    <a class="nav-link active" href="{% url 'gestion_cursos' %}">
+                        <i class="bi bi-book"></i>Gestión de Cursos
+                    </a>
+
+                    <a class="nav-link" href="{% url 'gestionar_novedades' %}">
+                        <i class="bi bi-newspaper"></i>Gestión de Contenidos
+                    </a>
+                </nav>
+
+                <!-- MENÚ USUARIO EN EL NAV -->
+                <div class="sidebar-nav-footer">
+                    <a class="nav-link" href="{% url 'perfil_usuario' %}">
+                        <i class="bi bi-person"></i>Mi perfil
+                    </a>
+                    <a class="nav-link" href="{% url 'cerrar_sesion' %}">
+                        <i class="bi bi-box-arrow-right"></i>Cerrar sesión
+                    </a>
+                </div>
+            </div>
+
+            <!-- CONTENIDO PRINCIPAL -->
+            <div class="container-main">
+                <!-- HEADER -->
+                <div class="page-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <!-- Título principal de la página -->
+                            <h2><i class="bi bi-people me-3"></i>Lista de Inscritos</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <a href="{% url 'gestion_cursos' %}" class="btn-volver">
+                    <i class="bi bi-arrow-left"></i> Volver a Certificaciones
+                </a>
+
+                <!-- TABLA DE INSCRITOS -->
+                <div class="table-container-custom">
+                    <table class="table table-bordered table-striped">
+                        <thead class="table-dark">
+                            <tr>
+                                <th><i class="bi bi-person"></i> Usuario</th>
+                                <th><i class="bi bi-book"></i> Curso</th>
+                                <th><i class="bi bi-book"></i> Pais</th>
+                                <th><i class="bi bi-phone"></i> Celular</th>
+                                <th><i class="bi bi-calendar"></i> Fecha</th>
+                                <th><i class="bi bi-info-circle"></i> Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for inscripcion in inscripciones %}
+                            <tr>
+                                <td>
+                                    <div class="user-icon">
+                                        <i class="bi bi-person"></i>
+                                    </div>
+                                    <div class="user-info">
+                                        {{ inscripcion.usuario }}
+                                    </div>
+                                </td>
+
+                                <td>{{ inscripcion.curso.nombre }}</td>
+                                <td>{{ inscripcion.usuario.pais.name }}</td>
+                                <td>
+                                    <a href="#"
+                                    class="whatsapp-link abrir-whatsapp"
+                                    data-cel="{{ inscripcion.usuario.celular }}"
+                                    data-curso="{{ inscripcion.curso.nombre }}"
+                                    data-nombre="{{ inscripcion.usuario }}">
+                                        <i class="bi bi-whatsapp"></i> {{ inscripcion.usuario.celular }}
+                                    </a>
+                                </td>
+
+                                <td>{{ inscripcion.fecha_inscripcion|date:"d/m/Y H:i" }}</td>
+
+                                <td>
+                                    {% if inscripcion.estado_mostrado == "Inscrito" %}
+                                        <span class="estado-badge estado-activo">
+                                            Inscrito
+                                        </span>
+                                    {% else %}
+                                        <span class="estado-badge estado-pendiente">
+                                            Pre-inscrito
+                                        </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="empty-table-message">
+                                        <i class="bi bi-people"></i>
+                                        <p>No hay inscritos</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE CONFIRMACIÓN WHATSAPP -->
+    <div class="modal fade whatsapp-modal" id="confirmWhatsappModal" tabindex="-1" aria-labelledby="confirmWhatsappLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-whatsapp me-2"></i>Contactar por WhatsApp
+                    </h5>
+                    <button class="btn-close btn-close-white" data-bs-dismiss="modal" style="margin: 0; padding: 0.5rem;"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-icon text-center">
+                        <i class="bi bi-whatsapp"></i>
+                    </div>
+                    <p class="modal-text text-center">
+                        ¿Deseas abrir WhatsApp para contactar a este usuario?
+                    </p>
+                    <div class="user-details" id="userDetailsWhatsapp">
+                        <!-- Los detalles del usuario se insertarán aquí dinámicamente -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-cancel" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-2"></i>Cancelar
+                    </button>
+                    <a href="#" target="_blank" class="btn btn-confirm-whatsapp" id="confirmarWhatsapp">
+                        <i class="bi bi-whatsapp me-2"></i>Abrir WhatsApp
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script de Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- JS personalizado -->
+    <script src="{% static 'js/administrador/inscripciones/listar_inscritos.js' %}"></script>
+
+</body>
+</html>

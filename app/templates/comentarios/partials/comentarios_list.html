@@ -1,0 +1,31 @@
+{% for comentario in comentarios %}
+    <div class="comentario"
+         data-comentario-id="{{ comentario.id_comentario_clase }}"
+         data-usuario-id="{{ comentario.usuario.id_usuarios }}">
+
+        <div class="comentario-header">
+            <strong>{{ comentario.usuario.nombres }} {{ comentario.usuario.apellidos }}</strong>
+            <button class="menu-btn" title="Opciones">
+                <i class="bi bi-three-dots-vertical"></i>
+            </button>
+        </div>
+
+        <p class="texto-comentario">{{ comentario.descripcion }}</p>
+        <small>{{ comentario.fecha_creacion|date:"d/m/Y H:i" }}</small>
+
+        <div class="dropdown-menu">
+            <button class="editar-btn">
+                <i class="bi bi-pencil"></i> Editar
+            </button>
+            <button class="eliminar-btn">
+                <i class="bi bi-trash"></i> Eliminar
+            </button>
+        </div>
+    </div>
+{% empty %}
+    <div class="sin-comentarios">
+        <i class="bi bi-chat-left-text"></i>
+        <p>No hay comentarios todavía.</p>
+        <p class="text-muted small">Sé el primero en comentar</p>
+    </div>
+{% endfor %}

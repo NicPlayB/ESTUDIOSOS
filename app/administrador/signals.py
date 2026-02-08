@@ -10,7 +10,7 @@ from inicio_sesion.models import *  # Ajusta según tu app
 @receiver(post_save, sender=Usuario)
 def usuario_post_save(sender, instance, created, **kwargs):
     channel_layer = get_channel_layer()
-    html = render_to_string("administrador/usuario/tabla_usuarios.html", {
+    html = render_to_string("administrador/usuario/partials/tabla_usuarios.html", {
         "usuarios": Usuario.objects.all(),
         "roles": Rol.objects.all(),
     })

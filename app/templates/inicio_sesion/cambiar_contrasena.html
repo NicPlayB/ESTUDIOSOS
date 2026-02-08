@@ -1,0 +1,180 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restablecer Contraseña - Estudiosos</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- CSS Personalizado -->
+    <link rel="stylesheet" href="{% static 'css/inicio_sesion/cambiar_contrasena.css' %}">
+</head>
+<body>
+
+    <!-- CONTENEDOR DE ALERTAS -->
+    <div class="alert-container">
+        {% if messages %}
+            {% for message in messages %}
+                {% with message.tags as tags %}
+                <div class="alert-toast {% if tags == 'success' %}success{% elif tags == 'error' %}error{% elif tags == 'warning' %}warning{% elif tags == 'info' %}info{% else %}info{% endif %}">
+                    <div class="alert-toast-icon">
+                        {% if tags == 'success' %}
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                        {% elif tags == 'error' %}
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="15" y1="9" x2="9" y2="15"></line>
+                                <line x1="9" y1="9" x2="15" y2="15"></line>
+                            </svg>
+                        {% elif tags == 'warning' %}
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                <line x1="12" y1="9" x2="12" y2="13"></line>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                            </svg>
+                        {% else %}
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="16" x2="12" y2="12"></line>
+                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                            </svg>
+                        {% endif %}
+                    </div>
+                    <div class="alert-toast-content">
+                        <div class="alert-toast-title">
+                            {% if tags == 'success' %}Éxito{% elif tags == 'error' %}Error{% elif tags == 'warning' %}Advertencia{% else %}Información{% endif %}
+                        </div>
+                        <div class="alert-toast-message">{{ message }}</div>
+                    </div>
+                    <button class="alert-toast-close">&times;</button>
+                    <div class="alert-toast-progress"></div>
+                </div>
+                {% endwith %}
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div class="login-container">
+        <!-- LADO IZQUIERDO (DISEÑO) -->
+        <div class="welcome-side">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+            
+            <div class="welcome-content-wrapper">
+                <a href="#" class="logo-container" title="Ir al inicio">
+                    <div class="logo">
+                        <img src="{% static 'img/Logo tipo Estudiosos_Mesa de trabajo 1 copia 14.png' %}" alt="Logo Estudiosos">
+                    </div>
+                </a>
+                
+                <h1>Nueva Contraseña</h1>
+                <p>Establece una nueva contraseña segura para tu cuenta. Asegúrate de que sea única y difícil de adivinar para proteger tu información.</p>
+            </div>
+        </div>
+
+        <!-- LADO DERECHO (FORMULARIO) -->
+        <div class="form-side">
+            <h2>Restablecer Contraseña</h2>
+            <p class="welcome-message">Crea una nueva contraseña segura</p>
+            
+            <form method="POST" id="password-reset-form">
+                {% csrf_token %}
+                
+                <div class="info-box">
+                    <i class="fa-solid fa-info-circle"></i>
+                    <span>Tu contraseña debe tener al menos 8 caracteres, incluyendo mayúsculas, minúsculas, números y caracteres especiales.</span>
+                </div>
+                
+                <div class="password-requirements">
+                    <h4>Requisitos de la contraseña:</h4>
+                    <ul>
+                        <li id="req-length"><i class="fa-solid fa-circle"></i> Mínimo 8 caracteres</li>
+                        <li id="req-uppercase"><i class="fa-solid fa-circle"></i> Al menos una mayúscula</li>
+                        <li id="req-lowercase"><i class="fa-solid fa-circle"></i> Al menos una minúscula</li>
+                        <li id="req-number"><i class="fa-solid fa-circle"></i> Al menos un número</li>
+                        <li id="req-special"><i class="fa-solid fa-circle"></i> Al menos un carácter especial</li>
+                    </ul>
+                </div>
+
+                <!-- Campo: Nueva Contraseña -->
+                <div class="input-group">
+                    <i class="fa-solid fa-lock"></i>
+                    <div class="password-wrapper">
+                        <input type="password" 
+                               name="nueva_contraseña" 
+                               id="nueva_contraseña" 
+                               placeholder=" " 
+                               required
+                               autocomplete="new-password"
+                               class="{% if form.nueva_contraseña.errors %}is-invalid{% endif %}">
+                        <label class="floating-label">Nueva contraseña</label>
+                        <button type="button" class="toggle-password" data-target="nueva_contraseña">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                {% if form.nueva_contraseña.errors %}
+                    <div class="error-box">
+                        <i class="fa-solid fa-circle-exclamation"></i>
+                        <span>{{ form.nueva_contraseña.errors.0 }}</span>
+                    </div>
+                {% endif %}
+
+                <!-- Campo: Confirmar Contraseña -->
+                <div class="input-group">
+                    <i class="fa-solid fa-lock"></i>
+                    <div class="password-wrapper">
+                        <input type="password" 
+                               name="confirmar_contraseña" 
+                               id="confirmar_contraseña" 
+                               placeholder=" " 
+                               required
+                               autocomplete="new-password"
+                               class="{% if form.confirmar_contraseña.errors %}is-invalid{% endif %}">
+                        <label class="floating-label">Confirmar contraseña</label>
+                        <button type="button" class="toggle-password" data-target="confirmar_contraseña">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                {% if form.confirmar_contraseña.errors %}
+                    <div class="error-box">
+                        <i class="fa-solid fa-circle-exclamation"></i>
+                        <span>{{ form.confirmar_contraseña.errors.0 }}</span>
+                    </div>
+                {% endif %}
+
+                <!-- Mensaje de error para contraseñas no coincidentes -->
+                <div id="password-match" class="error-box" style="display: none;">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <span>Las contraseñas no coinciden</span>
+                </div>
+
+                <!-- Botón de envío -->
+                <button type="submit" class="login-btn" id="submit-btn">
+                    <i class="fa-solid fa-sync-alt"></i>
+                    ACTUALIZAR CONTRASEÑA
+                </button>
+
+                <!-- Enlace para volver al login -->
+                <div class="register-link">
+                    <a href="{% url 'login' %}">¿Recordaste tu contraseña? Inicia sesión aquí</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript Personalizado -->
+    <script src="{% static 'js/inicio_sesion/cambiar_contrasena.js' %}"></script>
+</body>
+</html>
