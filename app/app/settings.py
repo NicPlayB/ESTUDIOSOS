@@ -230,8 +230,8 @@ CELERY_TIMEZONE = TIME_ZONE
 # ---------------------------------------
 EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
 
-SENDGRID_API_KEY = os.getenv("EMAIL_HOST_PASSWORD")
-DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "altosdefontibon.cr@gmail.com")
+SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "ballesterosnicolas353@gmail.com")
 
 SENDGRID_SANDBOX_MODE_IN_DEBUG = False
 SENDGRID_ECHO_TO_STDOUT = True
