@@ -1,6 +1,9 @@
 from django.core.management.base import BaseCommand
 from inicio_sesion.models import *
 from clases.models import *
+from inicio_sesion.models import *
+from django.contrib.auth.hashers import make_password
+
 
 
 class Command(BaseCommand):
@@ -56,5 +59,42 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.SUCCESS(f"✅ Tipo archivo '{nombre}' creado"))
             else:
                 self.stdout.write(f"⚠️ Tipo archivo '{nombre}' ya existía")
+
+        self.stdout.write(self.style.SUCCESS("\n🎉 Datos iniciales cargados correctamente"))
+
+ # ================== USUARIO ADMINISTRADOR ==================
+        self.stdout.write("\n📌 Creando usuario administrador...")
+
+        try:
+            rol_admin = Rol.objects.get(id_rol=1)
+            tipo_doc = TipoDocumento.objects.get(nombre='CC')
+
+            correo_admin = "nicolasballesteros900@gmail.com"
+
+            admin, created = Usuario.objects.get_or_create(
+                correo=correo_admin,
+                defaults={
+                    "nombres": "Admin",
+                    "apellidos": "Principal",
+                    "id_tipo_documento": tipo_doc,
+                    "documento": "123456789",
+                    "pais": "CO",
+                    "celular": "3000000000",
+                    "fecha_nacimiento": "2000-01-01",
+                    "contrasena": make_password("admin123"),
+                    "id_tipo_rol": rol_admin,
+                    "estado": "activo",
+                }
+            )
+
+            if created:
+                self.stdout.write(self.style.SUCCESS("✅ Usuario administrador creado"))
+                self.stdout.write("📧 Correo: admin@admin.com")
+                self.stdout.write("🔑 Contraseña: admin123")
+            else:
+                self.stdout.write("⚠️ El usuario administrador ya existía")
+
+        except Exception as e:
+            self.stdout.write(self.style.ERROR(f"❌ Error creando administrador: {e}"))
 
         self.stdout.write(self.style.SUCCESS("\n🎉 Datos iniciales cargados correctamente"))
