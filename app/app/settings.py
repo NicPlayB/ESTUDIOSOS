@@ -114,7 +114,7 @@ CHANNEL_LAYERS = {
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-default_db = 'mysql'  # 'mysql' o 'postgres'
+default_db = 'postgres'  # 'mysql' o 'postgres'
 
 if default_db == 'mysql':
     DATABASES = {
@@ -215,26 +215,26 @@ CELERY_TIMEZONE = TIME_ZONE
 
 
 # GMAIL SMTP CONFIGURATION
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'altosdefontibon.cr@gmail.com'
-EMAIL_HOST_PASSWORD = 'heho zywq sayt pexm'
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+#EMAIL_HOST = 'smtp.gmail.com'
+#EMAIL_PORT = 587
+#EMAIL_USE_TLS = True
+#EMAIL_HOST_USER = 'altosdefontibon.cr@gmail.com'
+#EMAIL_HOST_PASSWORD = 'heho zywq sayt pexm'
+#DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 
 
 # ---------------------------------------
 # 📧 CORREO PRODUCCIÓN (SendGrid)
 # ---------------------------------------
-#EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
+EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
 
-#SENDGRID_API_KEY = os.getenv("EMAIL_HOST_PASSWORD")
-#DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "altosdefontibon.cr@gmail.com")
+SENDGRID_API_KEY = os.getenv("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "altosdefontibon.cr@gmail.com")
 
-#SENDGRID_SANDBOX_MODE_IN_DEBUG = False
-#SENDGRID_ECHO_TO_STDOUT = True
+SENDGRID_SANDBOX_MODE_IN_DEBUG = False
+SENDGRID_ECHO_TO_STDOUT = True
 
 
 #Tiempo de sesion en segundos
