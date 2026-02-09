@@ -38,7 +38,7 @@ const whatsappModalCourseName = document.getElementById('whatsappModalCourseName
 const whatsappModalLink = document.getElementById('whatsappModalLink');
     
 // Número de WhatsApp (reemplaza con el número real de tu empresa)
-const whatsappNumber = '+573001234567'; // Ejemplo: número colombiano
+const whatsappNumber = '+573162654440'; // Ejemplo: número colombiano
     
 function openWhatsAppModal(masterclassName) {
     // Actualizar el nombre de la masterclass en el modal
