@@ -56,26 +56,25 @@ def login_view(request):
                 request.session.set_expiry(300)  # 5 minutos
 
                 # ==========================
-                # ✉️ ENVÍO DE CORREO (CELERY) - Actualizado también aquí
+                # ✉️ ENVÍO DE CORREO (SIN CELERY)
                 # ==========================
                 asunto = "Código de verificación"
-                
+
                 mensaje = f"""
                 Hola {usuario.nombres},
-                
+
                 Tu código de inicio de sesión es: {codigo}
-                
+
                 Este código expira en 5 minutos.
                 """
-                
-                # Enviar correo usando Celery task
-                enviar_correo_task.delay(
+
+                send_mail(
                     subject=asunto,
                     message=mensaje,
                     from_email=settings.DEFAULT_FROM_EMAIL,
-                    recipient_list=[usuario.correo]
+                    recipient_list=[usuario.correo],
+                    fail_silently=False,
                 )
-                # ==========================
 
                 messages.info(request, "Te enviamos un código a tu correo")
                 return redirect("verificar_codigo")
@@ -183,12 +182,13 @@ def solicitar_recuperacion(request):
             """
             
             # Enviar correo usando Celery task (asincrónico)
-            enviar_correo_task.delay(
-                subject=asunto,
-                message=mensaje,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[correo]
-            )
+            send_mail(
+                    subject=asunto,
+                    message=mensaje,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[usuario.correo],
+                    fail_silently=False,
+                )
             # ==========================
 
             messages.success(
