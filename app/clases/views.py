@@ -454,7 +454,7 @@ def gestionar_trabajos(request, clase_id):
 
             if correos_estudiantes:
                 for correo in correos_estudiantes:
-                    enviar_correo_task.delay(
+                    send_mail(
                         subject=asunto,
                         message=mensaje,
                         from_email=settings.DEFAULT_FROM_EMAIL,
@@ -790,7 +790,7 @@ def clases_virtuales(request, clase_id):
 
             if correos_estudiantes:
                 for correo in correos_estudiantes:
-                    enviar_correo_task.delay(
+                    send_mail(
                         subject=asunto,
                         message=mensaje,
                         from_email=settings.DEFAULT_FROM_EMAIL,
@@ -978,7 +978,7 @@ def ver_entrega_estudiante(request, trabajo_id, estudiante_id):
         ¡Saludos!
         """
 
-        enviar_correo_task.delay(
+        send_mail(
             subject=asunto,
             message=mensaje,
             from_email=settings.DEFAULT_FROM_EMAIL,
@@ -1185,7 +1185,7 @@ def comentarios_clase(request, clase_id):
         """
 
         for correo in destinatarios:
-            enviar_correo_task.delay(
+            send_mail(
                 subject=asunto,
                 message=mensaje,
                 from_email=settings.DEFAULT_FROM_EMAIL,
