@@ -1,4 +1,4 @@
-// ===== FUNCIONALIDAD PARA ALERTAS =====
+// ===== FUNCIONALIDAD PARA ALERTAS ====
 function removeAlertToast(toastElement) {
     if (!toastElement.parentElement) return;
     
