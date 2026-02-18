@@ -10,11 +10,14 @@ from django.http import JsonResponse
 from django.template.defaulttags import register
 
 # Create your views here.
-
+@rol_requerido([1]) # Solo Administrador
+@login_requerido # Solo Administrador
 def panel_admin(request):
     request.session.pop('id_clase', None)
     return render(request, "paneles_inicio/panel_administrador.html")
 
+@rol_requerido([1]) # Solo Administrador
+@login_requerido # Solo Administrador
 def lista_usuarios(request):
     usuarios = Usuario.objects.select_related('id_tipo_rol')
     roles = Rol.objects.all()
@@ -318,7 +321,8 @@ def gestion_cursos(request):
     })
 
 
-
+@rol_requerido([1]) # Solo Administrador
+@login_requerido # Solo Administrador
 @register.filter
 def filter_tipo(queryset, tipo):
     """Filtra un queryset por tipo de contenido"""
@@ -448,7 +452,8 @@ def gestionar_novedades(request):
         'iconos': iconos
     })
     
-    
+@rol_requerido([1]) # Solo Administrador
+@login_requerido # Solo Administrador 
 def inscritos_por_curso(request, id_curso):
     curso = get_object_or_404(Cursos, id_curso=id_curso)
 

@@ -1,4 +1,4 @@
-/* static/css/detalle_certificaciones_usuario.css */
+/* static/css/administrador/certificaciones/certificados_usuario.css */
 
 /* ===== VARIABLES Y ESTILOS BASE DEL CÓDIGO 1 ===== */
 :root {
@@ -233,7 +233,7 @@ nav.nav {
 
 /* Separación adicional para pantallas pequeñas */
 .page-header h2 i {
-    margin-right: 1rem; /* Aumentado de me-3 */
+    margin-right: 1rem;
 }
 
 .btn-volver {
@@ -262,7 +262,7 @@ nav.nav {
     transform: translateX(-3px);
 }
 
-/* Botones - CORREGIDOS PARA HOVER CONSISTENTE */
+/* Botones */
 .btn {
     border-radius: 10px;
     padding: 10px 20px;
@@ -345,7 +345,7 @@ nav.nav {
 /* ===== CONTENEDOR DE CARDS AL ESTILO DEL CÓDIGO 1 ===== */
 .documentos-container {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 tarjetas por línea */
+    grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
     margin-top: 2rem;
 }
@@ -451,7 +451,7 @@ nav.nav {
     color: var(--text-secondary);
 }
 
-/* Badge de tipo de documento - SIN FONDO, solo icono y texto */
+/* Badge de tipo de documento */
 .documento-badge {
     position: absolute;
     top: 1rem;
@@ -500,7 +500,7 @@ nav.nav {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Botones dentro de la tarjeta - MODIFICADOS PARA SER MÁS PEQUEÑOS */
+/* Botones dentro de la tarjeta */
 .documento-card-buttons {
     display: flex;
     justify-content: space-between;
@@ -509,26 +509,23 @@ nav.nav {
     width: 100%;
 }
 
-/* Botones más pequeños - MODIFICACIÓN PRINCIPAL */
 .documento-card-buttons .btn {
     flex: 1;
-    padding: 6px 10px; /* Reducido de 10px 12px */
-    font-size: 0.8rem; /* Reducido de 0.9rem */
+    padding: 6px 10px;
+    font-size: 0.8rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.4rem; /* Reducido ligeramente */
-    min-height: 34px; /* Altura mínima reducida */
+    gap: 0.4rem;
+    min-height: 34px;
 }
 
-/* Iconos dentro de los botones más pequeños */
 .documento-card-buttons .btn i {
     color: inherit !important;
     transition: none !important;
-    font-size: 0.9rem; /* Reducido ligeramente */
+    font-size: 0.9rem;
 }
 
-/* Botón ver a la izquierda */
 .documento-card-buttons .btn-primary {
     background: linear-gradient(135deg, var(--primary-orange) 0%, var(--dark-orange) 100%);
     color: white;
@@ -540,7 +537,6 @@ nav.nav {
     color: white;
 }
 
-/* Botón descargar a la derecha */
 .documento-card-buttons .btn-success {
     background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     color: white;
@@ -552,7 +548,7 @@ nav.nav {
     color: white;
 }
 
-/* Dropdown menu más pequeño y centrado */
+/* Dropdown menu */
 .dropdown-menu {
     border: none;
     border-radius: 12px;
@@ -653,6 +649,11 @@ nav.nav {
 
 .alert-warning {
     background: linear-gradient(180deg, #d97706 0%, #fbbf24 100%);
+    color: white;
+}
+
+.alert-info {
+    background: linear-gradient(180deg, #0ea5e9 0%, #38bdf8 100%);
     color: white;
 }
 
@@ -868,20 +869,24 @@ nav.nav {
     padding: 2rem;
 }
 
-/* FORM COLUMNS - DOS COLUMNAS */
+/* FORM COLUMNS - DOS COLUMNAS CON TAMAÑOS FIJOS */
 .form-columns {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 2rem;
+    min-height: 400px;
 }
 
+/* ARREGLAR EL PROBLEMA DE DESFORMACIÓN CON NOMBRES LARGOS */
 .form-column-left {
     border-right: 1px solid #eee;
     padding-right: 2rem;
+    min-width: 0; /* IMPORTANTE: Permite que la columna se reduzca */
 }
 
 .form-column-right {
     padding-left: 2rem;
+    min-width: 0; /* IMPORTANTE: Permite que la columna se reduzca */
 }
 
 .close-floating {
@@ -906,7 +911,7 @@ nav.nav {
     transform: none;
 }
 
-/* ZONA DE ARRASTRE - DISEÑO MEJORADO */
+/* ZONA DE ARRASTRE - DISEÑO MEJORADO CON CONTROL DE TEXTO LARGO */
 .drop-zone {
     border: 2px dashed #dee2e6;
     border-radius: 16px;
@@ -922,6 +927,7 @@ nav.nav {
     justify-content: center;
     align-items: center;
     position: relative;
+    width: 100%;
 }
 
 .drop-zone:hover,
@@ -949,23 +955,31 @@ nav.nav {
     color: #495057;
     margin-bottom: 0.5rem;
     font-weight: 500;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 0 10px;
 }
 
 .drop-zone .drop-subtext {
     font-size: 0.9rem;
     color: #6c757d;
-}
-
-/* NUEVO: Estilo para truncar texto largo en la zona de arrastre */
-.drop-zone .drop-text,
-.drop-zone .drop-subtext {
-    white-space: nowrap;
+    width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 0 10px;
+}
+
+/* CONTROL DE TEXTO LARGO EN TODAS LAS ÁREAS */
+.drop-text,
+.drop-subtext {
     max-width: 100%;
-    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     display: block;
-    text-align: center;
 }
 
 .file-preview-container {
@@ -976,6 +990,7 @@ nav.nav {
     border-radius: 12px;
     padding: 1rem;
     background: #f8f9fa;
+    width: 100%;
 }
 
 .file-preview-item {
@@ -989,6 +1004,7 @@ nav.nav {
     transition: all 0.3s ease;
     border: 1px solid #e9ecef;
     position: relative;
+    width: 100%;
 }
 
 .file-preview-item.uploading {
@@ -1021,7 +1037,34 @@ nav.nav {
     font-size: 1.2rem;
 }
 
-/* CORRECCIÓN PRINCIPAL: Evitar que nombres largos deformen el layout */
+/* NUEVO: Botón para quitar archivo en la vista previa */
+.file-remove-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(220, 53, 69, 0.1);
+    border: none;
+    color: #dc3545;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 10;
+    padding: 0;
+}
+
+.file-remove-btn:hover {
+    background: #dc3545;
+    color: white;
+    transform: scale(1.1);
+}
+
+/* SOLUCIÓN PARA NOMBRES LARGOS EN VISTA PREVIA */
 .file-preview-item .file-name {
     font-size: 0.9rem;
     color: #495057;
@@ -1031,6 +1074,7 @@ nav.nav {
     text-overflow: ellipsis;
     flex: 1;
     min-width: 0;
+    max-width: calc(100% - 40px);
 }
 
 .file-size {
@@ -1079,6 +1123,7 @@ nav.nav {
     padding: 12px 16px;
     transition: all 0.3s ease;
     font-size: 0.95rem;
+    width: 100%;
 }
 
 .form-control:focus, .form-select:focus {
@@ -1090,9 +1135,10 @@ nav.nav {
     font-weight: 600;
     color: var(--text-primary);
     margin-bottom: 8px;
+    display: block;
 }
 
-/* Botonera de formulario con botón cancelar a la izquierda - MODIFICADO */
+/* Botonera de formulario */
 .form-buttons-container {
     display: flex;
     justify-content: space-between;
@@ -1112,10 +1158,42 @@ nav.nav {
 
 .form-buttons-container .btn-submit {
     order: 2;
-    flex: 2; /* Más grande que cancelar */
+    flex: 2;
     padding: 14px 20px;
     font-size: 1.1rem;
     font-weight: 700;
+}
+
+/* ALERTA DE ERROR EN FORMULARIO CON MISMO DISEÑO */
+.floating-form .alert {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    margin-top: 10px;
+}
+
+.floating-form .alert .alert-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.floating-form .alert-danger {
+    background: linear-gradient(180deg, #ff9393 0%, #f87171 100%);
+    color: white;
+}
+
+.floating-form .alert .btn-close {
+    filter: brightness(0) invert(1);
+    opacity: 0.8;
+}
+
+.floating-form .alert .btn-close:hover {
+    opacity: 1;
 }
 
 /* Modal de eliminación de archivo */
@@ -1174,7 +1252,7 @@ nav.nav {
 /* Responsive */
 @media (max-width: 1200px) {
     .documentos-container {
-        grid-template-columns: repeat(2, 1fr); /* 2 tarjetas en pantallas medianas */
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
@@ -1210,13 +1288,12 @@ nav.nav {
         align-items: center;
     }
 
-    /* Separación adicional para pantallas pequeñas */
     .page-header h2 i {
         margin-right: 0.8rem;
     }
 
     .documentos-container {
-        grid-template-columns: 1fr; /* 1 tarjeta en móviles */
+        grid-template-columns: 1fr;
         gap: 1rem;
     }
     
@@ -1241,7 +1318,6 @@ nav.nav {
         font-size: 1.2rem;
     }
 
-    /* Botones aún más pequeños en móviles */
     .documento-card-buttons .btn {
         padding: 5px 8px;
         font-size: 0.75rem;
@@ -1277,6 +1353,7 @@ nav.nav {
     .form-columns {
         grid-template-columns: 1fr;
         gap: 1.5rem;
+        min-height: auto;
     }
     
     .form-column-left {
@@ -1294,7 +1371,6 @@ nav.nav {
         min-height: 200px;
     }
     
-    /* Ajuste específico para texto en móviles */
     .drop-zone .drop-text,
     .drop-zone .drop-subtext {
         white-space: normal;
@@ -1307,6 +1383,7 @@ nav.nav {
         white-space: normal;
         word-wrap: break-word;
         overflow-wrap: break-word;
+        max-width: calc(100% - 30px);
     }
     
     .alert-container {
@@ -1351,5 +1428,15 @@ nav.nav {
     
     .delete-file-modal .modal-footer .btn {
         width: 100%;
+    }
+    
+    .file-preview-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .file-status {
+        align-self: flex-end;
     }
 }

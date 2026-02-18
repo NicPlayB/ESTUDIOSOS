@@ -1,8 +1,9 @@
-// static/js/detalle_certificaciones_usuario.js
+// static/js/administrador/certificaciones/certificados_usuario.js
 
 // ===== VARIABLES GLOBALES =====
 let deleteDocumentUrl = '';
 let deleteDocumentTitle = '';
+let currentFile = null; // Para manejar el archivo actual
 
 // ===== MANEJO DEL SIDEBAR RESPONSIVE =====
 document.addEventListener('DOMContentLoaded', function() {
@@ -45,6 +46,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const fileInput = document.getElementById('id_archivo');
     const filePreview = document.getElementById('filePreview');
     const submitDocumentBtn = document.getElementById('submitDocumentForm');
+    const errorArchivoAlert = document.getElementById('error_archivo_alert');
+    const errorArchivoText = document.getElementById('error_archivo_text');
 
     // Función para limpiar errores del formulario
     function limpiarErroresFormulario() {
@@ -59,6 +62,11 @@ document.addEventListener('DOMContentLoaded', function() {
             el.textContent = '';
         });
         
+        // Ocultar alerta de error de archivo
+        if (errorArchivoAlert) {
+            errorArchivoAlert.classList.add('d-none');
+        }
+        
         if (dropZone) {
             dropZone.style.borderColor = '#dee2e6';
         }
@@ -70,6 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
             floatingFormOverlay.classList.add('show');
             document.body.style.overflow = 'hidden';
             limpiarErroresFormulario();
+            currentFile = null;
         });
     }
 
@@ -101,6 +110,9 @@ document.addEventListener('DOMContentLoaded', function() {
             submitDocumentBtn.innerHTML = '<i class="bi bi-upload me-2"></i>Subir documento';
             submitDocumentBtn.disabled = false;
         }
+        
+        // Limpiar archivo actual
+        currentFile = null;
     }
 
     // Configurar botones para cerrar el formulario
@@ -169,6 +181,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const dataTransfer = new DataTransfer();
                 dataTransfer.items.add(file);
                 fileInput.files = dataTransfer.files;
+                currentFile = file;
             }
         });
     }
@@ -177,6 +190,7 @@ document.addEventListener('DOMContentLoaded', function() {
         fileInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file) {
+                currentFile = file;
                 handleFileSelection(file);
             }
         });
@@ -199,15 +213,18 @@ document.addEventListener('DOMContentLoaded', function() {
         ];
         
         if (!allowedTypes.includes(file.type)) {
-            alert('Tipo de archivo no permitido. Por favor, sube un archivo PDF, Word, Excel, PowerPoint o imagen.');
+            mostrarErrorArchivo('Tipo de archivo no permitido. Por favor, sube un archivo PDF, Word, Excel, PowerPoint o imagen.');
             return;
         }
         
         // Validar tamaño (máximo 10MB)
         if (file.size > 10 * 1024 * 1024) {
-            alert('El archivo es demasiado grande. El tamaño máximo es 10MB.');
+            mostrarErrorArchivo('El archivo es demasiado grande. El tamaño máximo es 10MB.');
             return;
         }
+        
+        // Limpiar errores anteriores
+        limpiarErroresFormulario();
         
         // Mostrar vista previa del archivo
         const reader = new FileReader();
@@ -241,6 +258,9 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const previewHTML = `
                 <div class="file-preview-item uploaded">
+                    <button type="button" class="file-remove-btn" title="Quitar archivo">
+                        <i class="bi bi-x"></i>
+                    </button>
                     <div class="file-info">
                         <i class="bi ${iconClass}" style="color: ${iconColor}; font-size: 1.4rem;"></i>
                         <div style="flex: 1; min-width: 0; overflow: hidden;">
@@ -262,21 +282,78 @@ document.addEventListener('DOMContentLoaded', function() {
             if (dropZone) {
                 const dropText = dropZone.querySelector('.drop-text');
                 const dropSubtext = dropZone.querySelector('.drop-subtext');
-                if (dropText) {
-                    dropText.innerHTML = `<span style="color: var(--primary-orange); font-weight: 600;">Archivo seleccionado</span>`;
-                }
                 
                 // Truncar también en el texto de la zona de arrastre
                 let displayName = file.name;
                 if (displayName.length > 35) {
                     displayName = displayName.substring(0, 32) + '...';
                 }
+                
+                if (dropText) {
+                    dropText.innerHTML = `<span style="color: var(--primary-orange); font-weight: 600;">Archivo seleccionado</span>`;
+                }
+                
                 if (dropSubtext) {
                     dropSubtext.innerHTML = `<span style="color: var(--primary-orange);" title="${file.name}">${displayName}</span>`;
                 }
             }
+            
+            // Añadir event listener al botón de eliminar archivo
+            setTimeout(() => {
+                const removeBtn = document.querySelector('.file-remove-btn');
+                if (removeBtn) {
+                    removeBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        removeSelectedFile();
+                    });
+                }
+            }, 100);
         };
         reader.readAsDataURL(file);
+    }
+
+    // Función para remover el archivo seleccionado
+    function removeSelectedFile() {
+        // Limpiar el input file
+        if (fileInput) {
+            fileInput.value = '';
+        }
+        
+        // Limpiar la vista previa
+        if (filePreview) {
+            filePreview.innerHTML = '<p class="text-muted small m-0">Selecciona un archivo para cargarlo</p>';
+        }
+        
+        // Restaurar texto original en drop-zone
+        if (dropZone) {
+            const dropText = dropZone.querySelector('.drop-text');
+            const dropSubtext = dropZone.querySelector('.drop-subtext');
+            if (dropText) dropText.innerHTML = 'Arrastra y suelta el archivo aquí';
+            if (dropSubtext) dropSubtext.innerHTML = 'o haz clic para seleccionar';
+        }
+        
+        // Limpiar error de archivo si lo hay
+        limpiarErroresFormulario();
+        
+        // Limpiar archivo actual
+        currentFile = null;
+    }
+
+    // Función para mostrar error de archivo con diseño de alerta
+    function mostrarErrorArchivo(mensaje) {
+        if (errorArchivoAlert && errorArchivoText) {
+            errorArchivoText.textContent = mensaje;
+            errorArchivoAlert.classList.remove('d-none');
+        }
+        
+        if (dropZone) {
+            dropZone.style.borderColor = '#dc3545';
+        }
+        
+        // Hacer scroll a la alerta
+        setTimeout(() => {
+            errorArchivoAlert.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
     }
 
     // Función para formatear el tamaño del archivo
@@ -319,18 +396,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 hasError = true;
             }
             
-            if (!fileInput.files || fileInput.files.length === 0) {
-                const errorArchivo = document.getElementById('error_archivo');
-                if (errorArchivo) {
-                    errorArchivo.textContent = 'Debes seleccionar un archivo';
-                }
-                if (dropZone) {
-                    dropZone.style.borderColor = '#dc3545';
-                }
+            // Verificar si hay archivo seleccionado
+            if (!currentFile && (!fileInput.files || fileInput.files.length === 0)) {
+                mostrarErrorArchivo('Debes seleccionar un archivo');
                 hasError = true;
             }
             
             if (hasError) {
+                // Hacer scroll al primer error
+                const firstError = document.querySelector('.is-invalid');
+                if (firstError) {
+                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
                 return;
             }
             
@@ -340,6 +417,11 @@ document.addEventListener('DOMContentLoaded', function() {
             
             try {
                 const formData = new FormData(documentForm);
+                
+                // Si hay un archivo actual pero no en el input, agregarlo manualmente
+                if (currentFile && (!fileInput.files || fileInput.files.length === 0)) {
+                    formData.append('archivo', currentFile);
+                }
                 
                 const response = await fetch(window.location.href, {
                     method: 'POST',
@@ -393,11 +475,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 input.classList.add('is-invalid');
                 errorElement.textContent = messages[0];
                 
-                // Si es el campo archivo, también marcar la zona de arrastre
+                // Si es el campo archivo, mostrar alerta especial
                 if (field === 'archivo') {
-                    if (dropZone) {
-                        dropZone.style.borderColor = '#dc3545';
-                    }
+                    mostrarErrorArchivo(messages[0]);
                 }
                 
                 // Hacer scroll al primer campo con error
@@ -541,14 +621,14 @@ document.addEventListener('DOMContentLoaded', function() {
                         location.reload();
                     });
                 } else {
-                    mostrarModalExito('Error al eliminar el documento: ' + (result.message || 'Error desconocido'));
+                    mostrarAlertaError('Error al eliminar el documento: ' + (result.message || 'Error desconocido'));
                     btn.innerHTML = originalText;
                     btn.disabled = false;
                 }
                 
             } catch (error) {
                 console.error('Error:', error);
-                mostrarModalExito('Error de conexión. Por favor, inténtalo de nuevo.');
+                mostrarAlertaError('Error de conexión. Por favor, inténtalo de nuevo.');
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             }
@@ -565,7 +645,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const alertId = 'alert-' + Date.now();
         
         const alertHTML = `
-            <div id="${alertId}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <div id="${alertId}" class="alert alert-danger alert-dismissible fade show alert-auto-close" role="alert">
                 <i class="bi bi-x-circle-fill alert-icon"></i>
                 <span>${mensaje}</span>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>

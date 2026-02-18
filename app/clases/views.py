@@ -18,6 +18,8 @@ from django.utils.timezone import localtime
 # FUNCIÓN HELPER PARA ADMIN
 #-------------------#
 
+@rol_requerido([1, 3, 4]) 
+@login_requerido# Solo roles autenticados
 def get_admin_context(request):
     """
     Helper para manejar la lógica del admin en todas las views
@@ -60,6 +62,10 @@ def get_admin_context(request):
     
     return profesor_id, profesor, modo_admin
 
+
+
+@rol_requerido([1, 3, 4]) 
+@login_requerido# Solo roles autenticados
 def puede_administrar_clase(usuario, clase, modo_admin=False, profesor=None):
     """
     Determina si el usuario puede administrar la clase
@@ -81,7 +87,8 @@ def puede_administrar_clase(usuario, clase, modo_admin=False, profesor=None):
 # PANEL ESTUDISOSO 
 #-------------------#
 
-@login_requerido
+@rol_requerido([1, 3, 4]) 
+@login_requerido# Solo roles autenticados
 def panel_inicio_clases(request, clase_id):
     usuario = request.usuario
     rol = getattr(usuario.id_tipo_rol, 'id_rol', None) if hasattr(usuario, 'id_tipo_rol') else None
@@ -123,7 +130,8 @@ def generar_codigo_clase():
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
 
 #VIEW PARA CAMBIAR ESTADO DE CLASE
-@login_requerido
+@rol_requerido([1, 3, 4]) 
+@login_requerido# Solo roles autenticados
 def cambiar_estado_clase(request, id_clase):
     usuario = request.usuario
     rol = getattr(usuario.id_tipo_rol, 'id_rol', None) if hasattr(usuario, 'id_tipo_rol') else None
@@ -156,7 +164,8 @@ def cambiar_estado_clase(request, id_clase):
     return redirect(redirect_to)
 
 #VIEW PARA GESTIONAR CLASES CREARLAS, UNIRSE A ELLAS, EDITARLAS Y ELIMINARLAS
-@login_requerido
+@rol_requerido([1, 3, 4]) 
+@login_requerido# Solo roles autenticados
 def gestion_clases(request):
     usuario = request.usuario
     rol = getattr(usuario.id_tipo_rol, 'id_rol', None) if hasattr(usuario, 'id_tipo_rol') else None
@@ -260,7 +269,8 @@ def gestion_clases(request):
     })
     
 # VIEW PARA VER CLASES INACTIVAS    
-@login_requerido
+@rol_requerido([1, 3, 4]) 
+@login_requerido# Solo roles autenticados
 def clases_inactivas(request):
     usuario = request.usuario
     rol = getattr(usuario.id_tipo_rol, 'id_rol', None) if hasattr(usuario, 'id_tipo_rol') else None
@@ -324,7 +334,8 @@ def clases_inactivas(request):
     })
     
 # VIEW PARA EDITAR Y ELIMINAR CLASES
-@login_requerido
+@rol_requerido([1, 3, 4]) 
+@login_requerido# Solo roles autenticados
 def editar_eliminar_clase(request, clase_id):
     usuario = request.usuario
     rol = getattr(usuario.id_tipo_rol, 'id_rol', None) if hasattr(usuario, 'id_tipo_rol') else None
@@ -371,7 +382,8 @@ def editar_eliminar_clase(request, clase_id):
 #-------------------#
 
 # PARA CREAR Y GESTIONAR TRABAJOS
-@login_requerido    
+@rol_requerido([1, 3, 4]) 
+@login_requerido# Solo roles autenticados  
 def gestionar_trabajos(request, clase_id):
     usuario = request.usuario
     request.session['id_clase'] = clase_id
@@ -498,7 +510,8 @@ def gestionar_trabajos(request, clase_id):
     
     return render(request, 'trabajos/lista_trabajos.html', context)
 
-@login_requerido
+@rol_requerido([1, 3, 4]) 
+@login_requerido# Solo roles autenticados
 def detalle_trabajo(request, trabajo_id):
     usuario = request.usuario
     rol = getattr(usuario.id_tipo_rol, 'id_rol', None) if hasattr(usuario, 'id_tipo_rol') else None
@@ -590,7 +603,8 @@ def detalle_trabajo(request, trabajo_id):
     
     return render(request, 'trabajos/detalle_trabajo.html', context)
 
-@login_requerido
+@rol_requerido([1, 3, 4]) 
+@login_requerido# Solo roles autenticados
 def eliminar_archivo(request, archivo_id):
     usuario = request.usuario
     rol = getattr(usuario.id_tipo_rol, 'id_rol', None) if hasattr(usuario, 'id_tipo_rol') else None
@@ -622,7 +636,8 @@ def eliminar_archivo(request, archivo_id):
     
     return redirect('detalle_trabajo', trabajo_id=trabajo.id_trabajos)
 
-@login_requerido
+@rol_requerido([1, 3, 4]) 
+@login_requerido# Solo roles autenticados
 def ver_entregas_trabajo(request, trabajo_id):
     usuario = request.usuario
     rol = getattr(usuario.id_tipo_rol, 'id_rol', None) if hasattr(usuario, 'id_tipo_rol') else None
@@ -678,7 +693,8 @@ def ver_entregas_trabajo(request, trabajo_id):
     
     return render(request, 'trabajos/entregas_trabajo.html', context)
     
-@login_requerido
+@rol_requerido([1, 3, 4]) 
+@login_requerido# Solo roles autenticados
 def inscritos_clase(request, clase_id):
     usuario = request.usuario
     rol = getattr(usuario.id_tipo_rol, 'id_rol', None) if hasattr(usuario, 'id_tipo_rol') else None
@@ -718,7 +734,8 @@ def inscritos_clase(request, clase_id):
 
     return render(request, 'inscritos/inscritos_clase.html', context)
 
-@login_requerido
+@rol_requerido([1, 3, 4]) 
+@login_requerido# Solo roles autenticados
 def clases_virtuales(request, clase_id):
     usuario = request.usuario
     rol = getattr(usuario.id_tipo_rol, 'id_rol', None) if hasattr(usuario, 'id_tipo_rol') else None
@@ -882,7 +899,8 @@ def clases_virtuales(request, clase_id):
 
     return render(request, 'clases_virtuales/clases_virtuales.html', context)
     
-@login_requerido
+@rol_requerido([1, 3, 4]) 
+@login_requerido# Solo roles autenticados
 def ver_entrega_estudiante(request, trabajo_id, estudiante_id):
     usuario = request.usuario
     rol = getattr(usuario.id_tipo_rol, 'id_rol', None) if hasattr(usuario, 'id_tipo_rol') else None
@@ -1008,7 +1026,8 @@ def ver_entrega_estudiante(request, trabajo_id, estudiante_id):
 
     return render(request, "trabajos/ver_entrega_estudiante.html", context)
   
-@login_requerido
+@rol_requerido([1, 3, 4]) 
+@login_requerido# Solo roles autenticados
 def entregar_trabajo(request, trabajo_id):
     usuario = request.usuario
     rol = getattr(usuario.id_tipo_rol, 'id_rol', None) if hasattr(usuario, 'id_tipo_rol') else None
@@ -1072,7 +1091,8 @@ def entregar_trabajo(request, trabajo_id):
         "calificacion": calificacion
     })
 
-@login_requerido
+@rol_requerido([1, 3, 4]) 
+@login_requerido# Solo roles autenticados
 def eliminar_archivo_entrega(request, archivo_id):
     usuario = request.usuario
     rol = getattr(usuario.id_tipo_rol, 'id_rol', None) if hasattr(usuario, 'id_tipo_rol') else None
@@ -1113,7 +1133,8 @@ def eliminar_archivo_entrega(request, archivo_id):
 
 
 
-@login_requerido
+@rol_requerido([1, 3, 4]) 
+@login_requerido# Solo roles autenticados
 def comentarios_clase(request, clase_id):
     usuario = request.usuario
     rol = getattr(usuario.id_tipo_rol, 'id_rol', None) if hasattr(usuario, 'id_tipo_rol') else None

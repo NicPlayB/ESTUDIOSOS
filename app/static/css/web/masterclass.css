@@ -1135,6 +1135,14 @@ footer {
     font-size: 1.3rem;
     font-weight: 700;
 }
+.footer-logo-img {
+    display: block;       /* necesario para margin auto */
+    margin: 0 auto;       /* centra horizontalmente */
+    height: 80px;
+    width: auto;
+    max-width: 180px;
+    object-fit: contain;
+}
 
 .footer-logo-text {
     font-family: var(--font-display);

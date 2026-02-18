@@ -679,9 +679,8 @@
     <footer>
         <div class="footer-content">
             <div class="footer-about">
-                <div class="footer-logo">
-                    <div class="footer-logo-icon">E</div>
-                    <div class="footer-logo-text">ESTUDIOSOS</div>
+               <div class="footer-logo">
+                    <img src="{% static 'img/Logo tipo Estudiosos_Mesa de trabajo 1 copia 14.png' %}" alt="Estudiosos" class="footer-logo-img">
                 </div>
                 <p>
                     Academia educativa comprometida con la excelencia en la formación 
@@ -692,18 +691,19 @@
                 <h4>Enlaces</h4>
                 <ul>
                     <li><a href="#inicio">Inicio</a></li>
-                    <li><a href="#nosotros">Nosotros</a></li>
-                    <li><a href="#cursos">Cursos</a></li>
-                    <li><a href="#testimonios">Testimonios</a></li>
+                <li><a href="{% url 'nuestras_clases' %}">Nuestras Clases</a></li>
+                <li><a href="{% url 'mostrar_cursos' %}">Cursos</a></li>
+                <li><a href="{% url 'masterclass' %}">Nuestra Masterclass</a></li>
+                <li><a href="{% url 'noticias' %}">Novedades</a></li>
                 </ul>
             </div>
             <div class="footer-links">
                 <h4>Programas</h4>
                 <ul>
-                    <li><a href="#cursos">Desarrollo Profesional</a></li>
-                    <li><a href="#cursos">Desarrollo Humano</a></li>
-                    <li><a href="#cursos">Habilidades Digitales</a></li>
-                    <li><a href="#cursos">Emprendimiento</a></li>
+                    <li><a href="{% url 'mostrar_cursos' %}">Desarrollo Profesional</a></li>
+                    <li><a href="{% url 'mostrar_cursos' %}">Desarrollo Humano</a></li>
+                    <li><a href="{% url 'mostrar_cursos' %}">Ingles</a></li>
+                    <li><a href="{% url 'mostrar_cursos' %}">Emprendimiento</a></li>
                 </ul>
             </div>
             <div class="footer-links">

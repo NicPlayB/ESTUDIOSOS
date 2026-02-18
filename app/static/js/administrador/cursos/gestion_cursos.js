@@ -44,30 +44,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Inicializar modales usando las variables de Django
     if (typeof djangoVariables !== 'undefined') {
-        // Modal de crear
+        // Mostrar overlay de crear si está configurado
         if (djangoVariables.mostrar_modal_crear) {
-            const modalCrear = document.getElementById('modalCrearCurso');
-            if (modalCrear) {
-                const bsModalCrear = new bootstrap.Modal(modalCrear);
-                bsModalCrear.show();
-                
-                modalCrear.addEventListener('hidden.bs.modal', function () {
-                    window.location.href = window.location.pathname;
-                });
-            }
+            mostrarFormularioCrear();
         }
         
-        // Modal de editar específico
+        // Mostrar overlay de editar específico
         if (djangoVariables.mostrar_modal_editar) {
-            const modalEditar = document.getElementById('modalEditarCurso' + djangoVariables.mostrar_modal_editar);
-            if (modalEditar) {
-                const bsModalEditar = new bootstrap.Modal(modalEditar);
-                bsModalEditar.show();
-                
-                modalEditar.addEventListener('hidden.bs.modal', function () {
-                    window.location.href = window.location.pathname;
-                });
-            }
+            mostrarFormularioEditar(djangoVariables.mostrar_modal_editar);
         }
         
         // Modal de éxito
@@ -94,12 +78,115 @@ function verImagenCompleta(imageUrl) {
     imageModal.show();
 }
 
-/* ===== ZONA DE ARRASTRE PARA CREAR CURSO ===== */
-const dropZoneCrear = document.getElementById('dropZoneCrear');
-const imagenInputCrear = document.getElementById('imagenInputCrear');
-const filePreviewCrear = document.getElementById('filePreviewCrear');
+/* ===== FUNCIONES PARA MOSTRAR/OCULTAR FORMULARIOS FLOTANTES ===== */
+function mostrarFormularioCrear() {
+    const overlay = document.getElementById('floatingFormOverlayCrear');
+    if (overlay) {
+        overlay.classList.add('show');
+        document.body.style.overflow = 'hidden';
+        
+        // Enfocar el primer campo
+        setTimeout(() => {
+            const firstInput = overlay.querySelector('input[name="nombre"]');
+            if (firstInput) firstInput.focus();
+        }, 300);
+    }
+}
 
-if (dropZoneCrear) {
+function ocultarFormularioCrear() {
+    const overlay = document.getElementById('floatingFormOverlayCrear');
+    if (overlay) {
+        overlay.classList.remove('show');
+        document.body.style.overflow = 'auto';
+        
+        // Limpiar formulario
+        const form = document.getElementById('crearCursoForm');
+        if (form) {
+            form.reset();
+            removeFileCrear();
+        }
+    }
+}
+
+function mostrarFormularioEditar(cursoId) {
+    const overlay = document.getElementById('floatingFormOverlayEditar' + cursoId);
+    if (overlay) {
+        overlay.classList.add('show');
+        document.body.style.overflow = 'hidden';
+        
+        // Configurar zona de arrastre para editar
+        setupDropZoneEdit(cursoId);
+        
+        // Enfocar el primer campo
+        setTimeout(() => {
+            const firstInput = overlay.querySelector('input[name="nombre"]');
+            if (firstInput) firstInput.focus();
+        }, 300);
+    }
+}
+
+function ocultarFormularioEditar(cursoId) {
+    const overlay = document.getElementById('floatingFormOverlayEditar' + cursoId);
+    if (overlay) {
+        overlay.classList.remove('show');
+        document.body.style.overflow = 'auto';
+    }
+}
+
+/* ===== CONFIGURACIÓN DE EVENT LISTENERS PARA FORMULARIOS FLOTANTES ===== */
+document.addEventListener('DOMContentLoaded', function() {
+    // Botón flotante para crear
+    const openFloatingBtn = document.getElementById('openFloatingFormCrear');
+    if (openFloatingBtn) {
+        openFloatingBtn.addEventListener('click', mostrarFormularioCrear);
+    }
+    
+    // Botón de cerrar en crear
+    const closeFloatingCrear = document.getElementById('closeFloatingFormCrear');
+    if (closeFloatingCrear) {
+        closeFloatingCrear.addEventListener('click', ocultarFormularioCrear);
+    }
+    
+    // Botón cancelar en crear
+    const cancelFloatingCrear = document.getElementById('cancelFloatingFormCrear');
+    if (cancelFloatingCrear) {
+        cancelFloatingCrear.addEventListener('click', ocultarFormularioCrear);
+    }
+    
+    // Cerrar overlay al hacer clic fuera
+    document.querySelectorAll('.floating-form-overlay').forEach(overlay => {
+        overlay.addEventListener('click', function(e) {
+            if (e.target === this) {
+                const overlayId = this.id;
+                if (overlayId === 'floatingFormOverlayCrear') {
+                    ocultarFormularioCrear();
+                } else if (overlayId.includes('floatingFormOverlayEditar')) {
+                    const cursoId = overlayId.replace('floatingFormOverlayEditar', '');
+                    ocultarFormularioEditar(cursoId);
+                }
+            }
+        });
+    });
+    
+    // Configurar zonas de arrastre si hay cursos
+    if (typeof djangoVariables !== 'undefined' && djangoVariables.cursos_ids) {
+        djangoVariables.cursos_ids.forEach(cursoId => {
+            setupDropZoneEdit(cursoId);
+        });
+    }
+    
+    // Configurar zona de arrastre para crear
+    setupDropZoneCrear();
+});
+
+/* ===== ZONA DE ARRASTRE PARA CREAR CURSO ===== */
+function setupDropZoneCrear() {
+    const dropZoneCrear = document.getElementById('dropZoneCrear');
+    const imagenInputCrear = document.getElementById('imagenInputCrear');
+    const filePreviewCrear = document.getElementById('filePreviewCrear');
+    
+    if (!dropZoneCrear || !imagenInputCrear) return;
+    
     dropZoneCrear.addEventListener('click', () => {
         imagenInputCrear.click();
     });
@@ -131,15 +218,15 @@ if (dropZoneCrear) {
             imagenInputCrear.files = dataTransfer.files;
         }
     });
-}
 
-if (imagenInputCrear) {
-    imagenInputCrear.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            handleFileSelectionCrear(file);
-        }
-    });
+    if (imagenInputCrear) {
+        imagenInputCrear.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                handleFileSelectionCrear(file);
+            }
+        });
+    }
 }
 
 /* ===== FUNCIÓN PARA MANEJAR LA SELECCIÓN DE ARCHIVOS EN CREAR ===== */
@@ -183,16 +270,22 @@ function handleFileSelectionCrear(file) {
             </div>
         `;
         
-        filePreviewCrear.innerHTML = previewHTML;
-        filePreviewCrear.style.display = 'block';
+        const filePreviewCrear = document.getElementById('filePreviewCrear');
+        if (filePreviewCrear) {
+            filePreviewCrear.innerHTML = previewHTML;
+            filePreviewCrear.style.display = 'block';
+        }
         
-        const dropText = dropZoneCrear.querySelector('.drop-text');
-        const dropSubtext = dropZoneCrear.querySelector('.drop-subtext');
-        const dropIcon = dropZoneCrear.querySelector('i');
-        
-        dropIcon.style.color = 'var(--primary-orange)';
-        dropText.innerHTML = `<span style="color: var(--primary-orange); font-weight: 600;">Imagen seleccionada</span>`;
-        dropSubtext.innerHTML = `<span style="color: var(--primary-orange);" title="${fileName}">${displayName}</span>`;
+        const dropZoneCrear = document.getElementById('dropZoneCrear');
+        if (dropZoneCrear) {
+            const dropText = dropZoneCrear.querySelector('.drop-text');
+            const dropSubtext = dropZoneCrear.querySelector('.drop-subtext');
+            const dropIcon = dropZoneCrear.querySelector('i');
+            
+            if (dropIcon) dropIcon.style.color = 'var(--primary-orange)';
+            if (dropText) dropText.innerHTML = `<span style="color: var(--primary-orange); font-weight: 600;">Imagen seleccionada</span>`;
+            if (dropSubtext) dropSubtext.innerHTML = `<span style="color: var(--primary-orange);" title="${fileName}">${displayName}</span>`;
+        }
     };
     reader.readAsDataURL(file);
 }
@@ -217,26 +310,16 @@ function removeFileCrear() {
         const dropText = dropZone.querySelector('.drop-text');
         const dropSubtext = dropZone.querySelector('.drop-subtext');
         
-        dropIcon.style.color = '#adb5bd';
-        dropText.innerHTML = 'Arrastra y suelta la imagen aquí';
-        dropSubtext.innerHTML = 'o haz clic para seleccionar';
+        if (dropIcon) dropIcon.style.color = '#adb5bd';
+        if (dropText) dropText.innerHTML = 'Arrastra y suelta la imagen aquí';
+        if (dropSubtext) dropSubtext.innerHTML = 'o haz clic para seleccionar';
     }
-}
-
-/* ===== FUNCIÓN PARA FORMATEAR EL TAMAÑO DEL ARCHIVO ===== */
-function formatFileSize(bytes) {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
 /* ===== ZONA DE ARRASTRE PARA EDITAR CURSO ===== */
 function setupDropZoneEdit(cursoId) {
     const dropZone = document.getElementById(`dropZoneEditar${cursoId}`);
     const imagenInput = document.getElementById(`imagenInputEditar${cursoId}`);
-    const filePreview = document.getElementById(`filePreviewEditar${cursoId}`);
     
     if (!dropZone || !imagenInput) return;
     
@@ -344,8 +427,13 @@ function handleFileSelectionEdit(file, cursoId) {
                 dropIcon.style.color = 'var(--primary-orange)';
             }
             
-            dropText.innerHTML = `<span style="color: var(--primary-orange); font-weight: 600;">Nueva imagen seleccionada</span>`;
-            dropSubtext.innerHTML = `<span style="color: var(--primary-orange);" title="${fileName}">${displayName}</span>`;
+            if (dropText) {
+                dropText.innerHTML = `<span style="color: var(--primary-orange); font-weight: 600;">Nueva imagen seleccionada</span>`;
+            }
+            
+            if (dropSubtext) {
+                dropSubtext.innerHTML = `<span style="color: var(--primary-orange);" title="${fileName}">${displayName}</span>`;
+            }
         }
     };
     reader.readAsDataURL(file);
@@ -377,17 +465,26 @@ function removeFileEdit(cursoId) {
             if (currentImageText) {
                 currentImageText.style.display = 'block';
             }
-            dropText.innerHTML = 'Arrastra una nueva imagen';
-            dropSubtext.innerHTML = 'o haz clic para cambiar';
+            if (dropText) dropText.innerHTML = 'Arrastra una nueva imagen';
+            if (dropSubtext) dropSubtext.innerHTML = 'o haz clic para cambiar';
         } else {
-            dropText.innerHTML = 'Arrastra y suelta la imagen aquí';
-            dropSubtext.innerHTML = 'o haz clic para seleccionar';
+            if (dropText) dropText.innerHTML = 'Arrastra y suelta la imagen aquí';
+            if (dropSubtext) dropSubtext.innerHTML = 'o haz clic para seleccionar';
         }
         
         if (dropIcon) {
             dropIcon.style.color = '#adb5bd';
         }
     }
+}
+
+/* ===== FUNCIÓN PARA FORMATEAR EL TAMAÑO DEL ARCHIVO ===== */
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
 /* ===== FUNCIÓN PARA MOSTRAR ALERTA DE ERROR ===== */
@@ -422,39 +519,3 @@ function mostrarAlertaError(mensaje) {
         }
     }, 5000);
 }
-
-/* ===== CONFIGURAR ZONAS DE ARRASTRE ===== */
-document.addEventListener('DOMContentLoaded', function() {
-    // Configurar zonas de arrastre si hay cursos
-    if (typeof djangoVariables !== 'undefined' && djangoVariables.cursos_ids) {
-        djangoVariables.cursos_ids.forEach(cursoId => {
-            setupDropZoneEdit(cursoId);
-        });
-    }
-    
-    // Auto-focus en el primer campo del formulario de crear
-    if (typeof djangoVariables !== 'undefined' && djangoVariables.mostrar_modal_crear) {
-        setTimeout(() => {
-            const modalCrear = document.getElementById('modalCrearCurso');
-            if (modalCrear) {
-                const firstInput = modalCrear.querySelector('input[name="nombre"]');
-                if (firstInput) firstInput.focus();
-            }
-        }, 300);
-    }
-    
-    // Ajustar el texto truncado en las zonas de arrastre
-    function adjustDropZoneText() {
-        document.querySelectorAll('.drop-zone .drop-subtext').forEach(textElement => {
-            const text = textElement.textContent || textElement.innerText;
-            if (text.length > 35) {
-                const truncated = text.substring(0, 32) + '...';
-                textElement.textContent = truncated;
-                textElement.title = text;
-            }
-        });
-    }
-    
-    // Ejecutar ajuste inicial
-    setTimeout(adjustDropZoneText, 100);
-});

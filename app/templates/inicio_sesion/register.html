@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro - Estudiosos</title>
+    <link rel="icon" href="{% static 'img/Logo tipo Estudiosos_Mesa de trabajo 1 copia 1 (2) (1).png' %}" type="image/x-icon">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="{% static 'css/inicio_sesion/register.css' %}">
@@ -48,7 +49,7 @@
             <div class="shape shape-3"></div>
             
             <div class="welcome-content-wrapper">
-                <a href="#" class="logo-container" title="Ir al inicio">
+                <a href="{% url 'index' %}" class="logo-container" title="Ir al inicio">
                     <div class="logo">
                         <img src="{% static 'img/Logo tipo Estudiosos_Mesa de trabajo 1 copia 14.png' %}" alt="Logo Estudiosos">
                     </div>
@@ -324,7 +325,15 @@
                 <!-- Checkbox Términos -->
                 <div class="terms-checkbox">
                     <input type="checkbox" name="agree-term" id="agree-term" required />
-                    <label for="agree-term">Acepto los <a href="#" class="term-service">Términos de servicio</a></label>
+                    <label for="agree-term">
+                        Acepto los 
+                        <a href="{% static 'archive/Terminos_y_Condiciones_Estudiosos.pdf' %}" 
+                        class="term-service" 
+                        target="_blank" 
+                        rel="noopener noreferrer">
+                        Términos de servicio
+                        </a>
+                    </label>
                 </div>
 
                 <!-- Botón Registrar -->

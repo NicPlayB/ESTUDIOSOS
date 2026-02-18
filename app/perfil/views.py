@@ -43,6 +43,7 @@ def perfil_usuario(request):
         'rol': rol
     })
 
+@login_requerido
 def actualizar_campo_individual(request, usuario):
     """Maneja la actualización de un solo campo"""
     field_name = request.POST.get('field_name')
